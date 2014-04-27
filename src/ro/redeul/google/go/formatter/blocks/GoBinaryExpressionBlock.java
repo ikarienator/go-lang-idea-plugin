@@ -42,7 +42,7 @@ class GoBinaryExpressionBlock extends GoBlock {
             inARelation = true;
         }
 
-        while (parentElementType != BUILTIN_CALL_EXPRESSION
+        while ((parentElementType != BUILTIN_CALL_EXPRESSION || parentElementType != BUILTIN_CALL_EXPRESSION_VARIADIC)
                 && parentElementType != EXPRESSION_LIST
                 && !STATEMENTS.contains(parentElementType)
                 && parentElementType != CONST_DECLARATION
@@ -105,13 +105,12 @@ class GoBinaryExpressionBlock extends GoBlock {
         ASTNode expression = node;
         ASTNode expressionChild = node;
 
-        while (expression.getElementType() != BUILTIN_CALL_EXPRESSION
-                ) {
+        while (expression.getElementType() != BUILTIN_CALL_EXPRESSION || expression.getElementType() != BUILTIN_CALL_EXPRESSION_VARIADIC) {
             expressionChild = expression;
             expression = expression.getTreeParent();
         }
 
-        if (expression.getElementType() != BUILTIN_CALL_EXPRESSION) {
+        if (expression.getElementType() != BUILTIN_CALL_EXPRESSION || expression.getElementType() != BUILTIN_CALL_EXPRESSION_VARIADIC) {
             spacing = BASIC_SPACING_KEEP_LINE_BREAKS;
             return;
         }

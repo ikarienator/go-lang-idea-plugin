@@ -1,6 +1,7 @@
 package ro.redeul.google.go.lang.parser.parsing.expressions;
 
 import com.intellij.lang.PsiBuilder;
+import com.intellij.psi.tree.IElementType;
 import ro.redeul.google.go.GoBundle;
 import ro.redeul.google.go.lang.completion.GoCompletionContributor;
 import ro.redeul.google.go.lang.lexer.GoTokenTypes;
@@ -242,6 +243,8 @@ class PrimaryExpression implements GoElementTypes {
                                                  GoParser parser,
                                                  PsiBuilder.Marker mark) {
         boolean allowComposite = parser.resetFlag(AllowCompositeLiteral, true);
+        IElementType elementType = CALL_OR_CONVERSION_EXPRESSION;
+
         ParserUtils.getToken(builder, pLPAREN);
 
         if (builder.getTokenType() != pRPAREN) {
@@ -251,11 +254,15 @@ class PrimaryExpression implements GoElementTypes {
             } else {
                 expressionList.drop();
             }
+            if (ParserUtils.getToken(builder, oTRIPLE_DOT)) {
+                elementType = CALL_OR_CONVERSION_EXPRESSION_VARIADIC;
+            }
+            ParserUtils.getToken(builder, oCOMMA);
         }
 
         ParserUtils.getToken(builder, pRPAREN, "closed.parenthesis.expected");
 
-        mark.done(CALL_OR_CONVERSION_EXPRESSION);
+        mark.done(elementType);
         parser.resetFlag(AllowCompositeLiteral, allowComposite);
         return true;
     }

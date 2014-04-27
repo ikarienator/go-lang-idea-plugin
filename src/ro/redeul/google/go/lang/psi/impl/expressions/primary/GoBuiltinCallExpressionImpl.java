@@ -50,6 +50,10 @@ public class GoBuiltinCallExpressionImpl extends GoCallOrConvExpressionImpl
         super(node);
     }
 
+    public GoBuiltinCallExpressionImpl(@NotNull ASTNode node, boolean variadic) {
+        super(node, variadic);
+    }
+
     @Override
     protected GoType[] resolveTypes() {
         PsiElement reference = resolveSafely(getBaseExpression(),

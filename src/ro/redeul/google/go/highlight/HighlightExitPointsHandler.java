@@ -89,7 +89,9 @@ public class HighlightExitPointsHandler extends HighlightUsagesHandlerBase<PsiEl
         }
 
         PsiElement parent = element.getParent();
-        return !(!(parent instanceof GoLiteralExpression) || parent.getStartOffsetInParent() != 0) && isNodeOfType(parent.getParent(), GoElementTypes.BUILTIN_CALL_EXPRESSION);
+        return !(!(parent instanceof GoLiteralExpression) || parent.getStartOffsetInParent() != 0) &&
+                (isNodeOfType(parent.getParent(), GoElementTypes.BUILTIN_CALL_EXPRESSION) ||
+                        isNodeOfType(parent.getParent(), GoElementTypes.BUILTIN_CALL_EXPRESSION_VARIADIC));
 
     }
 }

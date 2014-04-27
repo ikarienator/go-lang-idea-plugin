@@ -2,6 +2,7 @@ package ro.redeul.google.go.lang.parser.parsing.expressions;
 
 import com.google.common.collect.ImmutableSet;
 import com.intellij.lang.PsiBuilder;
+import com.intellij.psi.tree.IElementType;
 import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.parser.GoParser;
 import ro.redeul.google.go.lang.parser.parsing.util.ParserUtils;
@@ -70,6 +71,7 @@ class BuiltInCallExpression implements GoElementTypes {
     public static boolean parse(PsiBuilder builder, GoParser parser) {
 
         String callName = builder.getTokenText();
+        IElementType elementType = BUILTIN_CALL_EXPRESSION;
 
         if (!ParserUtils.lookAhead(builder, mIDENT, pLPAREN))
             return false;
@@ -92,16 +94,20 @@ class BuiltInCallExpression implements GoElementTypes {
 
         if (builder.getTokenType() != pRPAREN) {
             PsiBuilder.Marker expressionList = builder.mark();
-            if (parser.parseExpressionList(builder) > 1) {
+            if (parser.parseExpressionList(builder) > 1 || hasTypeParameter.contains(callName)) {
                 expressionList.done(GoElementTypes.EXPRESSION_LIST);
             } else {
                 expressionList.drop();
             }
+            if (ParserUtils.getToken(builder, oTRIPLE_DOT)) {
+                elementType = BUILTIN_CALL_EXPRESSION_VARIADIC;
+            }
+            ParserUtils.getToken(builder, oCOMMA);
         }
 
         ParserUtils.getToken(builder, pRPAREN, "closed.parenthesis.expected");
 
-        mark.done(BUILTIN_CALL_EXPRESSION);
+        mark.done(elementType);
 
         return true;
     }

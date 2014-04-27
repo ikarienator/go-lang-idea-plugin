@@ -68,7 +68,8 @@ public class GoBlockGenerator {
             if (node.getTreeParent().getElementType() == GoElementTypes.LITERAL_COMPOSITE_VALUE) {
                 ASTNode nodeParent = node;
                 while (nodeParent != null) {
-                    if (nodeParent.getElementType() == GoElementTypes.CALL_OR_CONVERSION_EXPRESSION) {
+                    if (nodeParent.getElementType() == GoElementTypes.CALL_OR_CONVERSION_EXPRESSION ||
+                            nodeParent.getElementType() == GoElementTypes.CALL_OR_CONVERSION_EXPRESSION_VARIADIC) {
                         return new GoLeafBlock(node, null, indent, NO_WRAP, styleSettings);
                     }
 
