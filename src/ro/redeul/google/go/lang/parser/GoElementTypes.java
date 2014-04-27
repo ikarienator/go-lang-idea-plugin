@@ -99,6 +99,9 @@ public interface GoElementTypes extends GoTokenTypes {
 
     GoElementType CALL_OR_CONVERSION_EXPRESSION =
         new GoElementTypeImpl("CallOrConversionExpression");
+    GoElementType CALL_OR_CONVERSION_EXPRESSION_VARIADIC =
+        new GoElementTypeImpl("CallOrConversionExpressionVariadic");
+
     GoElementType INDEX_EXPRESSION =
         new GoElementTypeImpl("IndexExpression");
     GoElementType SLICE_EXPRESSION =
@@ -117,6 +120,8 @@ public interface GoElementTypes extends GoTokenTypes {
         new GoElementTypeImpl("SelectorExpression");
     GoElementType BUILTIN_CALL_EXPRESSION =
         new GoElementTypeImpl("BuiltInCallExpression");
+    GoElementType BUILTIN_CALL_EXPRESSION_VARIADIC =
+            new GoElementTypeImpl("BuiltInCallExpressionVariadic");
 
     GoElementType EXPRESSION_LIST =
         new GoElementTypeImpl("ExpressionList");
@@ -277,9 +282,10 @@ public interface GoElementTypes extends GoTokenTypes {
         ADD_EXPRESSION, MUL_EXPRESSION, REL_EXPRESSION, COM_EXPRESSION,
         LOG_AND_EXPRESSION, LOG_OR_EXPRESSION,
         CALL_OR_CONVERSION_EXPRESSION,
+        CALL_OR_CONVERSION_EXPRESSION_VARIADIC,
         INDEX_EXPRESSION, SLICE_EXPRESSION, TYPE_ASSERTION_EXPRESSION,
         UNARY_EXPRESSION, SELECTOR_EXPRESSION,
-        BUILTIN_CALL_EXPRESSION, LITERAL_FUNCTION,
+        BUILTIN_CALL_EXPRESSION, BUILTIN_CALL_EXPRESSION_VARIADIC, LITERAL_FUNCTION,
         LITERAL_COMPOSITE_ELEMENT
     );
 
@@ -302,7 +308,9 @@ public interface GoElementTypes extends GoTokenTypes {
 
     public final TokenSet FUNCTION_CALL_SETS = TokenSet.create(
             CALL_OR_CONVERSION_EXPRESSION,
-            BUILTIN_CALL_EXPRESSION
+            CALL_OR_CONVERSION_EXPRESSION_VARIADIC,
+            BUILTIN_CALL_EXPRESSION,
+            BUILTIN_CALL_EXPRESSION_VARIADIC
     );
 
     GoElementType METHOD_EXPRESSION = new GoElementTypeImpl("MethodExpression");

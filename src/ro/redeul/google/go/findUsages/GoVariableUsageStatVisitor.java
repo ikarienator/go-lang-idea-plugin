@@ -284,7 +284,8 @@ public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
         }
 
         PsiElement grandpa = id.getParent().getParent();
-        return grandpa.getNode().getElementType() == GoElementTypes.CALL_OR_CONVERSION_EXPRESSION &&
+        return (grandpa.getNode().getElementType() == GoElementTypes.CALL_OR_CONVERSION_EXPRESSION ||
+                grandpa.getNode().getElementType() == GoElementTypes.CALL_OR_CONVERSION_EXPRESSION_VARIADIC) &&
                 id.getParent().isEquivalentTo(grandpa.getFirstChild());
     }
 

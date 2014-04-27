@@ -31,8 +31,16 @@ import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.resolveSafely;
 
 public class GoCallOrConvExpressionImpl extends GoExpressionBase
         implements GoCallOrConvExpression {
+    private boolean variadic;
+
     public GoCallOrConvExpressionImpl(@NotNull ASTNode node) {
         super(node);
+        variadic = false;
+    }
+
+    public GoCallOrConvExpressionImpl(@NotNull ASTNode node, boolean variadic) {
+        super(node);
+        this.variadic = variadic;
     }
 
     @Override
@@ -164,5 +172,10 @@ public class GoCallOrConvExpressionImpl extends GoExpressionBase
         }
 
         return false;
+    }
+
+    @Override
+    public boolean isVariadic() {
+        return variadic;
     }
 }

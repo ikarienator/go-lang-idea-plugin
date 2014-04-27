@@ -223,6 +223,9 @@ class GoPsiCreator implements GoElementTypes {
         if (elementType.equals(CALL_OR_CONVERSION_EXPRESSION))
             return new GoCallOrConvExpressionImpl(node);
 
+        if (elementType.equals(CALL_OR_CONVERSION_EXPRESSION_VARIADIC))
+            return new GoCallOrConvExpressionImpl(node, true);
+
         if (elementType.equals(FOR_WITH_CONDITION_STATEMENT))
             return new GoForWithConditionStatementImpl(node);
 
@@ -237,6 +240,9 @@ class GoPsiCreator implements GoElementTypes {
 
         if (elementType.equals(BUILTIN_CALL_EXPRESSION))
             return new GoBuiltinCallExpressionImpl(node);
+
+        if (elementType.equals(BUILTIN_CALL_EXPRESSION_VARIADIC))
+            return new GoBuiltinCallExpressionImpl(node, true);
 
         if (elementType.equals(ASSIGN_STATEMENT))
             return new GoAssignmentStatementImpl(node);
