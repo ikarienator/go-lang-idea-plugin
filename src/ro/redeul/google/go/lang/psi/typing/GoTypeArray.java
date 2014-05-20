@@ -1,46 +1,35 @@
 package ro.redeul.google.go.lang.psi.typing;
 
-import ro.redeul.google.go.lang.psi.types.GoPsiType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import ro.redeul.google.go.inspection.InspectionUtil;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeArray;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeArray;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
 
-public class GoTypeArray extends GoAbstractType<GoUnderlyingTypeArray> implements GoType {
+public class GoTypeArray extends GoTypeBase<GoPsiTypeArray> {
 
+    @NotNull
     private final GoType elementType;
-    private GoPsiType elementPsiType = null;
 
-    public GoTypeArray(GoPsiTypeArray type) {
-        this(GoTypes.fromPsiType(type.getElementType()));
-        elementPsiType = type;
-    }
+    private final int length;
 
-    public GoTypeArray(GoType elementType) {
+    public GoTypeArray(@Nullable GoPsiTypeArray psiType, @NotNull GoType elementType, int length) {
+        super(psiType);
         this.elementType = elementType;
-        setUnderlyingType(GoUnderlyingTypes.getArray(elementType.getUnderlyingType(), 1));
-    }
-
-    public GoPsiType getPsiType() {
-        return elementPsiType;
+        this.length = length;
     }
 
     @Override
-    public boolean isIdentical(GoType type) {
-        if (!(type instanceof GoTypeArray)) {
-            return false;
+    public boolean isIdentical(GoType other) {
+        if (this == other) return true;
+        if (other instanceof GoTypeArray) {
+            GoTypeArray otherArray = (GoTypeArray) other;
+            return !(this.length == InspectionUtil.UNKNOWN_COUNT || otherArray.length == InspectionUtil.UNKNOWN_COUNT || length == otherArray.length) && otherArray.elementType.isIdentical(elementType);
         }
-
-        GoTypeArray otherArray = (GoTypeArray) type;
-
-        return elementType.isIdentical(otherArray.getElementType());
+        return false;
     }
 
+    @NotNull
     public GoType getElementType() {
         return elementType;
-    }
-
-    @Override
-    public void accept(Visitor visitor) {
-        visitor.visitTypeArray(this);
     }
 }

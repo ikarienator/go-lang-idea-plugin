@@ -3,9 +3,9 @@ package ro.redeul.google.go.lang.psi.impl.toplevel;
 import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.parser.GoElementTypes;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.impl.GoPsiElementBase;
-import ro.redeul.google.go.lang.psi.impl.expressions.literals.GoLiteralIdentifierImpl;
+import ro.redeul.google.go.lang.psi.impl.expressions.primary.GoIdentifierImpl;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
@@ -33,8 +33,8 @@ public class GoFunctionParameterImpl extends GoPsiElementBase implements GoFunct
     }
 
     @Override
-    public GoLiteralIdentifier[] getIdentifiers() {
-        return findChildrenByClass(GoLiteralIdentifierImpl.class);
+    public GoIdentifier[] getIdentifiers() {
+        return findChildrenByClass(GoIdentifierImpl.class);
     }
 
     @Override
@@ -52,9 +52,9 @@ public class GoFunctionParameterImpl extends GoPsiElementBase implements GoFunct
     public String getPresentationTailText() {
         StringBuilder presentationText = new StringBuilder();
 
-        GoLiteralIdentifier[] identifiers = getIdentifiers();
+        GoIdentifier[] identifiers = getIdentifiers();
         for (int i = 0; i < identifiers.length; i++) {
-            GoLiteralIdentifier identifier = identifiers[i];
+            GoIdentifier identifier = identifiers[i];
 
             presentationText.append(identifier.getName());
             if (i < identifiers.length - 1) {

@@ -47,7 +47,7 @@ public class GoPsiStringsTest extends GoPsiTestCase {
                   ).getLiteral()
             );
 
-        assertEquals(GoLiteral.Type.InterpretedString, string.getType());
+        assertEquals(GoLiteral.Type.InterpretedString, string.getConstantType());
         assertEquals("a", string.getValue());
 
         string =
@@ -59,7 +59,7 @@ public class GoPsiStringsTest extends GoPsiTestCase {
                   ).getLiteral()
             );
 
-        assertEquals(GoLiteral.Type.RawString, string.getType());
+        assertEquals(GoLiteral.Type.RawString, string.getConstantType());
         assertEquals("b", string.getValue());
 
 
@@ -72,7 +72,7 @@ public class GoPsiStringsTest extends GoPsiTestCase {
                         ).getLiteral()
                 );
 
-        assertEquals(GoLiteral.Type.InterpretedString, string.getType());
+        assertEquals(GoLiteral.Type.InterpretedString, string.getConstantType());
         assertEquals("本", string.getValue());
 
         string =
@@ -84,7 +84,7 @@ public class GoPsiStringsTest extends GoPsiTestCase {
                         ).getLiteral()
                 );
 
-        assertEquals(GoLiteral.Type.InterpretedString, string.getType());
+        assertEquals(GoLiteral.Type.InterpretedString, string.getConstantType());
         assertEquals("ሴ", string.getValue());
 
     }
@@ -146,7 +146,7 @@ public class GoPsiStringsTest extends GoPsiTestCase {
                             ).getLiteral()
                     );
 
-            assertEquals(GoLiteral.Type.InterpretedString, string.getType());
+            assertEquals(GoLiteral.Type.InterpretedString, string.getConstantType());
             assertEquals(GoElementTypes.LITERAL_CHAR, string.getNode().getElementType());
             assertEquals(value, GoPsiUtils.getRuneValue(string.getText()));
         }

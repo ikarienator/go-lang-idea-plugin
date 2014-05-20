@@ -1,64 +1,44 @@
 package ro.redeul.google.go.lang.psi.typing;
 
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import ro.redeul.google.go.lang.psi.expressions.GoExpr;
+import ro.redeul.google.go.lang.psi.types.GoPsiType;
 
-/**
- * // TODO: mtoader ! Please explain yourself.
- */
 public interface GoType {
 
-    GoType[] EMPTY_ARRAY = new GoType[0];
+    public static GoType[] EMPTY_ARRAY = new GoType[0];
 
-    static final GoType Unknown = new GoType() {
-
+    public static GoType Undefined = new GoType() {
         @Override
-        public boolean isIdentical(GoType type) {
-            return type != null && type == this;
+        public boolean isIdentical(GoType other) {
+            return false;
         }
 
         @Override
-        public GoUnderlyingType getUnderlyingType() {
-            return GoUnderlyingType.Undefined;
+        public boolean isAssignableFrom(@NotNull GoExpr x) {
+            return false;
         }
 
+        @Nullable
         @Override
-        public void accept(Visitor visitor) {
+        public GoPsiType getPsiType() {
+            return null;
+        }
 
+
+        @Override
+        public String toString() {
+            return "undefined";
         }
     };
 
-    boolean isIdentical(GoType type);
+    boolean isIdentical(GoType other);
 
-    GoUnderlyingType getUnderlyingType();
+    boolean isAssignableFrom(@NotNull GoExpr x);
 
-    void accept(Visitor visitor);
+    @Nullable
+    GoPsiType getPsiType();
 
-    public class Visitor<T> {
-
-        T data;
-
-        public Visitor(T data) {
-            this.data = data;
-        }
-
-        public T visit(GoType node) {
-            node.accept(this);
-            return data;
-        }
-        protected void setData(T data) {
-            this.data = data;
-        }
-
-        protected void visitTypeArray(GoTypeArray array) { }
-
-        public void visitTypeChannel(GoTypeChannel channel) { }
-
-        public void visitTypeName(GoTypeName name) { }
-
-        public void visitTypeSlice(GoTypeSlice slice) { }
-
-        public void visitTypePointer(GoTypePointer pointer) { }
-
-        public void visitTypeMap(GoTypeMap map) { }
-    }
+    // method sets
 }

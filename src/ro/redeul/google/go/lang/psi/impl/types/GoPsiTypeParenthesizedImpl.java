@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.impl.GoPsiPackagedElementBase;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeParenthesized;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
+import ro.redeul.google.go.lang.psi.typing.GoType;
 
 public class GoPsiTypeParenthesizedImpl extends GoPsiPackagedElementBase
     implements GoPsiTypeParenthesized
@@ -20,14 +20,8 @@ public class GoPsiTypeParenthesizedImpl extends GoPsiPackagedElementBase
     }
 
     @Override
-    public GoUnderlyingType getUnderlyingType() {
-        return getInnerType().getUnderlyingType();
-    }
-
-    @Override
-    public boolean isIdentical(GoPsiType goType) {
-        // TODO: implement this
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    public GoType resolveType() {
+        return getInnerType().getType();
     }
 
     @Override

@@ -9,12 +9,12 @@ public interface GoLiteral<T> extends GoPsiElement {
         RawString, InterpretedString,
         Bool, Char,
         Int, ImaginaryInt,
-        Float, Identifier, ImaginaryFloat,
+        Float, ImaginaryFloat,
         Composite, Function
     }
 
     @NotNull
     T getValue();
 
-    Type getType();
+    Type getConstantType();
 }

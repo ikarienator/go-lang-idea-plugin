@@ -4,12 +4,10 @@ import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.impl.GoPsiPackagedElementBase;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
-import ro.redeul.google.go.lang.psi.toplevel.GoMethodDeclaration;
-import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeInterface;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
+import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeInterface;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 
 /**
@@ -26,28 +24,22 @@ public class GoPsiTypeInterfaceImpl extends GoPsiPackagedElementBase implements
     }
 
     @Override
-    public GoUnderlyingType getUnderlyingType() {
-        return GoUnderlyingTypes.getInterface();
-    }
+    public GoType resolveType() {
+        GoFunctionDeclaration[] decls = getFunctionDeclarations();
+        String[] functionNames = new String[decls.length];
+        GoType[] functionDeclTypes = new GoType[decls.length];
+        int i = 0;
+        for (GoFunctionDeclaration decl : decls) {
+            functionNames[i] = decl.getFunctionName();
+            functionDeclTypes[i++] = decl.getType();
+        }
 
-    @Override
-    public boolean isIdentical(GoPsiType goType) {
-        //if (!(goType instanceof GoPsiTypeInterface))
-        //    return false;
-        //TODO: this may need to be changed later
-        //Right now the only interface{} expressions are getting this type
-        return goType instanceof GoPsiTypeInterface;
+        return new GoTypeInterface(this, functionNames, functionDeclTypes);
     }
 
     @Override
     public void accept(GoElementVisitor visitor) {
         visitor.visitInterfaceType(this);
-    }
-
-    @Override
-    public GoMethodDeclaration[] getMethodSet() {
-//        return declarations;
-        return GoMethodDeclaration.EMPTY_ARRAY;
     }
 
     @Override

@@ -10,10 +10,9 @@ import ro.redeul.google.go.intentions.Intention;
 import ro.redeul.google.go.intentions.IntentionExecutionException;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.statements.GoExpressionStatement;
-import ro.redeul.google.go.lang.psi.types.GoPsiType;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
 import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypePsiBacked;
+import ro.redeul.google.go.lang.psi.typing.GoTypeBuiltin;
+import ro.redeul.google.go.lang.psi.typing.GoTypeNamed;
 import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
 import ro.redeul.google.go.util.GoUtil;
 
@@ -38,12 +37,10 @@ public class CheckErrorIntention extends Intention {
             if (expr != null) {
                 for (GoType goType : expr.getType()) {
                     if (goType != null) {
-                        if (goType instanceof GoTypePsiBacked) {
-                            GoPsiType psiType = GoTypeUtils.resolveToFinalType(((GoTypePsiBacked) goType).getPsiType());
-                            if (psiType instanceof GoPsiTypeName) {
-                                if (psiType.getText().equals("error") && ((GoPsiTypeName) psiType).isPrimitive())
-                                    return true;
-                            }
+                        goType = GoTypeUtils.resolveToFinalType(goType);
+                        if (goType instanceof GoTypeNamed) {
+                            if (((GoTypeNamed) goType).getName().equals("error") || goType.isIdentical(GoTypeBuiltin.Error))
+                                return true;
                         }
                     }
                 }
@@ -78,9 +75,9 @@ public class CheckErrorIntention extends Intention {
 
                 String currentVar = String.format("$v%d$", j);
                 if (goType != null) {
-                    if (goType instanceof GoTypePsiBacked) {
-                        GoPsiType psiType = GoTypeUtils.resolveToFinalType(((GoTypePsiBacked) goType).getPsiType());
-                        if (psiType instanceof GoPsiTypeName && psiType.getText().equals("error") && ((GoPsiTypeName) psiType).isPrimitive()) {
+                    if (goType.getPsiType() != null) {
+                        goType = GoTypeUtils.resolveToFinalType(goType);
+                        if (goType instanceof GoTypeNamed && goType.isIdentical(GoTypeBuiltin.Error)) {
                             if (k.equals("err") && i != 0)
                                 k = "err0";
                             while (GoUtil.TestDeclVar(expr, k)) {

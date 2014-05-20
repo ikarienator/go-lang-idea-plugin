@@ -4,7 +4,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.BaseScopeProcessor;
 import org.jetbrains.annotations.NotNull;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.statements.GoShortVarDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
@@ -18,9 +18,9 @@ import ro.redeul.google.go.lang.psi.types.GoPsiType;
 class VariableTypeResolver extends BaseScopeProcessor {
 
     private GoPsiType type;
-    private final GoLiteralIdentifier identifier;
+    private final GoIdentifier identifier;
 
-    public VariableTypeResolver(GoLiteralIdentifier identifier) {
+    public VariableTypeResolver(GoIdentifier identifier) {
         this.identifier = identifier;
     }
 
@@ -34,9 +34,9 @@ class VariableTypeResolver extends BaseScopeProcessor {
         if ( element instanceof GoShortVarDeclaration) {
             GoShortVarDeclaration shortVarDeclaration = (GoShortVarDeclaration) element;
 
-            GoLiteralIdentifier identifiers[] = shortVarDeclaration.getIdentifiers();
+            GoIdentifier identifiers[] = shortVarDeclaration.getIdentifiers();
 
-            for (GoLiteralIdentifier identifier : identifiers) {
+            for (GoIdentifier identifier : identifiers) {
 
                 if (identifier.getName() == null) {
                     return false;
@@ -53,9 +53,9 @@ class VariableTypeResolver extends BaseScopeProcessor {
 
     private boolean checkFunctionParameters(GoFunctionParameter parameter) {
 
-        GoLiteralIdentifier[]identifiers = parameter.getIdentifiers();
+        GoIdentifier[]identifiers = parameter.getIdentifiers();
 
-        for (GoLiteralIdentifier identifier : identifiers) {
+        for (GoIdentifier identifier : identifiers) {
             if ( identifier.getText().equalsIgnoreCase(this.identifier.getText()) ) {
                 type = parameter.getType();
                 return false;

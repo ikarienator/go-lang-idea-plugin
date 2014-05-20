@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 
 import static ro.redeul.google.go.inspection.fix.FixUtil.removeWholeElement;
 
@@ -31,11 +31,11 @@ public class RemoveVariableFix implements LocalQuickFix {
     }
 
     public void applyFix(@NotNull PsiElement element) {
-        if (!(element instanceof GoLiteralIdentifier)) {
+        if (!(element instanceof GoIdentifier)) {
             return;
         }
 
-        GoLiteralIdentifier id = (GoLiteralIdentifier) element;
+        GoIdentifier id = (GoIdentifier) element;
         PsiElement parent = id.getParent();
         if (parent instanceof GoVarDeclaration) {
             GoVarDeclaration gsvd = (GoVarDeclaration) parent;
@@ -46,7 +46,7 @@ public class RemoveVariableFix implements LocalQuickFix {
         }
     }
 
-    private void removeIdentifier(GoLiteralIdentifier id, PsiElement parent, GoLiteralIdentifier[] ids, GoExpr[] exprs) {
+    private void removeIdentifier(GoIdentifier id, PsiElement parent, GoIdentifier[] ids, GoExpr[] exprs) {
         if (isIdWithBlank(id, ids)) {
             if (FixUtil.isOnlyVarDeclaration(parent) || FixUtil.isOnlyConstDeclaration(parent)) {
                 parent = parent.getParent();
@@ -75,8 +75,8 @@ public class RemoveVariableFix implements LocalQuickFix {
         }
     }
 
-    private static boolean isIdWithBlank(GoLiteralIdentifier id, GoLiteralIdentifier[] ids) {
-        for (GoLiteralIdentifier i : ids) {
+    private static boolean isIdWithBlank(GoIdentifier id, GoIdentifier[] ids) {
+        for (GoIdentifier i : ids) {
             if (!i.isBlank() && !i.isEquivalentTo(id)) {
                 return false;
             }
@@ -84,7 +84,7 @@ public class RemoveVariableFix implements LocalQuickFix {
         return true;
     }
 
-    private static int identifierIndex(GoLiteralIdentifier[] ids, GoLiteralIdentifier id) {
+    private static int identifierIndex(GoIdentifier[] ids, GoIdentifier id) {
         for (int i = 0; i < ids.length; i++) {
             if (ids[i].isEquivalentTo(id)) {
                 return i;

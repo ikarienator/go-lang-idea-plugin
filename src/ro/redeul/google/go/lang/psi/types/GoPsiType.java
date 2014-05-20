@@ -2,7 +2,8 @@ package ro.redeul.google.go.lang.psi.types;
 
 import ro.redeul.google.go.lang.psi.GoPackagedElement;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
+import ro.redeul.google.go.lang.psi.expressions.GoExpr;
+import ro.redeul.google.go.lang.psi.typing.GoType;
 
 /**
  * Author: Toader Mihai Claudiu <mtoader@gmail.com>
@@ -14,7 +15,5 @@ public interface GoPsiType extends GoPsiElement, GoPackagedElement {
 
     public static final GoPsiType[] EMPTY_ARRAY = new GoPsiType[0];
 
-    GoUnderlyingType getUnderlyingType();
-
-    boolean isIdentical(GoPsiType goType);
+    GoType getType();
 }

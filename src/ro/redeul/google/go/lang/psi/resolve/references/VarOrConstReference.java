@@ -1,37 +1,25 @@
 package ro.redeul.google.go.lang.psi.resolve.references;
 
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.patterns.ElementPattern;
-import com.intellij.patterns.PatternCondition;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
-import com.intellij.util.ProcessingContext;
-import ro.redeul.google.go.lang.psi.statements.GoForWithRangeStatement;
-import ro.redeul.google.go.lang.psi.utils.GoPsiScopesUtil;
 import com.intellij.psi.util.PsiUtilCore;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
-import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.primary.GoIdentifierExpression;
 import ro.redeul.google.go.lang.psi.processors.GoResolveStates;
 import ro.redeul.google.go.lang.psi.resolve.GoResolveResult;
 import ro.redeul.google.go.lang.psi.resolve.VarOrConstResolver;
+import ro.redeul.google.go.lang.psi.utils.GoPsiScopesUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.intellij.patterns.PlatformPatterns.psiElement;
 import static ro.redeul.google.go.util.LookupElementUtil.createLookupElement;
 
 public class VarOrConstReference
-    extends GoPsiReference.Single<GoLiteralIdentifier, VarOrConstReference> {
-
-    public static final ElementPattern<GoLiteralIdentifier> MATCHER =
-            psiElement(GoLiteralIdentifier.class)
-                    .withParent(
-                            psiElement(GoLiteralExpression.class)
-                    );
-
+        extends GoPsiReference.Single<GoIdentifier, VarOrConstReference> {
 
     private static final ResolveCache.AbstractResolver<VarOrConstReference, GoResolveResult> RESOLVER =
             new ResolveCache.AbstractResolver<VarOrConstReference, GoResolveResult>() {
@@ -50,8 +38,8 @@ public class VarOrConstReference
                 }
             };
 
-    public VarOrConstReference(GoLiteralIdentifier element) {
-        super(element, RESOLVER);
+    public VarOrConstReference(GoIdentifierExpression element) {
+        super(element.getIdentifier(), RESOLVER);
     }
 
     @Override
@@ -99,10 +87,10 @@ public class VarOrConstReference
         };
 
         GoPsiScopesUtil.treeWalkUp(
-            processor,
-            getElement().getParent().getParent(),
-            getElement().getContainingFile(),
-            GoResolveStates.initial());
+                processor,
+                getElement().getParent().getParent(),
+                getElement().getContainingFile(),
+                GoResolveStates.initial());
 
         return variants.toArray();
     }

@@ -1,38 +1,36 @@
 package ro.redeul.google.go.lang.psi.typing;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeSlice;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeSlice;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
 
-/**
- * // TODO: mtoader ! Please explain yourself.
- */
-public class GoTypeSlice extends GoTypePsiBacked<GoPsiTypeSlice, GoUnderlyingTypeSlice> implements GoType {
-
+public class GoTypeSlice extends GoTypeBase<GoPsiTypeSlice> {
+    @NotNull
     private final GoType elementType;
 
-    public GoTypeSlice(GoPsiTypeSlice type) {
-        super(type);
-
-        elementType = GoTypes.fromPsiType(type.getElementType());
-
-        setUnderlyingType(GoUnderlyingTypes.getSlice(elementType.getUnderlyingType()));
+    public GoTypeSlice(@Nullable GoPsiTypeSlice psiType, @NotNull GoType elementType) {
+        super(psiType);
+        this.elementType = elementType;
     }
 
     @Override
-    public boolean isIdentical(GoType type) {
-        if ( !(type instanceof GoTypeSlice) )
-            return false;
-
-        GoTypeSlice otherSlice = (GoTypeSlice)type;
-        return elementType.isIdentical(otherSlice.getElementType());
+    public boolean isIdentical(GoType other) {
+        if (this == other) return true;
+        if (other instanceof GoTypeSlice) {
+            GoTypeSlice otherSlice =
+                    (GoTypeSlice) other;
+            return elementType.isIdentical(otherSlice.elementType);
+        }
+        return false;
     }
 
     @Override
-    public void accept(Visitor visitor) {
-        visitor.visitTypeSlice(this);
+    public String toString() {
+        return String.format("[]%s", elementType.toString());
     }
 
+
+    @NotNull
     public GoType getElementType() {
         return elementType;
     }

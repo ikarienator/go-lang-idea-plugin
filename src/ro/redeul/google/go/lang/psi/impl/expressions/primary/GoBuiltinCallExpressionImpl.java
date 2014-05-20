@@ -11,19 +11,12 @@ import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoMethodDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoPackageDeclaration;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeMap;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeSlice;
-import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypeMap;
-import ro.redeul.google.go.lang.psi.typing.GoTypeSlice;
-import ro.redeul.google.go.lang.psi.typing.GoTypes;
+import ro.redeul.google.go.lang.psi.typing.*;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 import ro.redeul.google.go.lang.stubs.GoNamesCache;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 import static com.intellij.patterns.StandardPatterns.string;
-import static ro.redeul.google.go.lang.psi.typing.GoTypes.Builtin.*;
-import static ro.redeul.google.go.lang.psi.typing.GoTypes.getBuiltin;
 import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.resolveSafely;
 
 /**
@@ -80,7 +73,7 @@ public class GoBuiltinCallExpressionImpl extends GoCallOrConvExpressionImpl
     }
 
     @Override
-    public GoPsiType[] getArgumentsType() {
+    public GoType[] getArgumentsType() {
         PsiElement reference = resolveSafely(getBaseExpression(),
                 PsiElement.class);
 
@@ -96,10 +89,10 @@ public class GoBuiltinCallExpressionImpl extends GoCallOrConvExpressionImpl
                 return processArgumentsType(declaration.getFunctionName());
         }
 
-        return GoPsiType.EMPTY_ARRAY;
+        return GoType.EMPTY_ARRAY;
     }
 
-    private GoPsiType[] processArgumentsType(String functionName) {
+    private GoType[] processArgumentsType(String functionName) {
         GoNamesCache namesCache = GoNamesCache.getInstance(getProject());
 
         GoExpr[] args = getArguments();
@@ -109,11 +102,11 @@ public class GoBuiltinCallExpressionImpl extends GoCallOrConvExpressionImpl
             if (args.length > 1) {
                 GoType[] types = args[0].getType();
                 if (types.length > 0 && types[0] instanceof GoTypeSlice) {
-                    GoPsiTypeSlice appendedSlice = ((GoTypeSlice) types[0]).getPsiType();
-                    GoPsiType[] result = new GoPsiType[args.length];
+                    GoTypeSlice appendedSlice = (GoTypeSlice) types[0];
+                    GoType[] result = new GoType[args.length];
                     result[0] = appendedSlice;
-                    GoPsiType elem = appendedSlice.getElementType();
-                    for (int i = 1; i < args.length; i++){
+                    GoType elem = appendedSlice.getElementType();
+                    for (int i = 1; i < args.length; i++) {
                         result[i] = elem;
                     }
                     return result;
@@ -123,21 +116,19 @@ public class GoBuiltinCallExpressionImpl extends GoCallOrConvExpressionImpl
             if (args.length == 2) {
                 GoType[] types = args[0].getType();
                 if (types.length > 0 && types[0] instanceof GoTypeSlice) {
-                    GoPsiTypeSlice copiedSlice = ((GoTypeSlice) types[0]).getPsiType();
-                    return new GoPsiType[]{copiedSlice, copiedSlice};
+                    return new GoType[]{types[0], types[0]};
                 }
             }
         } else if (functionName.equals("delete")) {
             if (args.length == 2) {
                 GoType[] types = args[0].getType();
                 if (types.length > 0 && types[0] instanceof GoTypeMap) {
-                    GoPsiTypeMap map = ((GoTypeMap) types[0]).getPsiType();
-                    return new GoPsiType[]{map, map.getKeyType()};
+                    return new GoType[]{types[0], ((GoTypeMap) types[0]).getKeyType()};
                 }
             }
         }
 
-        return GoPsiType.EMPTY_ARRAY;
+        return GoType.EMPTY_ARRAY;
     }
 
     private GoType[] processBuiltinFunction(String functionName) {
@@ -150,40 +141,40 @@ public class GoBuiltinCallExpressionImpl extends GoCallOrConvExpressionImpl
         if (functionName.equals("new")) {
             if (typeArg != null) {
                 return new GoType[]{
-                        GoTypes.makePointer(typeArg)
+                        new GoTypePointer(null, typeArg.getType())
                 };
             }
         } else if (functionName.matches("^(len|cap|copy)$")) {
             return new GoType[]{
-                    getBuiltin(Int, namesCache)
+                    GoTypeBuiltin.Int
             };
         } else if (functionName.equals("complex")) {
             if (args.length > 0) {
-                if (args[0].hasType(Float32))
+                if (args[0].hasType(GoTypeBuiltin.Float32))
                     return new GoType[]{
-                            getBuiltin(Complex64, namesCache)
+                            GoTypeBuiltin.Complex64
                     };
 
-                if (args[0].hasType(Float64))
+                if (args[0].hasType(GoTypeBuiltin.Float64))
                     return new GoType[]{
-                            getBuiltin(Complex128, namesCache)
+                            GoTypeBuiltin.Complex128
                     };
 
-                if (args[0].hasType(Int))
+                if (args[0].hasType(GoTypeBuiltin.Int))
                     return new GoType[]{
-                            getBuiltin(Complex128, namesCache)
+                            GoTypeBuiltin.Complex128
                     };
             }
         } else if (functionName.matches("^(real|imag)$")) {
             if (args.length > 0) {
-                if (args[0].hasType(Complex128))
+                if (args[0].hasType(GoTypeBuiltin.Complex128))
                     return new GoType[]{
-                            getBuiltin(Float64, namesCache)
+                            GoTypeBuiltin.Float64
                     };
 
-                if (args[0].hasType(Complex64))
+                if (args[0].hasType(GoTypeBuiltin.Complex64))
                     return new GoType[]{
-                            getBuiltin(Float32, namesCache)
+                            GoTypeBuiltin.Float32
                     };
             }
         } else if (functionName.equals("make")) {

@@ -17,8 +17,8 @@ import static ro.redeul.google.go.lang.parser.parsing.declarations.FunctionOrMet
 
 class PrimaryExpression implements GoElementTypes {
 
-    private static final Pattern BOOLEAN_LITERAL = Pattern.compile("true|false");
-    private static final Pattern IOTA_LITERAL = Pattern.compile("iota");
+    private static final Pattern BOOLEAN_IDENTIFIERS = Pattern.compile("true|false");
+    private static final Pattern IOTA_IDENTIFIERS = Pattern.compile("iota");
 
     /**
      * PrimaryExpr :=
@@ -103,12 +103,11 @@ class PrimaryExpression implements GoElementTypes {
 
         PsiBuilder.Marker mark = builder.mark();
         if (builder.getTokenType() == mIDENT) {
-            if (BuiltInCallExpression.parse(builder, parser)) {
-                mark.drop();
+            if (BuiltInCallExpression.parse(builder, parser, mark)) {
                 return true;
             }
 
-            if (parseLiteralIdentifier(builder, parser)) {
+            if (parseIdentifierExpression(builder, parser, mark)) {
                 // package? '.' ident '{' -> CompositeLiteral
                 if (builder.getTokenType() == pLCURLY) {
                     if ( parser.isSet(GoParser.ParsingFlag.AllowCompositeLiteral)) {
@@ -117,8 +116,6 @@ class PrimaryExpression implements GoElementTypes {
                         }
                     }
                 }
-
-                mark.done(LITERAL_EXPRESSION);
                 return true;
             }
         }
@@ -128,7 +125,7 @@ class PrimaryExpression implements GoElementTypes {
 
         if (ParserUtils.getToken(builder, pLPAREN)) {
             if (ParserUtils.getToken(builder, oMUL)) {
-                if (parseLiteralIdentifier(builder, parser)) {
+                if (parseIdentifierExpression(builder, parser, mark)) {
                     if (ParserUtils.lookAhead(builder, pRPAREN, oDOT)) {
                         mark.rollbackTo();
                         return parseMethodExpression(builder, parser);
@@ -287,7 +284,7 @@ class PrimaryExpression implements GoElementTypes {
         }
 
         if (ParserUtils.lookAhead(builder, mIDENT)) {
-            ParserUtils.eatElement(builder, LITERAL_IDENTIFIER);
+            ParserUtils.eatElement(builder, IDENTIFIER);
         } else {
             builder.error(GoBundle.message("error.identifier.expected"));
         }
@@ -415,25 +412,28 @@ class PrimaryExpression implements GoElementTypes {
         valueElement.done(LITERAL_COMPOSITE_ELEMENT);
     }
 
-    private static boolean parseLiteralIdentifier(PsiBuilder builder,
-                                                  GoParser parser) {
+    private static boolean parseIdentifierExpression(PsiBuilder builder,
+                                                     GoParser parser,
+                                                     PsiBuilder.Marker mark) {
         String identifier = builder.getTokenText();
 
-        if (BOOLEAN_LITERAL.matcher(identifier).matches()) {
-            ParserUtils.eatElement(builder, LITERAL_BOOL);
+        if (BOOLEAN_IDENTIFIERS.matcher(identifier).matches()) {
+            ParserUtils.eatElement(builder, IDENTIFIER);
+            mark.done(LITERAL_BOOL);
             return true;
         }
 
-        if (IOTA_LITERAL.matcher(identifier).matches() && parser.isSet(
+        if (IOTA_IDENTIFIERS.matcher(identifier).matches() && parser.isSet(
             ParseIota)) {
-            ParserUtils.eatElement(builder, LITERAL_IOTA);
+            ParserUtils.eatElement(builder, IDENTIFIER);
+            mark.done(IOTA_EXPRESSION);
             return true;
         }
 
-        PsiBuilder.Marker mark = builder.mark();
-
-        if (!ParserUtils.getToken(builder, mIDENT))
+        if (!ParserUtils.lookAhead(builder, mIDENT))
             return false;
+
+        ParserUtils.eatElement(builder, IDENTIFIER);
 
         if ( identifier != null) {
             identifier = identifier.replaceAll(GoCompletionContributor.DUMMY_IDENTIFIER, "");
@@ -443,14 +443,14 @@ class PrimaryExpression implements GoElementTypes {
             ParserUtils.lookAhead(builder, oDOT)) {
             ParserUtils.getToken(builder, oDOT);
             if (ParserUtils.lookAhead(builder, mIDENT)) {
-                ParserUtils.getToken(builder, mIDENT);
+
             } else {
                 builder.error(GoBundle.message("identifier.expected"));
             }
 
         }
 
-        mark.done(GoElementTypes.LITERAL_IDENTIFIER);
+        mark.done(GoElementTypes.IDENTIFIER_EXPRESSION);
         return true;
     }
 

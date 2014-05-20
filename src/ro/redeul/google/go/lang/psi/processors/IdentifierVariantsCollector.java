@@ -15,7 +15,7 @@ import ro.redeul.google.go.lang.completion.insertHandler.FunctionInsertHandler;
 import ro.redeul.google.go.lang.documentation.DocumentUtil;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoMethodDeclaration;
 
@@ -63,11 +63,11 @@ class IdentifierVariantsCollector extends BaseScopeProcessor{
 
     private void collectVariableDeclaration(GoVarDeclaration declaration, ResolveState state) {
 
-        GoLiteralIdentifier identifiers[] = declaration.getIdentifiers();
+        GoIdentifier identifiers[] = declaration.getIdentifiers();
 
         boolean isImported = isImported(state);
 
-        for (GoLiteralIdentifier identifier : identifiers) {
+        for (GoIdentifier identifier : identifiers) {
             if ( ! isImported || GoNamesUtil.isPublicType(identifier.getName()) ) {
                 addVariant(identifier, identifier.getName(), state, PlatformIcons.VARIABLE_ICON);
             }
@@ -76,11 +76,11 @@ class IdentifierVariantsCollector extends BaseScopeProcessor{
 
     private void collectVariableDeclaration(GoConstDeclaration declaration, ResolveState state) {
 
-        GoLiteralIdentifier identifiers[] = declaration.getIdentifiers();
+        GoIdentifier identifiers[] = declaration.getIdentifiers();
 
         boolean isImported = isImported(state);
 
-        for (GoLiteralIdentifier identifier : identifiers) {
+        for (GoIdentifier identifier : identifiers) {
             if ( ! isImported || GoNamesUtil.isPublicType(identifier.getName()) ) {
                 addVariant(identifier, identifier.getName(), state, GoIcons.CONST_ICON);
             }

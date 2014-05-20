@@ -3,7 +3,7 @@ package ro.redeul.google.go.lang.psi.impl.toplevel;
 import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.lexer.GoTokenTypes;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.impl.GoPsiElementBase;
 import ro.redeul.google.go.lang.psi.toplevel.GoMethodReceiver;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
@@ -17,8 +17,8 @@ public class GoMethodReceiverImpl extends GoPsiElementBase
     }
 
     @Override
-    public GoLiteralIdentifier getIdentifier() {
-        return findChildByClass(GoLiteralIdentifier.class);
+    public GoIdentifier getIdentifier() {
+        return findChildByClass(GoIdentifier.class);
     }
 
     @Override

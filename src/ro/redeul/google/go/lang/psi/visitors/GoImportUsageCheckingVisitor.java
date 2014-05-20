@@ -1,7 +1,8 @@
 package ro.redeul.google.go.lang.psi.visitors;
 
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteral;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.primary.GoIdentifierExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.toplevel.GoImportDeclaration;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
@@ -31,17 +32,19 @@ public class GoImportUsageCheckingVisitor extends GoRecursiveElementVisitor {
         if (literal == null)
             return;
 
-        switch (literal.getType()) {
-            case Identifier:
-                checkQualifiedIdentifier((GoLiteralIdentifier)literal);
-                break;
+        switch (literal.getConstantType()) {
             case Composite:
             case Function:
                 visitElement(expression);
         }
     }
 
-    private void checkQualifiedIdentifier(GoLiteralIdentifier identifier) {
+    @Override
+    public void visitIdentifierExpression(GoIdentifierExpression identifier) {
+        checkQualifiedIdentifier(identifier.getIdentifier());
+    }
+
+    private void checkQualifiedIdentifier(GoIdentifier identifier) {
         if ( identifier != null && identifier.isQualified() ) {
             if ( imports.remove(identifier.getLocalPackageName()) == null ) {
                 for (String s : new HashSet<String>(imports.keySet())) {

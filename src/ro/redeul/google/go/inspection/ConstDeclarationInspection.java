@@ -13,7 +13,7 @@ import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclarations;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.visitors.GoRecursiveElementVisitor;
 
 public class ConstDeclarationInspection extends AbstractWholeGoFileInspection {
@@ -87,7 +87,7 @@ public class ConstDeclarationInspection extends AbstractWholeGoFileInspection {
     }
 
     private static boolean isMissingExpressionInConst(GoConstDeclaration declaration) {
-        GoLiteralIdentifier[] ids = declaration.getIdentifiers();
+        GoIdentifier[] ids = declaration.getIdentifiers();
         GoExpr[] exprs = declaration.getExpressions();
 
         return
@@ -116,7 +116,7 @@ public class ConstDeclarationInspection extends AbstractWholeGoFileInspection {
     }
 
     private static boolean isExtraExpressionInConst(GoConstDeclaration declaration) {
-        GoLiteralIdentifier[] ids = declaration.getIdentifiers();
+        GoIdentifier[] ids = declaration.getIdentifiers();
         GoExpr[] exprs = declaration.getExpressions();
 
         return

@@ -40,7 +40,7 @@ class InterfaceType implements GoElementTypes {
 
         if (ParserUtils.lookAhead(builder, mIDENT, pLPAREN)) {
             PsiBuilder.Marker methodSpec = builder.mark();
-            ParserUtils.eatElement(builder, LITERAL_IDENTIFIER);
+            ParserUtils.eatElement(builder, IDENTIFIER);
             parser.parseFunctionSignature(builder);
             methodSpec.done(FUNCTION_DECLARATION);
             return true;

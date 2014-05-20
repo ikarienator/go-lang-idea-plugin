@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.lexer.GoLexer;
 import ro.redeul.google.go.lang.lexer.GoTokenTypeSets;
 import ro.redeul.google.go.lang.lexer.GoTokenTypes;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.toplevel.GoTypeNameDeclaration;
 
 /**
@@ -33,7 +33,7 @@ public class GoFindUsagesProvider implements FindUsagesProvider {
 
     public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
         return psiElement instanceof GoTypeNameDeclaration ||
-                psiElement instanceof GoLiteralIdentifier;
+                psiElement instanceof GoIdentifier;
     }
 
     public String getHelpId(@NotNull PsiElement psiElement) {
@@ -43,7 +43,7 @@ public class GoFindUsagesProvider implements FindUsagesProvider {
     @NotNull
     public String getType(@NotNull PsiElement element) {
         if (element instanceof GoTypeNameDeclaration) return "type";
-        if (element instanceof GoLiteralIdentifier) return "variable";
+        if (element instanceof GoIdentifier) return "variable";
 //        if (element instanceof PsiMethod) return "method";
 //        if (element instanceof PsiField) return "field";
 //        if (element instanceof PsiParameter) return "parameter";

@@ -16,15 +16,11 @@ import ro.redeul.google.go.lang.psi.GoPsiElement;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclarations;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
-import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.binary.GoRelationalExpression;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteral;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFunction;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralString;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoCallOrConvExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
-import ro.redeul.google.go.lang.psi.expressions.primary.GoParenthesisedExpression;
 import ro.redeul.google.go.lang.psi.impl.GoPsiElementBase;
 import ro.redeul.google.go.lang.psi.processors.GoResolveStates;
 import ro.redeul.google.go.lang.psi.toplevel.*;
@@ -32,9 +28,7 @@ import ro.redeul.google.go.lang.psi.types.*;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructAnonymousField;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructField;
 import ro.redeul.google.go.lang.psi.typing.*;
-import ro.redeul.google.go.lang.psi.utils.GoExpressionUtils;
 import ro.redeul.google.go.lang.psi.utils.GoPsiScopesUtil;
-import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +40,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static ro.redeul.google.go.lang.psi.utils.GoIdentifierUtils.getFunctionDeclaration;
 import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.*;
 
 /**
@@ -126,14 +119,14 @@ public class GoUtil {
         int counter = 0;
 
         for (GoFunctionParameter parameter : parameters) {
-            GoLiteralIdentifier[] identifiers = parameter.getIdentifiers();
+            GoIdentifier[] identifiers = parameter.getIdentifiers();
             if (identifiers.length == 0) {
                 if (counter != 0)
                     stringBuilder.append(',');
                 stringBuilder.append(getNameLocalOrGlobalAsParameter(parameter.getType(), currentPackge));
                 counter++;
             } else {
-                for (GoLiteralIdentifier identifier : identifiers) {
+                for (GoIdentifier identifier : identifiers) {
                     if (counter != 0)
                         stringBuilder.append(',');
                     stringBuilder.append(getNameLocalOrGlobalAsParameter(parameter.getType(), currentPackge));
@@ -149,14 +142,14 @@ public class GoUtil {
             stringBuilder.append('(');
 
         for (GoFunctionParameter parameter : results1) {
-            GoLiteralIdentifier[] identifiers = parameter.getIdentifiers();
+            GoIdentifier[] identifiers = parameter.getIdentifiers();
             if (identifiers.length == 0) {
                 if (counter != 0)
                     stringBuilder.append(',');
                 stringBuilder.append(getNameLocalOrGlobalAsParameter(parameter.getType(), currentPackge));
                 counter++;
             } else {
-                for (GoLiteralIdentifier identifier : identifiers) {
+                for (GoIdentifier identifier : identifiers) {
                     if (counter != 0)
                         stringBuilder.append(',');
                     stringBuilder.append(getNameLocalOrGlobalAsParameter(parameter.getType(), currentPackge));
@@ -182,10 +175,10 @@ public class GoUtil {
             return false;
 
         GoLiteral literal = ((GoLiteralExpression) e).getLiteral();
-        if (!(literal instanceof GoLiteralIdentifier))
+        if (!(literal instanceof GoIdentifier))
             return false;
 
-        if (((GoLiteralIdentifier) literal).isQualified())
+        if (((GoIdentifier) literal).isQualified())
             return false;
 
         if (!psiIsA(e.getParent(), GoCallOrConvExpression.class))
@@ -208,7 +201,7 @@ public class GoUtil {
             return String.format("map[%s]%s", recursiveNameOrGlobalTypeImp(type1.getKeyType(), currentFile), recursiveNameOrGlobalTypeImp(type1.getElementType(), currentFile));
         } else if (type instanceof GoPsiTypeChannel) {
             GoPsiTypeChannel type1 = (GoPsiTypeChannel) type;
-            return String.format("%s %s", GoTypeChannel.ChannelType.getText(type1.getChannelType()), recursiveNameOrGlobalTypeImp(type1.getElementType(), currentFile));
+            return String.format("%s %s", GoTypeChannel.Direction.getText(type1.getDirection()), recursiveNameOrGlobalTypeImp(type1.getElementType(), currentFile));
         } else if (type instanceof GoPsiTypeFunction) {
             GoPsiTypeFunction type1 = (GoPsiTypeFunction) type;
             return getFuncDecAsParam(type1.getParameters(), type1.getResults(), currentFile);
@@ -228,7 +221,7 @@ public class GoUtil {
 
                     int j = 0;
                     GoTypeStructField structField1 = (GoTypeStructField) structField;
-                    for (GoLiteralIdentifier identifier : structField1.getIdentifiers()) {
+                    for (GoIdentifier identifier : structField1.getIdentifiers()) {
                         if (j != 0)
                             stringBuilder.append(",");
                         stringBuilder.append(identifier.getName());
@@ -288,11 +281,6 @@ public class GoUtil {
         return recursiveNameOrGlobalTypeImp(type, currentFile);
     }
 
-
-    public static boolean CompareTypes(GoPsiType element, Object element2) {
-        return CompareTypes(element, element2, null);
-    }
-
     public static GoPsiElement ResolveReferece(GoPsiElement element) {
         for (PsiReference reference : element.getReferences()) {
             PsiElement resolve = reference.resolve();
@@ -300,133 +288,6 @@ public class GoUtil {
                 return ResolveReferece((GoPsiElement) resolve);
         }
         return element;
-    }
-
-    public static boolean CompareTypes(GoPsiType element, Object element2, GoPsiElement goExpr) {
-
-        if (element2 instanceof GoTypePsiBacked) {
-            GoPsiType psiType = ((GoTypePsiBacked) element2).getPsiType();
-            if (psiType != null)
-                return psiType.isIdentical(element);
-        }
-
-        if (element instanceof GoPsiTypeFunction && !(element2 instanceof GoPsiTypeFunction)) {
-
-
-            if (goExpr instanceof GoCallOrConvExpression) {
-                element2 = findChildOfClass(goExpr, GoPsiTypeParenthesized.class);
-                if (element2 != null) {
-                    element2 = ((GoPsiTypeParenthesized) element2).getInnerType();
-                    return CompareTypes(element, element2, null);
-                }
-            }
-            if (goExpr instanceof GoParenthesisedExpression) {
-                goExpr = ((GoParenthesisedExpression) goExpr).getInnerExpression();
-            }
-            if (goExpr instanceof GoLiteralExpression) {
-                goExpr = ((GoLiteralExpression) goExpr).getLiteral();
-            }
-            if (goExpr instanceof GoLiteralIdentifier) {
-                goExpr = ResolveReferece(goExpr);
-                element2 = getFunctionDeclaration(goExpr);
-                if (element2 == null) {
-                    element2 = goExpr.getParent().getLastChild();
-                    if (!(element2 instanceof GoFunctionDeclaration)) {
-                        if (element2 instanceof GoLiteralExpression) {
-                            GoType[] type = ((GoLiteralExpression) element2).getType();
-                            if (type.length != 0 && type[0] instanceof GoTypePsiBacked)
-                                return CompareTypes(element, type[0], (GoPsiElement) element2);
-                            element2 = ((GoLiteralExpression) element2).getLiteral();
-                            if (!(element2 instanceof GoFunctionDeclaration)) {
-                                return false;
-                            }
-                        }
-                    } else {
-                        return false;
-                    }
-                }
-            }
-
-            if (goExpr instanceof GoFunctionDeclaration)
-                return CompareFnTypeToDecl((GoPsiTypeFunction) element, (GoFunctionDeclaration) goExpr);
-
-            return element2 instanceof GoFunctionDeclaration && CompareFnTypeToDecl((GoPsiTypeFunction) element, (GoFunctionDeclaration) element2);
-        }
-
-
-        if (element2 instanceof GoPsiType) {
-            GoTypeUtils.resolveToFinalType((GoPsiType) element2);
-            return element.isIdentical((GoPsiType) element2);
-        }
-        //Resolve Issue In PR #330
-        if (element instanceof GoPsiTypePointer && element2 instanceof GoTypePointer) {
-            GoType targetType1 = ((GoTypePointer) element2).getTargetType();
-            return CompareTypes(((GoPsiTypePointer) element).getTargetType(), targetType1);
-//            if (targetType1 instanceof GoTypePsiBacked) {
-//                GoTypePsiBacked targetType = (GoTypePsiBacked) targetType1;
-//                return ((GoPsiTypePointer) element).getTargetType().isIdentical(targetType.getPsiType());
-//            }
-        }
-        if (element2 instanceof GoTypeArray) {
-            GoPsiType psiType = ((GoTypeArray) element2).getPsiType();
-            if (psiType != null)
-                return psiType.isIdentical(element);
-        }
-        if (element2 instanceof GoType) {
-            if (goExpr instanceof GoParenthesisedExpression)
-                goExpr = ((GoParenthesisedExpression) goExpr).getInnerExpression();
-            if (goExpr instanceof GoLiteralExpression) {
-                GoLiteral literal = ((GoLiteralExpression) goExpr).getLiteral();
-                if (literal instanceof GoLiteralFunction) {
-                    return ((GoLiteralFunction) literal).isIdentical(element);
-                }
-            }
-
-        }
-
-        return element.getUnderlyingType().isIdentical(((GoType) element2).getUnderlyingType());
-
-
-    }
-
-
-    public static boolean CompareFnTypeToDecl(GoPsiTypeFunction psiType, GoFunctionDeclaration functionDeclaration) {
-        if (!CompareParameterList(psiType.getParameters(), functionDeclaration.getParameters()))
-            return false;
-        return CompareParameterList(psiType.getResults(), functionDeclaration.getResults());
-    }
-
-    private static boolean CompareParameterList(GoFunctionParameter[] funcTypeArguments, GoFunctionParameter[] funcDeclArguments) {
-        List<GoPsiType> list = new ArrayList<GoPsiType>();
-        for (GoFunctionParameter argument : funcDeclArguments) {
-            GoLiteralIdentifier[] identifiers = argument.getIdentifiers();
-            if (identifiers.length == 0) {
-                list.add(argument.getType());
-            } else {
-                for (GoLiteralIdentifier identifier : identifiers) {
-                    list.add(argument.getType());
-                }
-            }
-        }
-        int i = 0;
-        for (GoFunctionParameter argument : funcTypeArguments) {
-            if (argument.getIdentifiers().length == 0) {
-                if (i >= list.size())
-                    return false;
-                if (!argument.getType().isIdentical(list.get(i)))
-                    return false;
-                i++;
-            } else {
-                for (GoLiteralIdentifier identifier : argument.getIdentifiers()) {
-                    if (i >= list.size())
-                        return false;
-                    if (!argument.getType().isIdentical(list.get(i)))
-                        return false;
-                    i++;
-                }
-            }
-        }
-        return true;
     }
 
     public static GoPsiElement ResolveTypeOfVarDecl(GoPsiElement element) {
@@ -450,7 +311,7 @@ public class GoUtil {
                 return identifiersType;
             return (GoPsiElement) parent.getLastChild();
         }
-        if (element instanceof GoLiteralIdentifier) {
+        if (element instanceof GoIdentifier) {
             for (PsiReference reference : element.getReferences()) {
                 if (reference != null) {
                     GoPsiElement resolve = (GoPsiElement) reference.resolve();
@@ -471,11 +332,11 @@ public class GoUtil {
         List<GoPsiType> types = new ArrayList<GoPsiType>();
         for (GoFunctionParameter result : results) {
 
-            GoLiteralIdentifier[] identifiers = result.getIdentifiers();
+            GoIdentifier[] identifiers = result.getIdentifiers();
             if (identifiers == null || identifiers.length == 0) {
                 types.add(result.getType());
             } else {
-                for (GoLiteralIdentifier identifier : identifiers) {
+                for (GoIdentifier identifier : identifiers) {
                     types.add(result.getType());
                 }
             }

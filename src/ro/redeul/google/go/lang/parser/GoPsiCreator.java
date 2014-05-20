@@ -28,8 +28,7 @@ import ro.redeul.google.go.lang.psi.impl.toplevel.*;
 import ro.redeul.google.go.lang.psi.impl.types.*;
 import ro.redeul.google.go.lang.psi.impl.types.struct.GoTypeStructAnonymousFieldImpl;
 import ro.redeul.google.go.lang.psi.impl.types.struct.GoTypeStructFieldImpl;
-
-import static ro.redeul.google.go.lang.psi.typing.GoTypeChannel.ChannelType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeChannel;
 
 class GoPsiCreator implements GoElementTypes {
 
@@ -37,8 +36,9 @@ class GoPsiCreator implements GoElementTypes {
 
         IElementType elementType = node.getElementType();
 
-//        if (elementType.equals(IDENTIFIER))
-//            return new GoLiteralIdentifierImpl(node);
+        if (elementType.equals(IDENTIFIER)) {
+            return new GoIdentifierImpl(node);
+        }
 
         if (elementType.equals(PACKAGE_DECLARATION))
             return new GoPackageDeclarationImpl(node);
@@ -125,13 +125,13 @@ class GoPsiCreator implements GoElementTypes {
             return new GoFunctionParameterImpl(node);
 
         if (elementType.equals(TYPE_CHAN_BIDIRECTIONAL))
-            return new GoPsiTypeChannelImpl(node, ChannelType.Bidirectional);
+            return new GoPsiTypeChannelImpl(node, GoTypeChannel.Direction.Bidirectional);
 
         if (elementType.equals(TYPE_CHAN_SENDING))
-            return new GoPsiTypeChannelImpl(node, ChannelType.Sending);
+            return new GoPsiTypeChannelImpl(node, GoTypeChannel.Direction.Sending);
 
         if (elementType.equals(TYPE_CHAN_RECEIVING))
-            return new GoPsiTypeChannelImpl(node, ChannelType.Receiving);
+            return new GoPsiTypeChannelImpl(node, GoTypeChannel.Direction.Receiving);
 
         if (elementType.equals(BLOCK_STATEMENT))
             return new GoBlockStatementImpl(node);
@@ -169,11 +169,11 @@ class GoPsiCreator implements GoElementTypes {
         if (elementType.equals(LITERAL_IMAGINARY))
             return new GoLiteralImaginaryImpl(node);
 
-        if (elementType.equals(LITERAL_IOTA))
-            return new GoLiteralIdentifierImpl(node, true);
+        if (elementType.equals(IOTA_EXPRESSION))
+            return new GoIdentifierExpressionImpl(node, true);
 
-        if (elementType.equals(LITERAL_IDENTIFIER))
-            return new GoLiteralIdentifierImpl(node);
+        if (elementType.equals(IDENTIFIER_EXPRESSION))
+            return new GoIdentifierExpressionImpl(node);
 
         if (elementType.equals(LITERAL_EXPRESSION))
             return new GoLiteralExpressionImpl(node);

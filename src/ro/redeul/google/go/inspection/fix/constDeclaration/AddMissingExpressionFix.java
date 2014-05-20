@@ -11,7 +11,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 
 import static ro.redeul.google.go.editor.TemplateUtil.createTemplate;
 import static ro.redeul.google.go.editor.TemplateUtil.getTemplateVariableExpression;
@@ -51,7 +51,7 @@ public class AddMissingExpressionFix implements LocalQuickFix {
     }
 
     private void addMissingExpression(Project project, Editor editor, GoConstDeclaration cd) {
-        GoLiteralIdentifier[] ids = cd.getIdentifiers();
+        GoIdentifier[] ids = cd.getIdentifiers();
         GoExpr[] expressions = cd.getExpressions();
         StringBuilder sb = new StringBuilder();
         for (int i = expressions.length; i < ids.length; i++) {

@@ -13,7 +13,7 @@ import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclarations;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclarations;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.toplevel.*;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 
@@ -120,13 +120,13 @@ public class DocumentUtil {
         return text + getHeaderDocumentOfElement(method.getOriginalElement());
     }
 
-    public static String getVarDocument(GoLiteralIdentifier id) {
+    public static String getVarDocument(GoIdentifier id) {
         if (id == null) {
             return "";
         }
 
         PsiElement original = id.getOriginalElement();
-        if (!(original instanceof GoLiteralIdentifier)) {
+        if (!(original instanceof GoIdentifier)) {
             return "";
         }
 
@@ -152,13 +152,13 @@ public class DocumentUtil {
         return doc;
     }
 
-    public static String getConstDocument(GoLiteralIdentifier id) {
+    public static String getConstDocument(GoIdentifier id) {
         if (id == null) {
             return "";
         }
 
         PsiElement original = id.getOriginalElement();
-        if (!(original instanceof GoLiteralIdentifier)) {
+        if (!(original instanceof GoIdentifier)) {
             return "";
         }
 
@@ -232,7 +232,7 @@ public class DocumentUtil {
         int currentIndex = 0;
         StringBuilder sb = new StringBuilder();
         for (GoFunctionParameter fp : parameters) {
-            GoLiteralIdentifier[] ids = fp.getIdentifiers();
+            GoIdentifier[] ids = fp.getIdentifiers();
             GoPsiType type = fp.getType();
             String variadic = fp.isVariadic() ? "..." : "";
             String typeName = variadic + String.valueOf(type != null ? type.getText() : null);
@@ -274,7 +274,7 @@ public class DocumentUtil {
 
         StringBuilder sb = new StringBuilder();
         for (GoFunctionParameter fp : parameters) {
-            GoLiteralIdentifier[] ids = fp.getIdentifiers();
+            GoIdentifier[] ids = fp.getIdentifiers();
             GoPsiType type = fp.getType();
             String variadic = fp.isVariadic() ? "..." : "";
             String typeName = variadic + String.valueOf(type != null ? type.getText() : null);
@@ -286,7 +286,7 @@ public class DocumentUtil {
                 continue;
             }
 
-            for (GoLiteralIdentifier id : ids) {
+            for (GoIdentifier id : ids) {
                 sb.append(id.getName()).append(", ");
             }
             sb.insert(sb.length() - 2, " " + typeName);

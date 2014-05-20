@@ -10,7 +10,7 @@ import com.intellij.spellchecker.tokenizer.Tokenizer;
 import com.intellij.util.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,10 +62,10 @@ public class GoIdentifierTokenizerStrategy extends SpellcheckingStrategy {
       }
   }
 
-    private static final Tokenizer<GoLiteralIdentifier> GO_IDENTIFIER_TOKENIZER
-        = new Tokenizer<GoLiteralIdentifier>() {
+    private static final Tokenizer<GoIdentifier> GO_IDENTIFIER_TOKENIZER
+        = new Tokenizer<GoIdentifier>() {
         @Override
-        public void tokenize(@NotNull GoLiteralIdentifier element,
+        public void tokenize(@NotNull GoIdentifier element,
                              TokenConsumer consumer) {
 
             PsiElement identifier = element.getNameIdentifier();
@@ -94,7 +94,7 @@ public class GoIdentifierTokenizerStrategy extends SpellcheckingStrategy {
     @NotNull
     @Override
     public Tokenizer getTokenizer(PsiElement element) {
-        if ( element instanceof GoLiteralIdentifier ) {
+        if ( element instanceof GoIdentifier) {
             return GO_IDENTIFIER_TOKENIZER;
         }
 

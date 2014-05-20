@@ -6,7 +6,7 @@ import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclarations;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclarations;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.toplevel.*;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class GoFileUtils {
         return consts;
     }
 
-    public static List<GoLiteralIdentifier> getConstIdentifiers(@Nullable GoFile psiFile) {
+    public static List<GoIdentifier> getConstIdentifiers(@Nullable GoFile psiFile) {
         if (psiFile == null) {
             return Collections.emptyList();
         }
@@ -43,7 +43,7 @@ public class GoFileUtils {
             return Collections.emptyList();
         }
 
-        List<GoLiteralIdentifier> consts = new ArrayList<GoLiteralIdentifier>();
+        List<GoIdentifier> consts = new ArrayList<GoIdentifier>();
         for (GoConstDeclarations cds : constDeclarations) {
             for (GoConstDeclaration cd : cds.getDeclarations()) {
                 Collections.addAll(consts, cd.getIdentifiers());
@@ -53,7 +53,7 @@ public class GoFileUtils {
         return consts;
     }
 
-    public static List<GoLiteralIdentifier> getVariableIdentifiers(@Nullable GoFile psiFile) {
+    public static List<GoIdentifier> getVariableIdentifiers(@Nullable GoFile psiFile) {
         if (psiFile == null) {
             return Collections.emptyList();
         }
@@ -63,7 +63,7 @@ public class GoFileUtils {
             return Collections.emptyList();
         }
 
-        List<GoLiteralIdentifier> vars = new ArrayList<GoLiteralIdentifier>();
+        List<GoIdentifier> vars = new ArrayList<GoIdentifier>();
         for (GoVarDeclarations vds : varDeclarations) {
             for (GoVarDeclaration vd : vds.getDeclarations()) {
                 Collections.addAll(vars, vd.getIdentifiers());

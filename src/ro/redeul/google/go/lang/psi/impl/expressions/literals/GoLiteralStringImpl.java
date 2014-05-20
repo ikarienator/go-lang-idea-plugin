@@ -20,7 +20,7 @@ public class GoLiteralStringImpl extends GoPsiElementBase
     }
 
     @Override
-    public Type getType() {
+    public Type getConstantType() {
         return getText().startsWith("`")
             ? Type.RawString : Type.InterpretedString;
     }

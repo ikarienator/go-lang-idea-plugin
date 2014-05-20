@@ -4,10 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeInterface;
 import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypeName;
+import ro.redeul.google.go.lang.psi.typing.GoTypeInterface;
 import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
 import ro.redeul.google.go.lang.psi.visitors.GoRecursiveElementVisitor;
 
@@ -28,76 +26,60 @@ public class TypeMatchInspection extends AbstractWholeGoFileInspection {
         if (left == null || right == null) {
             return;
         }
-        if (left.isConstantExpression() || right.isConstantExpression()){
+        if (left.isConstantExpression() || right.isConstantExpression()) {
             return;
         }
         GoType[] leftTypes = left.getType();
         GoType[] rightTypes = right.getType();
-        if (leftTypes.length == 0 || rightTypes.length == 0){
+        if (leftTypes.length == 0 || rightTypes.length == 0) {
             return;
         }
         String operator = expression.getOperator().toString();
-        boolean equality = operator.equals("!=") || operator.equals("==");
-        boolean shift = operator.equals("<<")||operator.equals(">>");
-        for (GoType leftType : leftTypes) {
-            for (GoType rightType : rightTypes) {
-                if (leftType == null || rightType == null) {
-                    return;
-                }
-                GoUnderlyingType leftUnder = leftType.getUnderlyingType();
-                GoUnderlyingType rightUnder = rightType.getUnderlyingType();
-                boolean hasInterface = leftUnder instanceof GoUnderlyingTypeInterface || rightUnder instanceof GoUnderlyingTypeInterface;
-                if (!equality) {
-                    if (leftType instanceof GoTypePointer || rightType instanceof GoTypePointer){
-                        result.addProblem(expression, "operator "+operator+" not defined on pointer");
+        boolean shift = operator.equals("<<") || operator.equals(">>");
+        if (operator.equals("!=") || operator.equals("==")) {
+            for (GoType leftType : leftTypes) {
+                for (GoType rightType : rightTypes) {
+                    if (leftType == null || rightType == null) {
                         return;
                     }
-                    if (hasInterface) {
-                        result.addProblem(expression, "operator "+operator+" not defined on interface");
+                    if (leftType instanceof GoTypeInterface || rightType instanceof GoTypeInterface) {
                         return;
                     }
-                    if (shift){
-                        if (rightUnder == null) {
-                            return;
-                        }
-                        String rightUnderStr = rightUnder.toString();
-                        if (rightUnderStr.startsWith("uint")||rightUnderStr.equals("byte")){
-                            return;
-                        }else{
-                            result.addProblem(expression, "shift count type " + rightUnder+", must be unsigned integer");
-                            return;
-                        }
-                    }
-                }else{
-                    if (hasInterface) {
-                        return;
-                    }
-                    if (leftType instanceof GoTypePointer && rightType instanceof GoTypePointer){
-                        GoTypePointer lptr = (GoTypePointer)leftType;
-                        GoTypePointer rptr = (GoTypePointer)rightType;
+                    if (leftType instanceof GoTypePointer && rightType instanceof GoTypePointer) {
+                        GoTypePointer lptr = (GoTypePointer) leftType;
+                        GoTypePointer rptr = (GoTypePointer) rightType;
                         leftType = lptr.getTargetType();
                         rightType = rptr.getTargetType();
                     }
                 }
-                if (leftType instanceof GoTypeName && rightType instanceof GoTypeName) {
-                    String leftName = ((GoTypeName)leftType).getName();
-                    if (leftName.equals("byte")) {
-                        leftName = "uint8";
-                    }else if (leftName.equals("rune")) {
-                        leftName = "int32";
-                    }
-                    String rightName = ((GoTypeName)rightType).getName();
-                    if (rightName.equals("byte")) {
-                        rightName = "uint8";
-                    }else if (rightName.equals("rune")) {
-                        rightName = "int32";
-                    }
-                    if (leftName.equals(rightName)) {
+            }
+        } else {
+            for (GoType leftType : leftTypes) {
+                for (GoType rightType : rightTypes) {
+                    if (leftType == null || rightType == null) {
                         return;
+                    }
+                    if (leftType instanceof GoTypePointer || rightType instanceof GoTypePointer) {
+                        result.addProblem(expression, "operator " + operator + " not defined on pointer");
+                        return;
+                    }
+                    if (leftType instanceof GoTypeInterface || rightType instanceof GoTypeInterface) {
+                        result.addProblem(expression, "operator " + operator + " not defined on interface");
+                        return;
+                    }
+                    if (shift) {
+                        String rightUnderStr = rightType.toString();
+                        if (rightUnderStr.startsWith("uint") || rightUnderStr.equals("byte")) {
+                            return;
+                        } else {
+                            result.addProblem(expression, "shift count type " + rightType + ", must be unsigned integer");
+                            return;
+                        }
                     }
                 }
             }
         }
+        // TODO
         result.addProblem(expression, "mismatched types");
     }
 }

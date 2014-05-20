@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.refactoring.RefactoringActionHandler;
 import ro.redeul.google.go.GoEditorAwareTestCase;
 import ro.redeul.google.go.lang.psi.GoFile;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 
 import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.findParentOfType;
 import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.resolveSafely;
@@ -35,7 +35,7 @@ public abstract class GoRefactoringTestCase extends GoEditorAwareTestCase {
             ((RefactoringActionHandler) handler).invoke(getProject(), editor, file, null);
         } else if (handler instanceof InlineActionHandler) {
             PsiElement element = file.findElementAt(editor.getCaretModel().getOffset());
-            element = findParentOfType(element, GoLiteralIdentifier.class);
+            element = findParentOfType(element, GoIdentifier.class);
             PsiElement resolve = resolveSafely(element, PsiElement.class);
             if (resolve != null) {
                 element = resolve;

@@ -7,7 +7,7 @@ import ro.redeul.google.go.lang.completion.insertHandler.FunctionInsertHandler;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoMethodDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoTypeNameDeclaration;
@@ -48,7 +48,7 @@ public class LookupElementUtil extends GoElementVisitor {
     }
 
     @Override
-    public void visitLiteralIdentifier(GoLiteralIdentifier identifier) {
+    public void visitIdentifier(GoIdentifier identifier) {
         ((GoPsiElement) identifier.getParent()).accept(this);
     }
 

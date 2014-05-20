@@ -6,6 +6,7 @@ import com.intellij.psi.tree.IElementType;
 import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.parser.GoParser;
 import ro.redeul.google.go.lang.parser.parsing.util.ParserUtils;
+import sun.net.www.ParseUtil;
 
 import java.util.Set;
 
@@ -68,7 +69,7 @@ class BuiltInCallExpression implements GoElementTypes {
                 noTypeParameter.contains(methodCall);
     }
 
-    public static boolean parse(PsiBuilder builder, GoParser parser) {
+    public static boolean parse(PsiBuilder builder, GoParser parser, PsiBuilder.Marker mark) {
 
         String callName = builder.getTokenText();
         IElementType elementType = BUILTIN_CALL_EXPRESSION;
@@ -79,9 +80,8 @@ class BuiltInCallExpression implements GoElementTypes {
         if (!isBuiltInCall(callName))
             return false;
 
-        PsiBuilder.Marker mark = builder.mark();
-        ParserUtils.eatElement(builder, LITERAL_IDENTIFIER);
-        mark.done(LITERAL_EXPRESSION);
+        ParserUtils.eatElement(builder, IDENTIFIER);
+        mark.done(IDENTIFIER_EXPRESSION);
         mark = mark.precede();
         ParserUtils.getToken(builder, pLPAREN, "open.parenthesis.expected");
 

@@ -9,7 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import ro.redeul.google.go.GoEditorAwareTestCase;
 import ro.redeul.google.go.lang.psi.GoFile;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 
 import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.findParentOfType;
 
@@ -19,7 +19,7 @@ public class ConvertToAssignmentFixTest extends GoEditorAwareTestCase {
     @Override
     protected void invoke(Project project, Editor editor, GoFile file) {
         PsiElement element = file.findElementAt(editor.getSelectionModel().getSelectionStart());
-        GoLiteralIdentifier identifier = findParentOfType(element, GoLiteralIdentifier.class);
+        GoIdentifier identifier = findParentOfType(element, GoIdentifier.class);
         assertNotNull(identifier);
         InspectionManager im = InspectionManager.getInstance(project);
         LocalQuickFix fix = null;

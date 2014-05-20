@@ -11,7 +11,7 @@ import ro.redeul.google.go.lang.psi.toplevel.GoTypeNameDeclaration;
  * Date: 5/23/11
  * Time: 5:19 PM
  */
-public class GoTypeName extends StringStubIndexExtension<GoTypeNameDeclaration> {
+public class GoTypeNameIndex extends StringStubIndexExtension<GoTypeNameDeclaration> {
 
     public static final StubIndexKey<String, GoTypeNameDeclaration> KEY = StubIndexKey.createIndexKey("go.package.type.names");
 

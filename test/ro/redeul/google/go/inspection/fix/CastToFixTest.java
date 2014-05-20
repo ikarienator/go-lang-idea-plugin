@@ -6,7 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import ro.redeul.google.go.GoEditorAwareTestCase;
 import ro.redeul.google.go.lang.psi.GoFile;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
@@ -49,7 +49,7 @@ public class CastToFixTest extends GoEditorAwareTestCase {
 
         final GoLiteralExpression expression = findParentOfType(element, GoLiteralExpression.class);
         assertNotNull(expression);
-        assertInstanceOf(expression.getLiteral(), GoLiteralIdentifier.class);
+        assertInstanceOf(expression.getLiteral(), GoIdentifier.class);
 
         GoFunctionDeclaration goFunctionDeclaration = GoExpressionUtils.resolveToFunctionDeclaration(expression);
         assertNotNull(goFunctionDeclaration);

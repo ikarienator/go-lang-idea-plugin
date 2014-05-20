@@ -8,11 +8,10 @@ import ro.redeul.google.go.lang.lexer.GoTokenTypes;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.GoUnaryExpression;
 import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeBuiltin;
 import ro.redeul.google.go.lang.psi.typing.GoTypeChannel;
 import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
-import ro.redeul.google.go.lang.psi.typing.GoTypes;
 import ro.redeul.google.go.lang.psi.utils.GoTokenSets;
-import ro.redeul.google.go.lang.stubs.GoNamesCache;
 
 import static ro.redeul.google.go.lang.psi.expressions.GoUnaryExpression.Op.Channel;
 
@@ -34,8 +33,7 @@ public class GoUnaryExpressionImpl extends GoExpressionBase
                     GoTypeChannel channelType = (GoTypeChannel) basic[0];
                     return new GoType[]{
                             channelType.getElementType(),
-                            GoTypes.getBuiltin(GoTypes.Builtin.Bool,
-                                    GoNamesCache.getInstance(getProject()))
+                            GoTypeBuiltin.Bool
                     };
                 }
                 return GoType.EMPTY_ARRAY;
@@ -50,7 +48,7 @@ public class GoUnaryExpressionImpl extends GoExpressionBase
             case Address:
                 if (basic.length == 1) {
                     return new GoType[]{
-                            new GoTypePointer(basic[0])
+                            new GoTypePointer(null, basic[0])
                     };
                 }
                 return GoType.EMPTY_ARRAY;

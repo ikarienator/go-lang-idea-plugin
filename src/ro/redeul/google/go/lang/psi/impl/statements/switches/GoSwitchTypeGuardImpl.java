@@ -6,7 +6,7 @@ import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.impl.GoPsiElementBase;
 import ro.redeul.google.go.lang.psi.statements.switches.GoSwitchTypeGuard;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
@@ -22,8 +22,8 @@ public class GoSwitchTypeGuardImpl extends GoPsiElementBase
     }
 
     @Override
-    public GoLiteralIdentifier getIdentifier() {
-        return findChildByClass(GoLiteralIdentifier.class);
+    public GoIdentifier getIdentifier() {
+        return findChildByClass(GoIdentifier.class);
     }
 
     @NotNull

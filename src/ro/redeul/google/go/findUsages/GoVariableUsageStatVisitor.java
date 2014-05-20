@@ -14,9 +14,10 @@ import ro.redeul.google.go.lang.psi.GoPsiElement;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteral;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFunction;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.primary.GoIdentifierExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.impl.GoPsiElementBase;
 import ro.redeul.google.go.lang.psi.statements.GoForWithRangeAndVarsStatement;
@@ -40,18 +41,18 @@ import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.isNodeOfType;
 public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
 
     private static final TokenSet NEW_SCOPE_STATEMENT = TokenSet.create(
-        GoElementTypes.BLOCK_STATEMENT,
-        GoElementTypes.IF_STATEMENT,
-        GoElementTypes.FOR_WITH_CLAUSES_STATEMENT,
-        GoElementTypes.FOR_WITH_CONDITION_STATEMENT,
-        GoElementTypes.FOR_WITH_RANGE_STATEMENT,
-        GoElementTypes.SWITCH_EXPR_STATEMENT,
-        GoElementTypes.SWITCH_TYPE_STATEMENT,
-        GoElementTypes.SWITCH_EXPR_CASE,
-        GoElementTypes.SELECT_STATEMENT,
-        GoElementTypes.SELECT_COMM_CLAUSE_DEFAULT,
-        GoElementTypes.SELECT_COMM_CLAUSE_RECV,
-        GoElementTypes.SELECT_COMM_CLAUSE_SEND
+            GoElementTypes.BLOCK_STATEMENT,
+            GoElementTypes.IF_STATEMENT,
+            GoElementTypes.FOR_WITH_CLAUSES_STATEMENT,
+            GoElementTypes.FOR_WITH_CONDITION_STATEMENT,
+            GoElementTypes.FOR_WITH_RANGE_STATEMENT,
+            GoElementTypes.SWITCH_EXPR_STATEMENT,
+            GoElementTypes.SWITCH_TYPE_STATEMENT,
+            GoElementTypes.SWITCH_EXPR_CASE,
+            GoElementTypes.SELECT_STATEMENT,
+            GoElementTypes.SELECT_COMM_CLAUSE_DEFAULT,
+            GoElementTypes.SELECT_COMM_CLAUSE_RECV,
+            GoElementTypes.SELECT_COMM_CLAUSE_SEND
     );
 
     private final InspectionResult result;
@@ -97,19 +98,19 @@ public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
     @Override
     public void visitConstDeclaration(GoConstDeclaration declaration) {
         visitIdentifiersAndExpressions(
-            declaration.getIdentifiers(), declaration.getExpressions(), false);
+                declaration.getIdentifiers(), declaration.getExpressions(), false);
     }
 
     @Override
     public void visitVarDeclaration(GoVarDeclaration declaration) {
         visitIdentifiersAndExpressions(
-            declaration.getIdentifiers(), declaration.getExpressions(), false);
+                declaration.getIdentifiers(), declaration.getExpressions(), false);
     }
 
     @Override
     public void visitShortVarDeclaration(GoShortVarDeclaration declaration) {
         visitIdentifiersAndExpressions(
-            declaration.getIdentifiers(), declaration.getExpressions(), true);
+                declaration.getIdentifiers(), declaration.getExpressions(), true);
     }
 
     @Override
@@ -129,7 +130,7 @@ public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
     @Override
     public void visitFunctionLiteral(GoLiteralFunction literal) {
         createFunctionParametersMap(literal.getParameters(), literal
-            .getResults());
+                .getResults());
         visitElement(literal.getBlock());
         afterVisitGoFunctionDeclaration();
     }
@@ -138,8 +139,8 @@ public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
     public void visitForWithRange(GoForWithRangeStatement statement) {
         ctx.addNewScopeLevel();
 
-        visitExpressionAsIdentifier(statement.getKey(), false);
-        visitExpressionAsIdentifier(statement.getValue(), false);
+        visitIdentifierExpression(statement.getKey(), false);
+        visitIdentifierExpression(statement.getValue(), false);
 
         visitElement(statement.getRangeExpression());
         visitElement(statement.getBlock());
@@ -155,8 +156,8 @@ public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
     public void visitForWithRangeAndVars(GoForWithRangeAndVarsStatement statement) {
         ctx.addNewScopeLevel();
 
-        visitLiteralIdentifier(statement.getKey());
-        visitLiteralIdentifier(statement.getValue());
+        visitIdentifier(statement.getKey());
+        visitIdentifier(statement.getValue());
 
         visitElement(statement.getRangeExpression());
         visitElement(statement.getBlock());
@@ -170,21 +171,21 @@ public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
     }
 
     @Override
-    public void visitLiteralIdentifier(GoLiteralIdentifier identifier) {
+    public void visitIdentifier(GoIdentifier identifier) {
         if (needToCollectUsage(identifier)) {
             ctx.addUsage(identifier);
         }
     }
 
-    private void visitIdentifiersAndExpressions(GoLiteralIdentifier[] identifiers, GoExpr[] exprs,
+    private void visitIdentifiersAndExpressions(GoIdentifier[] identifiers, GoExpr[] exprs,
                                                 boolean mayRedeclareVariable) {
         if (identifiers.length == 0) {
             return;
         }
 
         int nonBlankIdCount = 0;
-        List<GoLiteralIdentifier> redeclaredIds = new ArrayList<GoLiteralIdentifier>();
-        for (GoLiteralIdentifier id : identifiers) {
+        List<GoIdentifier> redeclaredIds = new ArrayList<GoIdentifier>();
+        for (GoIdentifier id : identifiers) {
             if (!id.isBlank()) {
                 nonBlankIdCount++;
                 if (ctx.isDefinedInCurrentScope(id)) {
@@ -204,13 +205,13 @@ public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
                 ctx.addProblem(start, end, msg, ProblemHighlightType.GENERIC_ERROR, new ConvertToAssignmentFix());
             }
         } else {
-            for (GoLiteralIdentifier redeclaredId : redeclaredIds) {
+            for (GoIdentifier redeclaredId : redeclaredIds) {
                 String msg = redeclaredId.getText() + " redeclared in this block";
                 ctx.addProblem(redeclaredId, redeclaredId, msg, ProblemHighlightType.GENERIC_ERROR);
             }
         }
 
-        for (GoLiteralIdentifier id : identifiers) {
+        for (GoIdentifier id : identifiers) {
             ctx.addDefinition(id);
         }
 
@@ -224,45 +225,46 @@ public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
 
     }
 
-    private void visitExpressionAsIdentifier(GoExpr expr, boolean declaration) {
-        if (!(expr instanceof GoLiteralExpression)) {
+    private void visitIdentifierExpression(GoExpr expr, boolean declaration) {
+        if (!(expr instanceof GoIdentifierExpression)) {
             return;
         }
 
-        GoLiteral literal = ((GoLiteralExpression) expr).getLiteral();
-        if ( literal.getType() == GoLiteral.Type.Identifier )
-        if (needToCollectUsage((GoLiteralIdentifier)literal)) {
+        GoIdentifier identifier = ((GoIdentifierExpression) expr).getIdentifier();
+
+        if (needToCollectUsage(identifier)) {
             if (declaration) {
-                ctx.addDefinition(literal);
+                ctx.addDefinition(identifier);
             } else {
-                ctx.addUsage(literal);
+                ctx.addUsage(identifier);
             }
         }
     }
 
-    private boolean needToCollectUsage(GoLiteralIdentifier id) {
+    private boolean needToCollectUsage(GoIdentifier id) {
         return id != null && !isFunctionOrMethodCall(id) && !isTypeField(id) && !isType(id) &&
                 // if there is any dots in the identifier, it could be from other packages.
                 // usage collection of other package variables is not implemented yet.
                 !id.getText().contains(".");
     }
 
-    private boolean isType(GoLiteralIdentifier id) {
+    private boolean isType(GoIdentifier id) {
         PsiElement parent = id.getParent();
         return isNodeOfType(parent, GoElementTypes.BASE_TYPE_NAME) ||
                 isNodeOfType(parent, GoElementTypes.REFERENCE_BASE_TYPE_NAME) || parent instanceof GoPsiTypeName;
     }
 
-    private boolean isTypeField(GoLiteralIdentifier id) {
+    private boolean isTypeField(GoIdentifier id) {
         return id.getParent() instanceof GoTypeStructField || isTypeFieldInitializer(id);
     }
 
     /**
      * Check whether id is a field name in composite literals
+     *
      * @param id GoLiteralIdentifier
      * @return boolean
      */
-    private boolean isTypeFieldInitializer(GoLiteralIdentifier id) {
+    private boolean isTypeFieldInitializer(GoIdentifier id) {
         if (!(id.getParent() instanceof GoLiteral)) {
             return false;
         }
@@ -278,7 +280,7 @@ public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
 
     }
 
-    private boolean isFunctionOrMethodCall(GoLiteralIdentifier id) {
+    private boolean isFunctionOrMethodCall(GoIdentifier id) {
         if (!(id.getParent() instanceof GoLiteralExpression)) {
             return false;
         }
@@ -293,14 +295,14 @@ public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
                                             Map<String, VariableUsage> variables,
                                             boolean ignoreProblem) {
         for (GoFunctionParameter p : parameters) {
-            for (GoLiteralIdentifier id : p.getIdentifiers()) {
+            for (GoIdentifier id : p.getIdentifiers()) {
                 variables.put(id.getName(),
                         new VariableUsage(id, ignoreProblem));
             }
         }
     }
 
-    private GoLiteralIdentifier getMethodReceiverIdentifier(
+    private GoIdentifier getMethodReceiverIdentifier(
             GoMethodDeclaration md) {
         GoMethodReceiver methodReceiver = md.getMethodReceiver();
         if (methodReceiver == null) {
@@ -341,7 +343,7 @@ public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
 
         if (fd instanceof GoMethodDeclaration) {
             // Add method receiver to parameter list
-            GoLiteralIdentifier receiver = getMethodReceiverIdentifier((GoMethodDeclaration) fd);
+            GoIdentifier receiver = getMethodReceiverIdentifier((GoMethodDeclaration) fd);
             if (receiver != null) {
                 variables.put(receiver.getName(), new VariableUsage(receiver));
             }
@@ -392,30 +394,30 @@ public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
             }
 
             addProblem(variableUsage, "Unused variable",
-                       ProblemHighlightType.LIKE_UNUSED_SYMBOL, new RemoveVariableFix());
+                    ProblemHighlightType.LIKE_UNUSED_SYMBOL, new RemoveVariableFix());
         }
 
         public void unusedParameter(VariableUsage variableUsage) {
             if (!variableUsage.isBlank()) {
                 addProblem(variableUsage, "Unused parameter",
-                           ProblemHighlightType.LIKE_UNUSED_SYMBOL);
+                        ProblemHighlightType.LIKE_UNUSED_SYMBOL);
             }
         }
 
         public void unusedGlobalVariable(VariableUsage variableUsage) {
             if (variableUsage.element instanceof GoFunctionDeclaration ||
-                variableUsage.element instanceof GoPsiType) {
+                    variableUsage.element instanceof GoPsiType) {
                 return;
             }
 
             addProblem(variableUsage, "Unused global",
-                       ProblemHighlightType.LIKE_UNUSED_SYMBOL,
-                       new RemoveVariableFix());
+                    ProblemHighlightType.LIKE_UNUSED_SYMBOL,
+                    new RemoveVariableFix());
         }
 
         public void addProblem(VariableUsage variableUsage, String desc,
-                                ProblemHighlightType highlightType,
-                                LocalQuickFix... fixes) {
+                               ProblemHighlightType highlightType,
+                               LocalQuickFix... fixes) {
             if (!variableUsage.ignoreAnyProblem) {
                 result.addProblem(variableUsage.element, desc, highlightType, fixes);
             }
@@ -451,7 +453,7 @@ public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
         public void addUsage(GoPsiElement element) {
             for (int i = variables.size() - 1; i >= 0; i--) {
                 VariableUsage variableUsage = variables.get(i)
-                                                       .get(element.getText());
+                        .get(element.getText());
                 if (variableUsage != null) {
                     variableUsage.addUsage(element);
                     return;

@@ -7,7 +7,7 @@ import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.GoExpressionList;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.statements.GoAssignmentStatement;
 
@@ -17,7 +17,7 @@ import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.resolveSafely;
 public class GoReadWriteAccessDetector extends ReadWriteAccessDetector {
     @Override
     public boolean isReadWriteAccessible(PsiElement element) {
-        if (!(element instanceof GoLiteralIdentifier)) {
+        if (!(element instanceof GoIdentifier)) {
             return false;
         }
 
@@ -26,13 +26,13 @@ public class GoReadWriteAccessDetector extends ReadWriteAccessDetector {
         }
 
         PsiElement resolve = resolveSafely(element, PsiElement.class);
-        return resolve instanceof GoLiteralIdentifier && resolve.getParent() instanceof GoVarDeclaration;
+        return resolve instanceof GoIdentifier && resolve.getParent() instanceof GoVarDeclaration;
 
     }
 
     @Override
     public boolean isDeclarationWriteAccess(PsiElement element) {
-        return element instanceof GoLiteralIdentifier && element.getParent() instanceof GoVarDeclaration;
+        return element instanceof GoIdentifier && element.getParent() instanceof GoVarDeclaration;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class GoReadWriteAccessDetector extends ReadWriteAccessDetector {
         }
 
         if (parent instanceof GoVarDeclaration) {
-            for (GoLiteralIdentifier id : ((GoVarDeclaration) parent).getIdentifiers()) {
+            for (GoIdentifier id : ((GoVarDeclaration) parent).getIdentifiers()) {
                 if (id.getTextRange().equals(expression.getTextRange())) {
                     return Access.Write;
                 }

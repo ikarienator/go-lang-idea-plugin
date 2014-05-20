@@ -9,13 +9,11 @@ import ro.redeul.google.go.lang.psi.impl.GoPsiPackagedElementBase;
 import ro.redeul.google.go.lang.psi.impl.expressions.literals.composite.GoLiteralCompositeValueImpl;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeArray;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeArray;
+import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeArray;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 
-import static ro.redeul.google.go.lang.psi.utils.GoTypeUtils.resolveToFinalType;
 import static ro.redeul.google.go.inspection.FunctionCallInspection.getNumberValueFromLiteralExpr;
 
 /**
@@ -24,8 +22,7 @@ import static ro.redeul.google.go.inspection.FunctionCallInspection.getNumberVal
  * Date: Aug 30, 2010
  * Time: 9:07:51 PM
  */
-public class GoPsiTypeArrayImpl extends GoPsiPackagedElementBase implements
-        GoPsiTypeArray {
+public class GoPsiTypeArrayImpl extends GoPsiPackagedElementBase implements GoPsiTypeArray {
 
     public GoPsiTypeArrayImpl(@NotNull ASTNode node) {
         super(node);
@@ -58,20 +55,8 @@ public class GoPsiTypeArrayImpl extends GoPsiPackagedElementBase implements
     }
 
     @Override
-    public GoUnderlyingType getUnderlyingType() {
-        return new GoUnderlyingTypeArray(getElementType().getUnderlyingType(), getArrayLength());
-    }
-
-    @Override
-    public boolean isIdentical(GoPsiType goType) {
-        if (goType instanceof GoPsiTypeName) {
-            goType = resolveToFinalType(goType);
-        }
-        if (!(goType instanceof GoPsiTypeArray)) {
-            return false;
-        }
-        GoPsiTypeArray otherTypeArray = (GoPsiTypeArray) goType;
-        return getUnderlyingType().isIdentical(otherTypeArray.getUnderlyingType());
+    public GoType resolveType() {
+        return new GoTypeArray(this, getElementType().getType(), getArrayLength());
     }
 
     @NotNull

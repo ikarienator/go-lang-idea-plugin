@@ -19,7 +19,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import ro.redeul.google.go.GoFileType;
 import ro.redeul.google.go.lang.psi.GoFile;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameterList;
@@ -186,7 +186,7 @@ public class GoTestConfigurationProducer extends RunConfigurationProducer {
                                                     )
                                     )
                                     .afterSibling(
-                                            psiElement(GoLiteralIdentifier.class)
+                                            psiElement(GoIdentifier.class)
                                                     .withText(string().matches("Benchmark.*"))));
 
     private static final ElementPattern<GoFunctionDeclaration> FUNCTION_TEST =
@@ -202,7 +202,7 @@ public class GoTestConfigurationProducer extends RunConfigurationProducer {
                                                     )
                                     )
                                     .afterSibling(
-                                            psiElement(GoLiteralIdentifier.class)
+                                            psiElement(GoIdentifier.class)
                                                     .withText(string().matches("Test.*"))));
 
     private PsiElement locationToTestFunction(PsiElement location) {

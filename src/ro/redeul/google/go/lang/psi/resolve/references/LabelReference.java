@@ -5,8 +5,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFunction;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.resolve.GoResolveResult;
 import ro.redeul.google.go.lang.psi.statements.GoLabeledStatement;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
@@ -21,11 +21,11 @@ import static ro.redeul.google.go.lang.parser.GoElementTypes.*;
 import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.findParentOfType;
 
 public class LabelReference
-    extends GoPsiReference.Single<GoLiteralIdentifier, LabelReference> {
+    extends GoPsiReference.Single<GoIdentifier, LabelReference> {
 
     @SuppressWarnings("unchecked")
-    public static final ElementPattern<GoLiteralIdentifier> MATCHER =
-            psiElement(GoLiteralIdentifier.class)
+    public static final ElementPattern<GoIdentifier> MATCHER =
+            psiElement(GoIdentifier.class)
                     .withParent(
                             or(
                                     psiElement(GOTO_STATEMENT),
@@ -38,7 +38,7 @@ public class LabelReference
             new ResolveCache.AbstractResolver<LabelReference, GoResolveResult>() {
                 @Override
                 public GoResolveResult resolve(@NotNull LabelReference labelReference, boolean incompleteCode) {
-                    GoLiteralIdentifier e = labelReference.getElement();
+                    GoIdentifier e = labelReference.getElement();
                     GoFunctionDeclaration function = findParentOfType(e,
                             GoFunctionDeclaration.class);
                     final String name = e.getName();
@@ -60,7 +60,7 @@ public class LabelReference
                         public void visitLabeledStatement(GoLabeledStatement statement) {
                             super.visitLabeledStatement(statement);
 
-                            GoLiteralIdentifier label = statement.getLabel();
+                            GoIdentifier label = statement.getLabel();
                             if (label != null && name.equals(label.getText())) {
                                 declaration.set(label);
                             }
@@ -75,7 +75,7 @@ public class LabelReference
                 }
             };
 
-    public LabelReference(@NotNull GoLiteralIdentifier element) {
+    public LabelReference(@NotNull GoIdentifier element) {
         super(element, RESOLVER);
     }
 
@@ -92,7 +92,7 @@ public class LabelReference
 
     @Override
     public boolean isReferenceTo(PsiElement element) {
-        if (!(element instanceof GoLiteralIdentifier)) {
+        if (!(element instanceof GoIdentifier)) {
             return false;
         }
 
@@ -101,7 +101,7 @@ public class LabelReference
             return false;
         }
 
-        GoLiteralIdentifier label = ((GoLabeledStatement) parent).getLabel();
+        GoIdentifier label = ((GoLabeledStatement) parent).getLabel();
         String name = getElement().getName();
         if (label == null || name == null || name.isEmpty() || !name.equals(
                 label.getName())) {
@@ -127,7 +127,7 @@ public class LabelReference
             public void visitLabeledStatement(GoLabeledStatement statement) {
                 super.visitLabeledStatement(statement);
 
-                GoLiteralIdentifier label = statement.getLabel();
+                GoIdentifier label = statement.getLabel();
                 if (label != null) {
                     labels.add(label.getName());
                 }

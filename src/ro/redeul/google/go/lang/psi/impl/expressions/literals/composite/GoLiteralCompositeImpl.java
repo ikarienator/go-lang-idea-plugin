@@ -27,7 +27,7 @@ public class GoLiteralCompositeImpl extends GoPsiElementBase
     }
 
     @Override
-    public Type getType() {
+    public Type getConstantType() {
         return Type.Composite;
     }
 

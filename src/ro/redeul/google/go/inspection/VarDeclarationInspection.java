@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.statements.GoShortVarDeclaration;
 import ro.redeul.google.go.lang.psi.visitors.GoRecursiveElementVisitor;
 
@@ -30,7 +30,7 @@ public class VarDeclarationInspection extends AbstractWholeGoFileInspection {
 
     public static void checkVar(GoVarDeclaration varDeclaration,
                                 InspectionResult result) {
-        GoLiteralIdentifier[] ids = varDeclaration.getIdentifiers();
+        GoIdentifier[] ids = varDeclaration.getIdentifiers();
         GoExpr[] exprs = varDeclaration.getExpressions();
         if (ids.length == exprs.length) {
             checkExpressionShouldReturnOneResult(exprs, result);

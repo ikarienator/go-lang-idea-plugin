@@ -5,8 +5,8 @@ import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.GoUnaryExpression;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteral;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoCallOrConvExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoParenthesisedExpression;
@@ -61,7 +61,7 @@ public class FlipBooleanExpression {
 
         if (expr instanceof GoLiteralExpression) {
             GoLiteral literal = ((GoLiteralExpression) expr).getLiteral();
-            if (literal instanceof GoLiteralIdentifier) {
+            if (literal instanceof GoIdentifier) {
                 return "!" + expr.getText();
             }
         }

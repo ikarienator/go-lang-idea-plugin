@@ -3,8 +3,8 @@ package ro.redeul.google.go.inspection;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.GoBundle;
 import ro.redeul.google.go.lang.psi.GoFile;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFunction;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
 import ro.redeul.google.go.lang.psi.toplevel.GoMethodDeclaration;
@@ -43,7 +43,7 @@ public class FunctionDuplicateArgumentInspection extends AbstractWholeGoFileInsp
     private static void hasDuplicateArgument(InspectionResult result, GoFunctionDeclaration function) {
         Set<String> parameters = new HashSet<String>();
         for (GoFunctionParameter fp : function.getParameters()) {
-            for (GoLiteralIdentifier id : fp.getIdentifiers()) {
+            for (GoIdentifier id : fp.getIdentifiers()) {
                 if (id.isBlank()) {
                     continue;
                 }

@@ -10,7 +10,7 @@ import ro.redeul.google.go.lang.psi.impl.toplevel.GoTypeNameDeclarationImpl;
 import ro.redeul.google.go.lang.psi.stubs.GoStubUtils;
 import ro.redeul.google.go.lang.psi.stubs.GoTypeNameDeclarationStub;
 import ro.redeul.google.go.lang.psi.stubs.index.GoQualifiedTypeName;
-import ro.redeul.google.go.lang.psi.stubs.index.GoTypeName;
+import ro.redeul.google.go.lang.psi.stubs.index.GoTypeNameIndex;
 import ro.redeul.google.go.lang.psi.toplevel.GoTypeNameDeclaration;
 
 import java.io.IOException;
@@ -61,7 +61,7 @@ public class GoTypeNameDeclarationType extends GoStubElementType<GoTypeNameDecla
 
     @Override
     public void indexStub(@NotNull GoTypeNameDeclarationStub stub, @NotNull IndexSink sink) {
-        sink.occurrence(GoTypeName.KEY, stub.getName());
+        sink.occurrence(GoTypeNameIndex.KEY, stub.getName());
         sink.occurrence(GoQualifiedTypeName.KEY, stub.getQualifiedName());
     }
 }

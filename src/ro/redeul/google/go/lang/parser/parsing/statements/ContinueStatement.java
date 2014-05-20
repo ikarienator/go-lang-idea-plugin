@@ -21,7 +21,7 @@ class ContinueStatement implements GoElementTypes {
         }
 
         if (ParserUtils.lookAhead(builder, mIDENT))
-            ParserUtils.eatElement(builder, LITERAL_IDENTIFIER);
+            ParserUtils.eatElement(builder, IDENTIFIER);
 
         marker.done(CONTINUE_STATEMENT);
         return CONTINUE_STATEMENT;

@@ -11,7 +11,7 @@ import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.GoUnaryExpression;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.*;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
@@ -60,7 +60,7 @@ public class InspectionUtil {
             return 1;
         }
 
-        GoLiteralIdentifier[] identifiers = ((GoVarDeclaration) parent).getIdentifiers();
+        GoIdentifier[] identifiers = ((GoVarDeclaration) parent).getIdentifiers();
         GoExpr[] expressions = ((GoVarDeclaration) parent).getExpressions();
         // if the type assertion is the only expression, and there are two variables.
         // The result of the type assertion is a pair of values with types (T, bool)
@@ -72,6 +72,7 @@ public class InspectionUtil {
     }
 
     private static int getFunctionResultCount(GoCallOrConvExpression call) {
+        // TODO(ikarienator): If the call is a conversion, should return 1 instead of UNKNOWN_COUNT
         GoFunctionDeclaration function = resolveToFunctionDeclaration(call);
         return function == null ? UNKNOWN_COUNT : getFunctionResultCount(function);
     }
@@ -94,7 +95,7 @@ public class InspectionUtil {
         int count = 0;
         for (GoFunctionParameter p : function.getParameters()) {
             count += Math.max(p.getIdentifiers().length, 1);
-            if (p.isVariadic()) {
+            if (p.isVariadic() && !call.isVariadic()) {
                 return VARIADIC_COUNT;
             }
         }

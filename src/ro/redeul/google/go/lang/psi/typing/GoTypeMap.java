@@ -1,43 +1,35 @@
 package ro.redeul.google.go.lang.psi.typing;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeMap;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeMap;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
 
-public class GoTypeMap
-    extends GoTypePsiBacked<GoPsiTypeMap, GoUnderlyingTypeMap>
-    implements GoType {
+public class GoTypeMap extends GoTypeBase<GoPsiTypeMap> {
 
+    @NotNull
     private final GoType keyType;
-    private final GoType elementType;
 
-    public GoTypeMap(GoPsiTypeMap type) {
-        super(type);
+    @NotNull
+    private final GoType valueType;
 
-        keyType = GoTypes.fromPsiType(type.getKeyType());
-        elementType = GoTypes.fromPsiType(type.getElementType());
-
-        setUnderlyingType(
-            GoUnderlyingTypes.getMap(
-            ));
-
+    public GoTypeMap(@Nullable GoPsiTypeMap map, @NotNull GoType keyType, @NotNull GoType valueType) {
+        super(map);
+        this.keyType = keyType;
+        this.valueType = valueType;
     }
 
     @Override
-    public boolean isIdentical(GoType type) {
+    public boolean isIdentical(GoType other) {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    @Override
-    public void accept(Visitor visitor) {
-        visitor.visitTypeMap(this);
-    }
-
+    @NotNull
     public GoType getKeyType() {
         return keyType;
     }
 
-    public GoType getElementType() {
-        return elementType;
+    @NotNull
+    public GoType getValueType() {
+        return valueType;
     }
 }

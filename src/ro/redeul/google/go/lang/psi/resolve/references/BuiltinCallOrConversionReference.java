@@ -9,8 +9,9 @@ import com.intellij.psi.util.PsiUtilCore;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoBuiltinCallExpression;
-import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
+import ro.redeul.google.go.lang.psi.expressions.primary.GoIdentifierExpression;
 import ro.redeul.google.go.lang.psi.processors.GoResolveStates;
 import ro.redeul.google.go.lang.psi.resolve.GoResolveResult;
 import ro.redeul.google.go.lang.psi.resolve.MethodOrTypeNameResolver;
@@ -25,12 +26,12 @@ import static ro.redeul.google.go.util.LookupElementUtil.createLookupElement;
 
 public class BuiltinCallOrConversionReference extends AbstractCallOrConversionReference<BuiltinCallOrConversionReference> {
 
-    public static final ElementPattern<GoLiteralExpression> MATCHER =
-                psiElement(GoLiteralExpression.class)
+    public static final ElementPattern<GoIdentifierExpression> MATCHER =
+            psiElement(GoIdentifierExpression.class)
                     .withParent(psiElement(GoBuiltinCallExpression.class))
                     .atStartOf(psiElement(GoBuiltinCallExpression.class));
 
-    public BuiltinCallOrConversionReference(GoLiteralExpression identifier) {
+    public BuiltinCallOrConversionReference(GoIdentifierExpression identifier) {
         super(identifier, RESOLVER);
     }
 
@@ -40,30 +41,30 @@ public class BuiltinCallOrConversionReference extends AbstractCallOrConversionRe
     }
 
     private static final ResolveCache.AbstractResolver<BuiltinCallOrConversionReference, GoResolveResult> RESOLVER =
-        new ResolveCache.AbstractResolver<BuiltinCallOrConversionReference, GoResolveResult>() {
-            @Override
-            public GoResolveResult resolve(@NotNull BuiltinCallOrConversionReference psiReference, boolean incompleteCode) {
-                PsiElement element = psiReference.getElement();
+            new ResolveCache.AbstractResolver<BuiltinCallOrConversionReference, GoResolveResult>() {
+                @Override
+                public GoResolveResult resolve(@NotNull BuiltinCallOrConversionReference psiReference, boolean incompleteCode) {
+                    PsiElement element = psiReference.getElement();
 
-                MethodOrTypeNameResolver processor =
-                    new MethodOrTypeNameResolver(psiReference);
+                    MethodOrTypeNameResolver processor =
+                            new MethodOrTypeNameResolver(psiReference);
 
-                GoNamesCache namesCache = GoNamesCache.getInstance(element.getProject());
+                    GoNamesCache namesCache = GoNamesCache.getInstance(element.getProject());
 
-                // get the file included in the imported package name
-                Collection<GoFile> files = namesCache.getBuiltinPackageFiles();
+                    // get the file included in the imported package name
+                    Collection<GoFile> files = namesCache.getBuiltinPackageFiles();
 
-                for (GoFile file : files) {
-                    ResolveState newState = GoResolveStates.imported("builtin", "");
-                    if (!file.processDeclarations(processor, newState, null, element))  {
-                        break;
+                    for (GoFile file : files) {
+                        ResolveState newState = GoResolveStates.imported("builtin", "");
+                        if (!file.processDeclarations(processor, newState, null, element)) {
+                            break;
+                        }
                     }
+
+                    return GoResolveResult.fromElement(processor.getChildDeclaration());
                 }
 
-                return GoResolveResult.fromElement(processor.getChildDeclaration());
-            }
-
-        };
+            };
 
 //    @Override
 //    public PsiElement resolve() {
@@ -100,7 +101,7 @@ public class BuiltinCallOrConversionReference extends AbstractCallOrConversionRe
 
         for (GoFile file : files) {
             ResolveState newState = GoResolveStates.imported("builtin", "");
-            if (!file.processDeclarations(processor, newState, null, element))  {
+            if (!file.processDeclarations(processor, newState, null, element)) {
                 break;
             }
         }

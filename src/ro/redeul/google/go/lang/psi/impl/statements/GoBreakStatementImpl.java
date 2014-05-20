@@ -2,7 +2,7 @@ package ro.redeul.google.go.lang.psi.impl.statements;
 
 import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.impl.GoPsiElementBase;
 import ro.redeul.google.go.lang.psi.statements.GoBreakStatement;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
@@ -15,8 +15,8 @@ public class GoBreakStatementImpl extends GoPsiElementBase
     }
 
     @Override
-    public GoLiteralIdentifier getLabel() {
-        return findChildByClass(GoLiteralIdentifier.class);
+    public GoIdentifier getLabel() {
+        return findChildByClass(GoIdentifier.class);
     }
 
     @Override

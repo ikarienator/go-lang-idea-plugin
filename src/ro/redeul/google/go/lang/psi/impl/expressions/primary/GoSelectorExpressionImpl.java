@@ -8,8 +8,8 @@ import com.intellij.util.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.GoPrimaryExpression;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoSelectorExpression;
 import ro.redeul.google.go.lang.psi.impl.expressions.GoExpressionBase;
 import ro.redeul.google.go.lang.psi.resolve.references.InterfaceMethodReference;
@@ -19,22 +19,15 @@ import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructAnonymousField;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructField;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeInterface;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypePointer;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeStruct;
-import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypeName;
-import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
-import ro.redeul.google.go.lang.psi.typing.GoTypes;
+import ro.redeul.google.go.lang.psi.typing.*;
 import ro.redeul.google.go.lang.psi.utils.GoIdentifierUtils;
+import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 import ro.redeul.google.go.services.GoPsiManager;
 
 import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.resolveSafely;
 
-public class GoSelectorExpressionImpl extends GoExpressionBase
-        implements GoSelectorExpression {
+public class GoSelectorExpressionImpl extends GoExpressionBase implements GoSelectorExpression {
 
     public GoSelectorExpressionImpl(@NotNull ASTNode node) {
         super(node);
@@ -75,7 +68,7 @@ public class GoSelectorExpressionImpl extends GoExpressionBase
                             };
                         }
 
-                        if (target instanceof GoLiteralIdentifier) {
+                        if (target instanceof GoIdentifier) {
                             GoFunctionDeclaration functionDeclaration = GoIdentifierUtils.getFunctionDeclaration(target);
                             if (functionDeclaration != null) {
                                 return new GoType[]{
@@ -86,7 +79,8 @@ public class GoSelectorExpressionImpl extends GoExpressionBase
 
                         return GoType.EMPTY_ARRAY;
                     }
-                });
+                }
+        );
     }
 
     @Override
@@ -96,8 +90,8 @@ public class GoSelectorExpressionImpl extends GoExpressionBase
 
     @Override
     @Nullable
-    public GoLiteralIdentifier getIdentifier() {
-        return findChildByClass(GoLiteralIdentifier.class);
+    public GoIdentifier getIdentifier() {
+        return findChildByClass(GoIdentifier.class);
     }
 
     private Object[] convertToPresentation(GoPsiType type, GoPsiElement[] members) {
@@ -107,9 +101,9 @@ public class GoSelectorExpressionImpl extends GoExpressionBase
         for (int i = 0, numMembers = members.length; i < numMembers; i++) {
             GoPsiElement member = members[i];
 
-            if (member instanceof GoLiteralIdentifier) {
+            if (member instanceof GoIdentifier) {
                 LookupElementBuilder presentation =
-                        getFieldPresentation(type, (GoLiteralIdentifier) member);
+                        getFieldPresentation(type, (GoIdentifier) member);
 
                 if (presentation != null)
                     presentations[i] = presentation;
@@ -123,7 +117,7 @@ public class GoSelectorExpressionImpl extends GoExpressionBase
     }
 
     @Nullable
-    private LookupElementBuilder getFieldPresentation(GoPsiType type, GoLiteralIdentifier id) {
+    private LookupElementBuilder getFieldPresentation(GoPsiType type, GoIdentifier id) {
 
         String name = id.getName();
         if (name == null)
@@ -164,38 +158,35 @@ public class GoSelectorExpressionImpl extends GoExpressionBase
 
         GoType type = baseTypes[0];
 
-        if (type instanceof GoTypePointer)
+        if (type instanceof GoTypePointer) {
             type = ((GoTypePointer) type).getTargetType();
+        }
 
-        GoUnderlyingType x = type.getUnderlyingType();
+        type = GoTypeUtils.resolveToFinalType(type);
 
-        if (x instanceof GoUnderlyingTypeInterface)
+        if (type instanceof GoTypeInterface)
             return new PsiReference[]{new InterfaceMethodReference(this)};
 
-        if (x instanceof GoUnderlyingTypeStruct && getIdentifier() != null)
+        if (type instanceof GoTypeStruct && getIdentifier() != null)
             return new PsiReference[]{
                     new SelectorOfStructFieldReference(this),
                     new MethodReference(this)
             };
 
-        if (x instanceof GoUnderlyingTypePointer) {
+        if (type instanceof GoTypePointer) {
             return new PsiReference[]{
                     new SelectorOfStructFieldReference(this),
                     new MethodReference(this)
             };
         }
 
-        if (type instanceof GoTypeName) {
+        if (type instanceof GoTypeNamed) {
             return new PsiReference[]{
                     new MethodReference(this)
             };
         }
 
-
-//        if ( type instanceof GoPsiTypeStruct) {
-//            return new StructFieldReference(this);
-
-        return super.getReferences();    //To change body of overridden methods use File | Settings | File Templates.
+        return super.getReferences();
     }
 
     @Override

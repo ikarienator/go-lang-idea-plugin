@@ -10,7 +10,7 @@ import ro.redeul.google.go.intentions.Intention;
 import ro.redeul.google.go.intentions.IntentionExecutionException;
 import ro.redeul.google.go.lang.lexer.GoTokenTypes;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.statements.GoForWithClausesStatement;
 import ro.redeul.google.go.lang.psi.statements.GoIfStatement;
 import ro.redeul.google.go.lang.psi.statements.GoSimpleStatement;
@@ -193,7 +193,7 @@ public class MoveSimpleStatementOutIntention extends Intention {
 
         new GoRecursiveElementVisitor() {
             @Override
-            public void visitLiteralIdentifier(GoLiteralIdentifier identifier) {
+            public void visitIdentifier(GoIdentifier identifier) {
                 PsiElement resolve = resolveSafely(identifier, PsiElement.class);
                 if (resolve == null) {
                     return;

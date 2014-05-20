@@ -11,7 +11,7 @@ import ro.redeul.google.go.lang.psi.GoPsiElement;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.impl.types.GoPsiTypeFunctionImpl;
 import ro.redeul.google.go.lang.psi.processors.GoNamesUtil;
@@ -63,10 +63,10 @@ public class GoVariableUsageStatVisitor2 extends GoRecursiveElementVisitor {
 
         for (GoPsiElement declaration : declarations) {
 
-            if (psiElement(GoLiteralIdentifier.class).accepts(declaration)) {
-                GoLiteralIdentifier ident = (GoLiteralIdentifier) declaration;
+            if (psiElement(GoIdentifier.class).accepts(declaration)) {
+                GoIdentifier ident = (GoIdentifier) declaration;
 
-                if (ident.isIota() || ident.isBlank())
+                if (/* TODO(ikarienator): ident.isIota() || */ ident.isBlank())
                     continue;
 
                 if (GLOBAL_CONST_DECL.accepts(ident) ||
@@ -140,11 +140,11 @@ public class GoVariableUsageStatVisitor2 extends GoRecursiveElementVisitor {
 
     @Override
     public void visitShortVarDeclaration(GoShortVarDeclaration declaration) {
-        GoLiteralIdentifier[] identifiers = declaration.getIdentifiers();
+        GoIdentifier[] identifiers = declaration.getIdentifiers();
 
-        for (GoLiteralIdentifier identifier : identifiers) {
-            GoLiteralIdentifier definition = resolveSafely(identifier,
-                                                           GoLiteralIdentifier.class);
+        for (GoIdentifier identifier : identifiers) {
+            GoIdentifier definition = resolveSafely(identifier,
+                                                           GoIdentifier.class);
             if (definition == null) {
                 declarations.add(identifier);
             } else {
@@ -173,7 +173,7 @@ public class GoVariableUsageStatVisitor2 extends GoRecursiveElementVisitor {
     }
 
     @Override
-    public void visitLiteralIdentifier(GoLiteralIdentifier identifier) {
+    public void visitIdentifier(GoIdentifier identifier) {
         GoPsiElement psiElement = resolveSafely(identifier, GoPsiElement.class);
         if (psiElement != null) {
             usages.add(psiElement);

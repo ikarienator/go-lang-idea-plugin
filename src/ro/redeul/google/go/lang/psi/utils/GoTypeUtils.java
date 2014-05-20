@@ -1,9 +1,8 @@
 package ro.redeul.google.go.lang.psi.utils;
 
 import org.jetbrains.annotations.Nullable;
-import ro.redeul.google.go.lang.psi.toplevel.GoTypeSpec;
-import ro.redeul.google.go.lang.psi.types.GoPsiType;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
+import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeNamed;
 
 public class GoTypeUtils {
     // When trying to resolve the final type, what if user defined a recursive type?
@@ -23,27 +22,16 @@ public class GoTypeUtils {
      * @return null if resolving level is too deep, otherwise return the last resolved type.
      */
     @Nullable
-    public static GoPsiType resolveToFinalType(@Nullable GoPsiType type) {
+    public static GoType resolveToFinalType(@Nullable GoType type) {
         return resolveToFinalType(type, 0);
     }
 
-    private static GoPsiType resolveToFinalType(GoPsiType type, int level) {
+    private static GoType resolveToFinalType(GoType type, int level) {
         if (level > MAX_TYPE_RESOLVING_LEVEL) {
             return null;
         }
-
-        if (!(type instanceof GoPsiTypeName)) {
-            return type;
-        }
-
-        GoPsiTypeName typeName = (GoPsiTypeName) type;
-        if (typeName.isReference() || typeName.isPrimitive()) {
-            return type;
-        }
-
-        GoTypeSpec typeSpec = GoPsiUtils.resolveTypeSpec(typeName);
-        if (typeSpec != null) {
-            return resolveToFinalType(typeSpec.getType(), level + 1);
+        if (type instanceof GoTypeNamed) {
+            return resolveToFinalType(((GoTypeNamed) type).getDefinition(), level + 1);
         }
         return type;
     }

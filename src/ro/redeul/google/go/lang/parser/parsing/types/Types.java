@@ -84,7 +84,7 @@ public class Types implements GoElementTypes {
             ParserUtils.getToken(builder, mIDENT, GoBundle.message("error.identifier.expected"));
         }
 
-        marker.done(LITERAL_IDENTIFIER);
+        marker.done(IDENTIFIER);
         marker.precede().done(TYPE_NAME);
 
         return TYPE_NAME;
@@ -107,7 +107,7 @@ public class Types implements GoElementTypes {
                                      GoBundle.message("identifier.expected"));
             }
 
-            identifier.done(LITERAL_IDENTIFIER);
+            identifier.done(IDENTIFIER);
         } else {
             ParserUtils.wrapError(builder, "identifier.expected");
             identifier.drop();

@@ -7,7 +7,7 @@ import com.intellij.psi.impl.source.resolve.ResolveCache;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.processors.GoNamesUtil;
 import ro.redeul.google.go.lang.psi.resolve.GoResolveResult;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeStruct;
@@ -15,7 +15,6 @@ import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructAnonymousField;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructField;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructPromotedFields;
 import ro.redeul.google.go.lang.psi.typing.GoTypeStruct;
-import ro.redeul.google.go.util.GoUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +26,10 @@ abstract class AbstractStructFieldsReference
         T extends GoPsiElement,
         Ref extends AbstractStructFieldsReference<T, Ref>
     >
-    extends GoPsiReference<T, GoLiteralIdentifier, Ref> {
+    extends GoPsiReference<T, GoIdentifier, Ref> {
 
     AbstractStructFieldsReference(T element,
-                                  GoLiteralIdentifier name,
+                                  GoIdentifier name,
                                   ResolveCache.AbstractResolver<Ref, GoResolveResult> RESOLVER) {
         super(element, name, RESOLVER);
     }
@@ -57,7 +56,7 @@ abstract class AbstractStructFieldsReference
         boolean isImportedStruct = targetIsImportedStruct(psiType);
 
         for (GoTypeStructField field : psiType.getFields()) {
-            for (GoLiteralIdentifier identifier : field.getIdentifiers()) {
+            for (GoIdentifier identifier : field.getIdentifiers()) {
                 if ( !isImportedStruct || GoNamesUtil.isExportedName(identifier.getName()))
                     variants.add(field.getCompletionPresentation(identifier));
             }
@@ -69,7 +68,7 @@ abstract class AbstractStructFieldsReference
         }
 
         GoTypeStructPromotedFields promotedFields = psiType.getPromotedFields();
-        for (GoLiteralIdentifier identifier : promotedFields.getNamedFields()) {
+        for (GoIdentifier identifier : promotedFields.getNamedFields()) {
             GoTypeStructField field = findParentOfType(identifier, GoTypeStructField.class);
             if (field != null) {
                 if ( !isImportedStruct || GoNamesUtil.isExportedName(identifier.getName()))

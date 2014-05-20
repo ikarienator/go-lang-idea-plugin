@@ -9,12 +9,9 @@ import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
 import ro.redeul.google.go.lang.psi.impl.expressions.GoExpressionBase;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeInterface;
 import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypeName;
+import ro.redeul.google.go.lang.psi.typing.GoTypeBuiltin;
 import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
-import ro.redeul.google.go.lang.psi.typing.GoTypes;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 import ro.redeul.google.go.lang.stubs.GoNamesCache;
 
@@ -70,52 +67,28 @@ public abstract class GoBinaryExpressionImpl extends GoExpressionBase
                 return leftTypes;
             } else {
                 // based on http://golang.org/ref/spec#Constant_expressions
-                if (leftOperand.isConstantExpression() && rightOperand.isConstantExpression()){
+                if (leftOperand.isConstantExpression() && rightOperand.isConstantExpression()) {
                     String operator = getOperator().toString();
                     boolean equality = operator.equals("!=") || operator.equals("==");
-                    boolean shift = operator.equals("<<")||operator.equals(">>");
+                    boolean shift = operator.equals("<<") || operator.equals(">>");
                     GoType leftType = leftTypes[0];
                     GoType rightType = rightTypes[0];
-                    GoUnderlyingType leftUnder = leftType.getUnderlyingType();
-                    GoUnderlyingType rightUnder = rightType.getUnderlyingType();
                     if (!equality) {
-                        if (shift){
+                        if (shift) {
                             // shift operation returns untyped int
                             GoNamesCache namesCache =
                                     GoNamesCache.getInstance(this.getProject());
                             return new GoType[]{
-                                    GoTypes.getBuiltin(GoTypes.Builtin.Int, namesCache)
+                                    GoTypeBuiltin.Int
                             };
                         } else {
-                            if (leftType instanceof GoTypePointer && rightType instanceof GoTypePointer){
-                                GoTypePointer lptr = (GoTypePointer)leftType;
-                                GoTypePointer rptr = (GoTypePointer)rightType;
+                            if (leftType instanceof GoTypePointer && rightType instanceof GoTypePointer) {
+                                GoTypePointer lptr = (GoTypePointer) leftType;
+                                GoTypePointer rptr = (GoTypePointer) rightType;
                                 leftType = lptr.getTargetType();
                                 rightType = rptr.getTargetType();
                             }
-                            if (leftType instanceof GoTypeName && rightType instanceof GoTypeName) {
-                                String leftName = ((GoTypeName)leftType).getName();
-                                String rightName = ((GoTypeName)rightType).getName();
-                                // the right order is complex, float, rune, int
-                                if (leftName.startsWith("complex")){
-                                    return leftTypes;
-                                }
-                                if (rightName.startsWith("complex")){
-                                    return rightTypes;
-                                }
-                                if (leftName.startsWith("float")){
-                                    return leftTypes;
-                                }
-                                if (rightName.startsWith("float")){
-                                    return rightTypes;
-                                }
-                                if (leftName.startsWith("rune")) {
-                                    return leftTypes;
-                                }
-                                if (rightName.startsWith("rune")) {
-                                    return rightTypes;
-                                }
-                            }
+                            // TODO
                         }
                     }
                 }

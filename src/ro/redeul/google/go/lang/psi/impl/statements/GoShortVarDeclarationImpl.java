@@ -5,7 +5,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import org.jetbrains.annotations.NotNull;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.impl.declarations.GoVarDeclarationImpl;
 import ro.redeul.google.go.lang.psi.resolve.ShortVarDeclarationResolver;
 import ro.redeul.google.go.lang.psi.statements.GoShortVarDeclaration;
@@ -23,7 +23,7 @@ import java.util.List;
 public class GoShortVarDeclarationImpl extends GoVarDeclarationImpl
     implements GoShortVarDeclaration {
 
-    private List<GoLiteralIdentifier> declarations;
+    private List<GoIdentifier> declarations;
 
     public GoShortVarDeclarationImpl(@NotNull ASTNode node) {
         super(node);
@@ -45,15 +45,15 @@ public class GoShortVarDeclarationImpl extends GoVarDeclarationImpl
     }
 
     @Override
-    public GoLiteralIdentifier[] getDeclarations() {
+    public GoIdentifier[] getDeclarations() {
         if (declarations == null){
-            declarations = new ArrayList<GoLiteralIdentifier>();
-            for (GoLiteralIdentifier identifier: getIdentifiers()) {
+            declarations = new ArrayList<GoIdentifier>();
+            for (GoIdentifier identifier: getIdentifiers()) {
                 if (ShortVarDeclarationResolver.resolve(identifier) == null ) {
                     declarations.add(identifier);
                 }
             }
         }
-        return declarations.toArray(new GoLiteralIdentifier[declarations.size()]);
+        return declarations.toArray(new GoIdentifier[declarations.size()]);
     }
 }

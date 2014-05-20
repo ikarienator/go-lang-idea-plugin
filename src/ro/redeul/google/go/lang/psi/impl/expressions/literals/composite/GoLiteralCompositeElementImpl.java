@@ -6,13 +6,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.composite.GoLiteralComposite;
 import ro.redeul.google.go.lang.psi.expressions.literals.composite.GoLiteralCompositeElement;
 import ro.redeul.google.go.lang.psi.expressions.literals.composite.GoLiteralCompositeValue;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.impl.GoPsiElementBase;
+
 import ro.redeul.google.go.lang.psi.toplevel.GoTypeSpec;
+import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructField;
 import ro.redeul.google.go.lang.psi.typing.*;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
@@ -24,13 +26,30 @@ import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.resolveSafely;
 import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.resolveTypeSpec;
 
 public class GoLiteralCompositeElementImpl extends GoPsiElementBase
-    implements GoLiteralCompositeElement {
+        implements GoLiteralCompositeElement {
+    private static final
+    ElementPattern patternCompositeParent =
+            psiElement(GoLiteralCompositeElement.class)
+                    .withParent(
+                            psiElement(GoLiteralCompositeValue.class)
+                                    .withParent(
+                                            psiElement(GoLiteralComposite.class))
+                    );
+    private static final
+    ElementPattern patternElementParent =
+            psiElement(GoLiteralCompositeElement.class)
+                    .withParent(
+                            psiElement(GoLiteralCompositeValue.class)
+                                    .withParent(
+                                            psiElement(GoLiteralCompositeElement.class))
+                    );
+
     public GoLiteralCompositeElementImpl(@NotNull ASTNode node) {
         super(node);
     }
 
     @Override
-    public GoLiteralIdentifier getKey() {
+    public GoIdentifier getKey() {
         GoExpr keyExpression = getIndex();
 
         if (keyExpression == null)
@@ -39,8 +58,8 @@ public class GoLiteralCompositeElementImpl extends GoPsiElementBase
         if (keyExpression instanceof GoLiteralExpression) {
             GoLiteralExpression expression = (GoLiteralExpression) keyExpression;
 
-            if (expression.getLiteral() instanceof GoLiteralIdentifier) {
-                return (GoLiteralIdentifier) expression.getLiteral();
+            if (expression.getLiteral() instanceof GoIdentifier) {
+                return (GoIdentifier) expression.getLiteral();
             }
         }
 
@@ -68,47 +87,32 @@ public class GoLiteralCompositeElementImpl extends GoPsiElementBase
         return findChildByClass(GoLiteralCompositeValue.class);
     }
 
-    private static final
-    ElementPattern patternCompositeParent =
-        psiElement(GoLiteralCompositeElement.class)
-            .withParent(
-                psiElement(GoLiteralCompositeValue.class)
-                    .withParent(
-                        psiElement(GoLiteralComposite.class)));
-
-    private static final
-    ElementPattern patternElementParent =
-        psiElement(GoLiteralCompositeElement.class)
-            .withParent(
-                psiElement(GoLiteralCompositeValue.class)
-                    .withParent(
-                        psiElement(GoLiteralCompositeElement.class)));
-
     @Override
     public GoType getElementType() {
 
         GoType parentType = null;
         if (patternCompositeParent.accepts(this)) {
             GoLiteralComposite literalComposite =
-                (GoLiteralComposite) getParent().getParent();
+                    (GoLiteralComposite) getParent().getParent();
 
             parentType = GoTypes.fromPsiType(literalComposite.getLiteralType());
         }
 
         if (patternElementParent.accepts(this)) {
             GoLiteralCompositeElement compositeElement =
-                (GoLiteralCompositeElement) getParent().getParent();
+                    (GoLiteralCompositeElement) getParent().getParent();
 
             if (compositeElement.getKey() != null) {
-                GoLiteralIdentifier identifier =
-                    resolveSafely(
-                        compositeElement.getKey(),
-                        psiElement(GoLiteralIdentifier.class)
-                            .withParent(psiElement(GoTypeStructField.class)),
-                        GoLiteralIdentifier.class);
+                GoIdentifier identifier =
+                        resolveSafely(
+                                compositeElement.getKey(),
+                                psiElement(GoIdentifier.class)
+                                        .withParent(psiElement(GoTypeStructField.class)),
+                                GoIdentifier.class
+                        );
                 if (identifier != null) {
                     parentType = GoTypes.fromPsiType(
-                        ((GoTypeStructField) identifier.getParent()).getType());
+                            ((GoTypeStructField) identifier.getParent()).getType());
                 }
             } else {
                 parentType = compositeElement.getElementType();
@@ -119,9 +123,12 @@ public class GoLiteralCompositeElementImpl extends GoPsiElementBase
             return null;
         }
 
-        while (parentType != null && parentType instanceof GoTypeName) {
-            GoTypeName goTypeName = (GoTypeName) parentType;
-            GoTypeSpec typeSpec = resolveTypeSpec(goTypeName.getPsiType());
+        while (parentType != null) {
+            if (!(parentType.getPsiType() instanceof GoPsiTypeName)) {
+                break;
+            }
+
+            GoTypeSpec typeSpec = resolveTypeSpec((GoPsiTypeName) parentType.getPsiType());
 
             if (typeSpec != null)
                 parentType = GoTypes.fromPsiType(typeSpec.getType());
@@ -140,7 +147,7 @@ public class GoLiteralCompositeElementImpl extends GoPsiElementBase
         }
 
         if (parentType instanceof GoTypeMap) {
-            return ((GoTypeMap) parentType).getElementType();
+            return ((GoTypeMap) parentType).getValueType();
         }
 
         return parentType;

@@ -6,7 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.TokenSet;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.statements.GoStatement;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
@@ -48,7 +48,7 @@ class ExpressionOccurrenceManager {
             return;
         }
 
-        Map<GoLiteralIdentifier, PsiElement> localIdentifiers = getAllLocalIdentifiers();
+        Map<GoIdentifier, PsiElement> localIdentifiers = getAllLocalIdentifiers();
         Set<PsiElement> parents = getParentsOfIdentifierDeclarations(localIdentifiers);
         GoPsiElement visitStartElement = defaultVisitStartElement;
         if (!parents.isEmpty()) {
@@ -73,7 +73,7 @@ class ExpressionOccurrenceManager {
         }.visitElement(visitStartElement);
     }
 
-    private Set<PsiElement> getParentsOfIdentifierDeclarations(Map<GoLiteralIdentifier, PsiElement> identifiers) {
+    private Set<PsiElement> getParentsOfIdentifierDeclarations(Map<GoIdentifier, PsiElement> identifiers) {
         Set<PsiElement> parents = new HashSet<PsiElement>();
         for (PsiElement element : identifiers.values()) {
             GoStatement statement = findParentOfType(element, GoStatement.class);
@@ -84,8 +84,8 @@ class ExpressionOccurrenceManager {
         return parents;
     }
 
-    private Map<GoLiteralIdentifier, PsiElement> getAllLocalIdentifiers() {
-        final Map<GoLiteralIdentifier, PsiElement> identifiers = new HashMap<GoLiteralIdentifier, PsiElement>();
+    private Map<GoIdentifier, PsiElement> getAllLocalIdentifiers() {
+        final Map<GoIdentifier, PsiElement> identifiers = new HashMap<GoIdentifier, PsiElement>();
         final AtomicBoolean error = new AtomicBoolean(false);
         new GoRecursiveElementVisitor() {
             @Override
@@ -96,7 +96,7 @@ class ExpressionOccurrenceManager {
             }
 
             @Override
-            public void visitLiteralIdentifier(GoLiteralIdentifier identifier) {
+            public void visitIdentifier(GoIdentifier identifier) {
                 PsiElement resolve = GoPsiUtils.resolveSafely(identifier, PsiElement.class);
                 if (resolve == null) {
                     error.set(true);

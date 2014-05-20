@@ -36,8 +36,6 @@ public class ProjectSdkValidator extends AbstractProjectComponent {
 
     @Override
     public void projectClosed() {
-        //Cleanups fix issue pointing out on pr #354
-        GoTypes.cachedTypes.clear();
         super.projectClosed();
     }
 

@@ -6,7 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import ro.redeul.google.go.GoEditorAwareTestCase;
 import ro.redeul.google.go.lang.psi.GoFile;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 
 import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.findParentOfType;
 
@@ -20,7 +20,7 @@ public class CreateTypeFixTest extends GoEditorAwareTestCase {
     @Override
     protected void invoke(final Project project, final Editor editor, final GoFile file) {
         PsiElement element = file.findElementAt(editor.getSelectionModel().getSelectionStart());
-        final GoLiteralIdentifier identifier = findParentOfType(element, GoLiteralIdentifier.class);
+        final GoIdentifier identifier = findParentOfType(element, GoIdentifier.class);
         assertNotNull(identifier);
 
         CommandProcessor.getInstance().executeCommand(project, new Runnable() {

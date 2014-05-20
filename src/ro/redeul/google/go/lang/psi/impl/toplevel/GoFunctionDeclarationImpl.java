@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.psi.GoFile;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
-import ro.redeul.google.go.lang.psi.impl.GoPsiElementBase;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
+import ro.redeul.google.go.lang.psi.impl.GoFunction;
 import ro.redeul.google.go.lang.psi.processors.GoNamesUtil;
 import ro.redeul.google.go.lang.psi.processors.GoResolveStates;
 import ro.redeul.google.go.lang.psi.statements.GoBlockStatement;
@@ -19,19 +19,13 @@ import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameterList;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeFunction;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
-import ro.redeul.google.go.util.GoUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.getGlobalElementSearchScope;
-import static ro.redeul.google.go.lang.psi.utils.GoTypeUtils.resolveToFinalType;
 
 /**
  * Author: Toader Mihai Claudiu <mtoader@gmail.com>
@@ -39,34 +33,17 @@ import static ro.redeul.google.go.lang.psi.utils.GoTypeUtils.resolveToFinalType;
  * Date: Aug 26, 2010
  * Time: 2:33:51 PM
  */
-public class GoFunctionDeclarationImpl extends GoPsiElementBase
-    implements GoFunctionDeclaration {
-
-    @Override
-    public GoUnderlyingType getUnderlyingType() {
-        return GoUnderlyingTypes.getFunction();
-    }
-
-    @Override
-    public boolean isIdentical(GoPsiType goType) {
-        if (goType instanceof GoPsiTypeName) {
-            goType = resolveToFinalType(goType);
-        }
-        if ( !(goType instanceof GoPsiTypeFunction))
-            return false;
-
-        return GoUtil.CompareFnTypeToDecl((GoPsiTypeFunction) goType, this);
-    }
+public class GoFunctionDeclarationImpl extends GoFunction implements GoFunctionDeclaration {
 
     @Override
     public String getPackageName() {
-       return ((GoFile)getContainingFile()).getPackageName();
+        return ((GoFile) getContainingFile()).getPackageName();
     }
 
     @Override
     public String getQualifiedName() {
         String packageName = getPackageName();
-        if ( packageName == null || packageName.trim().equals("") )
+        if (packageName == null || packageName.trim().equals(""))
             return getName();
 
         return String.format("%s.%s", packageName, getName());
@@ -76,19 +53,21 @@ public class GoFunctionDeclarationImpl extends GoPsiElementBase
         super(node);
     }
 
+    @NotNull
     public String getFunctionName() {
-        GoLiteralIdentifier nameIdentifier = getNameIdentifier();
-        return nameIdentifier != null ? nameIdentifier.getName() : "";
+        GoIdentifier nameIdentifier = getNameIdentifier();
+        return nameIdentifier != null && nameIdentifier.getName() != null ? nameIdentifier.getName() : "";
     }
 
     @Override
+    @NotNull
     public String getName() {
         return getFunctionName();
     }
 
     @Override
     public PsiElement setName(@NonNls @NotNull String name)
-        throws IncorrectOperationException {
+            throws IncorrectOperationException {
         return null;
     }
 
@@ -100,6 +79,7 @@ public class GoFunctionDeclarationImpl extends GoPsiElementBase
         return findChildByClass(GoBlockStatement.class);
     }
 
+    @NotNull
     @Override
     public GoFunctionParameter[] getParameters() {
         GoFunctionParameterList parameterList =
@@ -112,6 +92,7 @@ public class GoFunctionDeclarationImpl extends GoPsiElementBase
         return parameterList.getFunctionParameters();
     }
 
+    @NotNull
     @Override
     public GoFunctionParameter[] getResults() {
         PsiElement result = findChildByType(GoElementTypes.FUNCTION_RESULT);
@@ -119,6 +100,7 @@ public class GoFunctionDeclarationImpl extends GoPsiElementBase
         return GoPsiUtils.getParameters(result);
     }
 
+    @NotNull
     @Override
     public GoPsiType[] getReturnType() {
 
@@ -126,12 +108,12 @@ public class GoFunctionDeclarationImpl extends GoPsiElementBase
 
         GoFunctionParameter[] results = getResults();
         for (GoFunctionParameter result : results) {
-            GoLiteralIdentifier identifiers[] = result.getIdentifiers();
+            GoIdentifier identifiers[] = result.getIdentifiers();
 
             if (identifiers.length == 0 && result.getType() != null) {
                 types.add(result.getType());
             } else {
-                for (GoLiteralIdentifier identifier : identifiers) {
+                for (GoIdentifier identifier : identifiers) {
                     types.add(result.getType());
                 }
             }
@@ -154,9 +136,9 @@ public class GoFunctionDeclarationImpl extends GoPsiElementBase
                                        PsiElement lastParent,
                                        @NotNull PsiElement place) {
 
-        if (! "builtin".equals(state.get(GoResolveStates.PackageName)) &&
-            ! state.get(GoResolveStates.IsOriginalPackage) &&
-            ! GoNamesUtil.isExportedName(getName()))
+        if (!"builtin".equals(state.get(GoResolveStates.PackageName)) &&
+                !state.get(GoResolveStates.IsOriginalPackage) &&
+                !GoNamesUtil.isExportedName(getName()))
             return true;
 
         if (!processor.execute(this, state))
@@ -184,8 +166,8 @@ public class GoFunctionDeclarationImpl extends GoPsiElementBase
     }
 
     @Override
-    public GoLiteralIdentifier getNameIdentifier() {
-        return findChildByClass(GoLiteralIdentifier.class);
+    public GoIdentifier getNameIdentifier() {
+        return findChildByClass(GoIdentifier.class);
     }
 
     @NotNull
@@ -197,7 +179,7 @@ public class GoFunctionDeclarationImpl extends GoPsiElementBase
     @NotNull
     @Override
     public String getPresentationText() {
-        return getName() == null ? "" : getName();
+        return getName();
     }
 
     @Override
@@ -209,7 +191,7 @@ public class GoFunctionDeclarationImpl extends GoPsiElementBase
         for (int i = 0; i < parameters.length; i++) {
             GoFunctionParameter parameter = parameters[i];
             presentationText.append(parameter.getPresentationTailText());
-            if ( i < parameters.length - 1) {
+            if (i < parameters.length - 1) {
                 presentationText.append(",");
             }
         }
@@ -225,7 +207,7 @@ public class GoFunctionDeclarationImpl extends GoPsiElementBase
         for (int i = 0; i < results.length; i++) {
             GoFunctionParameter parameter = results[i];
             presentationText.append(parameter.getPresentationTailText());
-            if ( i < results.length - 1) {
+            if (i < results.length - 1) {
                 presentationText.append(",");
             }
         }

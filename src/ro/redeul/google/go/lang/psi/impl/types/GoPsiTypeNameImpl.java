@@ -7,27 +7,25 @@ import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ro.redeul.google.go.lang.lexer.GoTokenTypes;
 import ro.redeul.google.go.lang.psi.GoPackageReference;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.impl.GoPsiPackagedElementBase;
 import ro.redeul.google.go.lang.psi.resolve.references.BuiltinTypeNameReference;
 import ro.redeul.google.go.lang.psi.resolve.references.TypeNameReference;
 import ro.redeul.google.go.lang.psi.toplevel.GoTypeSpec;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeMap;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeSlice;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeArray;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypePredeclared;
-import ro.redeul.google.go.lang.psi.typing.GoTypes;
-import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
+import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeBuiltin;
+import ro.redeul.google.go.lang.psi.typing.GoTypeNamed;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
+
+import java.util.regex.Pattern;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 import static com.intellij.patterns.StandardPatterns.string;
-import static ro.redeul.google.go.lang.psi.utils.GoTypeUtils.resolveToFinalType;
 
 /**
  * Author: Toader Mihai Claudiu <mtoader@gmail.com>
@@ -38,6 +36,19 @@ import static ro.redeul.google.go.lang.psi.utils.GoTypeUtils.resolveToFinalType;
 public class GoPsiTypeNameImpl extends GoPsiPackagedElementBase
         implements GoPsiTypeName {
 
+    public static final Pattern PRIMITIVE_TYPES_PATTERN =
+            Pattern.compile("" +
+                    "bool|error|byte|rune|uintptr|string|char|" +
+                    "(int|uint)(8|16|32|64)?|" +
+                    "float(32|64)|" +
+                    "complex(64|128)");
+    private static final ElementPattern<PsiElement> PRIMITIVE_TYPES =
+            psiElement()
+                    .withText(string().matches(PRIMITIVE_TYPES_PATTERN.pattern()));
+    private static final ElementPattern<PsiElement> NIL_TYPE =
+            psiElement()
+                    .withText(string().matches("nil"));
+
     public GoPsiTypeNameImpl(@NotNull ASTNode node) {
         super(node);
     }
@@ -45,8 +56,8 @@ public class GoPsiTypeNameImpl extends GoPsiPackagedElementBase
     @Override
     @NotNull
     public String getName() {
-        GoLiteralIdentifier identifier =
-                findChildByClass(GoLiteralIdentifier.class);
+        GoIdentifier identifier =
+                findChildByClass(GoIdentifier.class);
 
         return identifier != null ? identifier.getUnqualifiedName() : getText();
     }
@@ -61,15 +72,7 @@ public class GoPsiTypeNameImpl extends GoPsiPackagedElementBase
         return findChildByClass(GoPackageReference.class);
     }
 
-    private static final ElementPattern<PsiElement> PRIMITIVE_TYPES =
-            psiElement()
-                    .withText(
-                            string().matches(GoTypes.PRIMITIVE_TYPES_PATTERN.pattern()));
-
-    private static final ElementPattern<PsiElement> NIL_TYPE =
-            psiElement()
-                    .withText(string().matches("nil"));
-
+    @Nullable
     @Override
     public PsiReference getReference() {
 
@@ -87,66 +90,19 @@ public class GoPsiTypeNameImpl extends GoPsiPackagedElementBase
     }
 
     @Override
-    public GoUnderlyingType getUnderlyingType() {
+    public GoType resolveType() {
 
         if (PRIMITIVE_TYPES.accepts(this)) {
-            return GoUnderlyingTypePredeclared.getForName(getText());
+            return GoTypeBuiltin.getForName(getText());
         }
 
-        PsiReference reference = getReference();
-        if (reference == null) {
-            return GoUnderlyingType.Undefined;
-        }
-
-        PsiElement resolved = reference.resolve();
-        if (resolved == null) {
-            return GoUnderlyingType.Undefined;
-        }
-
-        if (resolved instanceof GoTypeSpec) {
-            GoTypeSpec spec = (GoTypeSpec) resolved;
-            return spec.getType().getUnderlyingType();
-        }
-
-        return GoUnderlyingType.Undefined;
-    }
-
-    @Override
-    public boolean isIdentical(GoPsiType goType) {
-        if (goType instanceof GoPsiTypeName) {
-
-            if (!getName().equals(goType.getName()))
-                return false;
-
-            if (isPrimitive())
-                return true;
-            GoTypeSpec goTypeSpec = GoPsiUtils.resolveTypeSpec(this);
-            GoTypeSpec goTypeSpec1 = GoPsiUtils.resolveTypeSpec((GoPsiTypeName) goType);
-
-            if (goTypeSpec == null || goTypeSpec1 == null) {
-                return false;
-            }
-
-            if (!goTypeSpec.getContainingFile().getContainingDirectory().equals(goTypeSpec1.getContainingFile().getContainingDirectory()))
-                return false;
-            return true;
-        }
-        else {
-            if (goType instanceof GoPsiTypeMap || goType instanceof GoPsiTypeSlice || goType instanceof GoPsiTypeArray) {
-                GoPsiType resolved = resolveToFinalType(this);
-                if (resolved != null && resolved != this)
-                    return resolved.isIdentical(goType);
-            }
-        }
-
-
-        return false;
+        return new GoTypeNamed(this);
     }
 
     @NotNull
     @Override
-    public GoLiteralIdentifier getIdentifier() {
-        return findChildByClass(GoLiteralIdentifier.class);
+    public GoIdentifier getIdentifier() {
+        return findChildByClass(GoIdentifier.class);
     }
 
     @Override
@@ -156,7 +112,33 @@ public class GoPsiTypeNameImpl extends GoPsiPackagedElementBase
 
     @Override
     public boolean isPrimitive() {
-        return GoTypes.PRIMITIVE_TYPES_PATTERN.matcher(getText()).matches();
+        return PRIMITIVE_TYPES_PATTERN.matcher(getText()).matches();
+    }
+
+    @Nullable
+    @Override
+    public GoPsiType getDefinition() {
+        GoType primitive = GoTypeBuiltin.getForName(getText());
+        if (primitive != null) {
+            return primitive.getPsiType();
+        }
+
+        PsiReference reference = getReference();
+        if (reference == null) {
+            return null;
+        }
+
+        PsiElement resolved = reference.resolve();
+        if (resolved == null) {
+            return null;
+        }
+
+        if (resolved instanceof GoTypeSpec) {
+            GoTypeSpec spec = (GoTypeSpec) resolved;
+            return spec.getType();
+        }
+
+        return null;
     }
 
     @Override

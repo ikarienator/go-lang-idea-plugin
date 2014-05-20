@@ -24,7 +24,7 @@ class GotoStatement implements GoElementTypes {
         if ( ! ParserUtils.getToken(builder, mIDENT, "label.expected") ) {
             labelMarker.drop();
         } else {
-            labelMarker.done(LITERAL_IDENTIFIER);
+            labelMarker.done(IDENTIFIER);
         }
         marker.done(GOTO_STATEMENT);
         return GOTO_STATEMENT;

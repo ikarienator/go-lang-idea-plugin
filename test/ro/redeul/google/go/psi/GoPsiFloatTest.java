@@ -45,7 +45,7 @@ public class GoPsiFloatTest extends GoPsiTestCase {
                         ).getLiteral()
                 );
 
-        assertEquals(GoLiteral.Type.Float, fl.getType());
+        assertEquals(GoLiteral.Type.Float, fl.getConstantType());
         assertEquals((float) 10.0, fl.getValue());
 
         // x
@@ -58,7 +58,7 @@ public class GoPsiFloatTest extends GoPsiTestCase {
                         ).getLiteral()
                 );
 
-        assertEquals(GoLiteral.Type.Float, fl.getType());
+        assertEquals(GoLiteral.Type.Float, fl.getConstantType());
         assertEquals((float) 0.25, fl.getValue());
 
         // y
@@ -71,7 +71,7 @@ public class GoPsiFloatTest extends GoPsiTestCase {
                         ).getLiteral()
                 );
 
-        assertEquals(GoLiteral.Type.Float, fl.getType());
+        assertEquals(GoLiteral.Type.Float, fl.getConstantType());
         assertEquals((float) 0.0, fl.getValue());
 
         // z
@@ -84,7 +84,7 @@ public class GoPsiFloatTest extends GoPsiTestCase {
                         ).getLiteral()
                 );
 
-        assertEquals(GoLiteral.Type.Float, fl.getType());
+        assertEquals(GoLiteral.Type.Float, fl.getConstantType());
         assertEquals((float) 72.40, fl.getValue());
 
         // e1
@@ -97,7 +97,7 @@ public class GoPsiFloatTest extends GoPsiTestCase {
                         ).getLiteral()
                 );
 
-        assertEquals(GoLiteral.Type.Float, fl.getType());
+        assertEquals(GoLiteral.Type.Float, fl.getConstantType());
         assertEquals((float) 1.e+0, fl.getValue());
 
         // e2
@@ -110,7 +110,7 @@ public class GoPsiFloatTest extends GoPsiTestCase {
                         ).getLiteral()
                 );
 
-        assertEquals(GoLiteral.Type.Float, fl.getType());
+        assertEquals(GoLiteral.Type.Float, fl.getConstantType());
         assertEquals((float) 6.67428e-11, fl.getValue());
 
         // e3
@@ -123,7 +123,7 @@ public class GoPsiFloatTest extends GoPsiTestCase {
                         ).getLiteral()
                 );
 
-        assertEquals(GoLiteral.Type.Float, fl.getType());
+        assertEquals(GoLiteral.Type.Float, fl.getConstantType());
         assertEquals((float) 1E6, fl.getValue());
 
     }

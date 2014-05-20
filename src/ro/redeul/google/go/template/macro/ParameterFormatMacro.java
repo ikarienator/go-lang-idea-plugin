@@ -2,7 +2,7 @@ package ro.redeul.google.go.template.macro;
 
 import com.intellij.codeInsight.template.*;
 import org.jetbrains.annotations.NotNull;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
 import ro.redeul.google.go.template.GoTemplateContextType;
@@ -37,7 +37,7 @@ public class ParameterFormatMacro extends Macro {
 
         StringBuilder sb = new StringBuilder();
         for (GoFunctionParameter fp : fd.getParameters()) {
-            for (GoLiteralIdentifier id : fp.getIdentifiers()) {
+            for (GoIdentifier id : fp.getIdentifiers()) {
                 if (id != null && !id.isBlank()) {
                     String name = id.getName();
                     if (name != null) {

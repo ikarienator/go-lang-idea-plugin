@@ -566,7 +566,7 @@
         <stubIndex
                 implementation="ro.redeul.google.go.lang.psi.stubs.index.GoPackageImportPath"/>
         <stubIndex
-                implementation="ro.redeul.google.go.lang.psi.stubs.index.GoTypeName"/>
+                implementation="ro.redeul.google.go.lang.psi.stubs.index.GoTypeNameIndex"/>
         <stubIndex
                 implementation="ro.redeul.google.go.lang.psi.stubs.index.GoQualifiedTypeName"/>
 

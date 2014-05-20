@@ -2,6 +2,7 @@ package ro.redeul.google.go.lang.psi.impl.expressions.literals;
 
 import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
+import ro.redeul.google.go.lang.psi.expressions.literals.GoComplexLiteralValue;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralImaginary;
 import ro.redeul.google.go.lang.psi.impl.GoPsiElementBase;
 
@@ -15,12 +16,12 @@ public class GoLiteralImaginaryImpl extends GoPsiElementBase
 
     @NotNull
     @Override
-    public Number getValue() {
+    public GoComplexLiteralValue getValue() {
         return null;
     }
 
     @Override
-    public Type getType() {
+    public Type getConstantType() {
         return findChildByType(litFLOAT_I) != null
              ? Type.ImaginaryFloat: Type.ImaginaryInt;
     }

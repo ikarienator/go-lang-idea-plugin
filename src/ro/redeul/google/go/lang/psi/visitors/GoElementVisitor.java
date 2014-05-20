@@ -6,14 +6,13 @@ import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclarations;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralBool;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFunction;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.composite.GoLiteralComposite;
 import ro.redeul.google.go.lang.psi.expressions.literals.composite.GoLiteralCompositeElement;
 import ro.redeul.google.go.lang.psi.expressions.literals.composite.GoLiteralCompositeValue;
 import ro.redeul.google.go.lang.psi.expressions.primary.*;
-import ro.redeul.google.go.lang.psi.impl.statements.GoForWithRangeAndVarsStatementImpl;
 import ro.redeul.google.go.lang.psi.statements.*;
 import ro.redeul.google.go.lang.psi.statements.select.GoSelectCommClauseDefault;
 import ro.redeul.google.go.lang.psi.statements.select.GoSelectCommClauseRecv;
@@ -96,7 +95,11 @@ public class GoElementVisitor  {
         visitElement(declaration);
     }
 
-    public void visitLiteralIdentifier(GoLiteralIdentifier identifier) {
+    public void visitIdentifierExpression(GoIdentifierExpression identifier) {
+        visitElement(identifier);
+    }
+
+    public void visitIdentifier(GoIdentifier identifier) {
         visitElement(identifier);
     }
 

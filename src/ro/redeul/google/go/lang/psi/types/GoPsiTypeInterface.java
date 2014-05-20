@@ -8,7 +8,7 @@ import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
  * Date: 5/29/11
  * Time: 2:14 PM
  */
-public interface GoPsiTypeInterface extends GoPsiType, GoMethodSetHolder {
+public interface GoPsiTypeInterface extends GoPsiType {
 
     GoFunctionDeclaration[] getFunctionDeclarations();
 

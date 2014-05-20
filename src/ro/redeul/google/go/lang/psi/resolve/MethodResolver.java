@@ -1,19 +1,18 @@
 package ro.redeul.google.go.lang.psi.resolve;
 
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.resolve.references.MethodReference;
 import ro.redeul.google.go.lang.psi.toplevel.GoMethodDeclaration;
-import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypePointer;
-import ro.redeul.google.go.lang.psi.typing.GoTypeName;
+import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeNamed;
+import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
 
 import java.util.Set;
 
 import static ro.redeul.google.go.lang.completion.GoCompletionContributor.DUMMY_IDENTIFIER;
 
-public class MethodResolver extends GoPsiReferenceResolver<MethodReference>
-{
+public class MethodResolver extends GoPsiReferenceResolver<MethodReference> {
     public MethodResolver(MethodReference reference) {
         super(reference);
     }
@@ -25,28 +24,28 @@ public class MethodResolver extends GoPsiReferenceResolver<MethodReference>
     }
 
     boolean isReferenceTo(GoMethodDeclaration declaration) {
-        GoPsiType receiverType = declaration.getMethodReceiver().getType();
+        GoType receiverType = declaration.getMethodReceiver().getType().getType();
 
         if (receiverType == null)
             return false;
 
-        if (receiverType instanceof GoPsiTypePointer) {
-            receiverType = ((GoPsiTypePointer) receiverType).getTargetType();
+        if (receiverType instanceof GoTypePointer) {
+            receiverType = ((GoTypePointer) receiverType).getTargetType();
         }
 
-        if (!(receiverType instanceof GoPsiTypeName))
+        if (!(receiverType instanceof GoTypeNamed))
             return false;
 
-        GoPsiTypeName methodTypeName = (GoPsiTypeName) receiverType;
+        GoTypeNamed methodTypeName = (GoTypeNamed) receiverType;
 
-        Set<GoTypeName> receiverTypes = getReference().resolveBaseReceiverTypes();
+        Set<GoTypeNamed> receiverTypes = getReference().resolveBaseReceiverTypes();
 
-        GoLiteralIdentifier identifier = getReference().getElement().getIdentifier();
+        GoIdentifier identifier = getReference().getElement().getIdentifier();
         if (identifier == null) {
             return false;
         }
-        for (GoTypeName type : receiverTypes) {
-            if ( type.getName().equals(methodTypeName.getName())) {
+        for (GoTypeNamed type : receiverTypes) {
+            if (type.getName().equals(methodTypeName.getName())) {
                 String methodName = declaration.getFunctionName();
                 String referenceName = identifier.getUnqualifiedName();
 

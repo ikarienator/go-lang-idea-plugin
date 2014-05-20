@@ -1,17 +1,19 @@
 package ro.redeul.google.go.typing;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import ro.redeul.google.go.GoFileBasedPsiTestCase;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
+import ro.redeul.google.go.lang.psi.resolve.GoResolveUtil;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeUntyped;
+import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
 
-public class GoPsiTypingTestCase extends GoFileBasedPsiTestCase
-{
+import java.util.HashSet;
+import java.util.Set;
+
+public class GoPsiTypingTestCase extends GoFileBasedPsiTestCase {
     public String MARKER = "/*type*/";
 
     @Override
@@ -29,13 +31,13 @@ public class GoPsiTypingTestCase extends GoFileBasedPsiTestCase
             position += MARKER.length();
 
             PsiElement element = psiFile.findElementAt(position);
-            while(!(element instanceof GoExpr) &&
-                element != null &&
-                element.getStartOffsetInParent() == 0) {
+            while (!(element instanceof GoExpr) &&
+                    element != null &&
+                    element.getStartOffsetInParent() == 0) {
                 element = element.getParent();
             }
 
-            if (!(element instanceof GoExpr) ) {
+            if (!(element instanceof GoExpr)) {
                 fail("The maker was not positioned on an expression");
             }
 
@@ -54,7 +56,7 @@ public class GoPsiTypingTestCase extends GoFileBasedPsiTestCase
         GoType[] baseTypes = GoType.EMPTY_ARRAY;
         for (GoType[] expressionTypes : expressionsTypes) {
             assertEquals("We should have the same number of types",
-                         typesCount, expressionTypes.length);
+                    typesCount, expressionTypes.length);
             baseTypes = expressionTypes;
         }
 
@@ -62,19 +64,33 @@ public class GoPsiTypingTestCase extends GoFileBasedPsiTestCase
 
         for (GoType[] expressionsType : expressionsTypes) {
             for (int i = 0; i < baseTypes.length; i++) {
-                GoType baseType = baseTypes[i];
+                GoType baseType = GoTypeUtils.resolveToFinalType(baseTypes[i]);
 
-                assertNotNull(baseTypes[i]);
+                assertNotNull(baseType);
                 assertNotNull(expressionsType[i]);
                 assertTrue("We should have the same underlying type",
-                            baseTypes[i].getUnderlyingType().isIdentical(expressionsType[i].getUnderlyingType()));
+                        baseType.isIdentical(GoTypeUtils.resolveToFinalType(expressionsType[i])));
             }
         }
     }
 
-    public void testPredefinedTypes() throws Exception { doTest(); }
-    public void testArrayTypes() throws Exception { doTest(); }
-    public void testSliceTypes() throws Exception { doTest(); }
-    public void testPointerTypes() throws Exception { doTest(); }
-    public void testBinaryExpressions() throws Exception { doTest(); }
+    public void testPredefinedTypes() throws Exception {
+        doTest();
+    }
+
+    public void testArrayTypes() throws Exception {
+        doTest();
+    }
+
+    public void testSliceTypes() throws Exception {
+        doTest();
+    }
+
+    public void testPointerTypes() throws Exception {
+        doTest();
+    }
+
+    public void testBinaryExpressions() throws Exception {
+        doTest();
+    }
 }

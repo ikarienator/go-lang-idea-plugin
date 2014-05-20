@@ -9,7 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import ro.redeul.google.go.GoEditorAwareTestCase;
 import ro.redeul.google.go.lang.psi.GoFile;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 
 public class RemoveVariableFixTest extends GoEditorAwareTestCase {
 
@@ -86,10 +86,10 @@ public class RemoveVariableFixTest extends GoEditorAwareTestCase {
     protected void invoke(Project project, Editor editor, GoFile file) {
         PsiElement element = file.findElementAt(
             editor.getSelectionModel().getSelectionStart());
-        if (!(element instanceof GoLiteralIdentifier)) {
+        if (!(element instanceof GoIdentifier)) {
             element = element.getParent();
         }
-        assertTrue(element instanceof GoLiteralIdentifier);
+        assertTrue(element instanceof GoIdentifier);
 
 //        System.out.println(DebugUtil.psiToString(file, false, true));
         InspectionManager im = InspectionManager.getInstance(project);

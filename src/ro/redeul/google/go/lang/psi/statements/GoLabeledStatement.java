@@ -1,9 +1,9 @@
 package ro.redeul.google.go.lang.psi.statements;
 
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 
 public interface GoLabeledStatement extends GoStatement {
-    GoLiteralIdentifier getLabel();
+    GoIdentifier getLabel();
 
     GoStatement getStatement();
 }

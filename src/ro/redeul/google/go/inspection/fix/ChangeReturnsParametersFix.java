@@ -19,9 +19,7 @@ import ro.redeul.google.go.lang.psi.statements.GoReturnStatement;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypeArray;
 import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
-import ro.redeul.google.go.lang.psi.typing.GoTypePsiBacked;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
 import ro.redeul.google.go.util.GoUtil;
 
@@ -93,21 +91,14 @@ public class ChangeReturnsParametersFix extends LocalQuickFixAndIntentionActionO
                 }
                 if (type != null) {
 
-                    while (!(type instanceof GoTypePsiBacked)) {
-                        if (type instanceof GoTypePointer) {
-                            type = ((GoTypePointer) type).getTargetType();
-                            stringBuilder.append("*");
-                            continue;
-                        }
-                        break;
+                    while (type instanceof GoTypePointer) {
+                        type = ((GoTypePointer) type).getTargetType();
+                        stringBuilder.append("*");
                     }
 
 
-                    if (type instanceof GoTypePsiBacked) {
-                        GoPsiType goPsiType = ((GoTypePsiBacked) type).getPsiType();
-                        stringBuilder.append(GoUtil.getNameLocalOrGlobal(goPsiType, (GoFile) element.getContainingFile()));
-                    } else if (type instanceof GoTypeArray) {
-                        GoPsiType goPsiType = ((GoTypeArray) type).getPsiType();
+                    if (type.getPsiType() != null) {
+                        GoPsiType goPsiType = type.getPsiType();
                         stringBuilder.append(GoUtil.getNameLocalOrGlobal(goPsiType, (GoFile) element.getContainingFile()));
                     }
                 } else {
@@ -119,6 +110,9 @@ public class ChangeReturnsParametersFix extends LocalQuickFixAndIntentionActionO
         }
 
         GoFunctionDeclaration functionDeclaration = GoPsiUtils.findParentOfType(element, GoFunctionDeclaration.class);
+        if (functionDeclaration == null) {
+            return;
+        }
         int startOffset;
         PsiElement result = GoPsiUtils.findChildOfType(functionDeclaration, GoElementTypes.FUNCTION_RESULT);
         if (result != null) {

@@ -187,11 +187,13 @@ public abstract class ParserUtils {
      * @param builder Given builder
      * @param elem    Node element
      */
-    public static void eatElement(PsiBuilder builder,
+    public static PsiBuilder.Marker eatElement(PsiBuilder builder,
                                           IElementType elem) {
         PsiBuilder.Marker marker = builder.mark();
         builder.advanceLexer();
         marker.done(elem);
+
+        return marker;
     }
 
     /**

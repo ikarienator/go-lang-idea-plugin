@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import ro.redeul.google.go.lang.lexer.GoTokenTypes;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
 import ro.redeul.google.go.lang.psi.expressions.GoPrimaryExpression;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoBuiltinCallExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoCallOrConvExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
@@ -31,7 +31,7 @@ public class GoExpressionUtils {
         if (baseExpression instanceof GoLiteralExpression) {
             GoLiteralExpression literal = (GoLiteralExpression) baseExpression;
             PsiElement child = literal.getLiteral();
-            return child instanceof GoLiteralIdentifier ? (GoLiteralIdentifier) child : null;
+            return child instanceof GoIdentifier ? (GoIdentifier) child : null;
         }
 
         if (baseExpression instanceof GoSelectorExpression) {

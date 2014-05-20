@@ -16,7 +16,7 @@ import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.toplevel.*;
 import ro.redeul.google.go.lang.psi.types.*;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructAnonymousField;
@@ -106,7 +106,7 @@ public class GoStructureViewElement implements StructureViewTreeElement, ItemPre
             return new MethodInfo(element);
         } else if (element instanceof GoFunctionDeclaration) {
             return new FunctionInfo(element);
-        } else if (element instanceof GoLiteralIdentifier || element instanceof GoPsiTypeName) {
+        } else if (element instanceof GoIdentifier || element instanceof GoPsiTypeName) {
             return new LiteralIdentifierInfo(element);
         } else if (element instanceof GoTypeSpec) {
             GoPsiType type = ((GoTypeSpec) element).getType();
@@ -159,11 +159,11 @@ public class GoStructureViewElement implements StructureViewTreeElement, ItemPre
 
             ArrayList<StructureViewTreeElement> children = new ArrayList<StructureViewTreeElement>();
 
-            for (GoLiteralIdentifier id : getConstDeclarations(psiFile)) {
+            for (GoIdentifier id : getConstDeclarations(psiFile)) {
                 children.add(new GoStructureViewElement(new ConstLiteralIdentifierInfo(id)));
             }
 
-            for (GoLiteralIdentifier id : getVariableDeclarations(psiFile)) {
+            for (GoIdentifier id : getVariableDeclarations(psiFile)) {
                 children.add(new GoStructureViewElement(new VariableLiteralIdentifierInfo(id)));
             }
 
@@ -196,14 +196,14 @@ public class GoStructureViewElement implements StructureViewTreeElement, ItemPre
             return children.toArray(new TreeElement[children.size()]);
         }
 
-        private List<GoLiteralIdentifier> getConstDeclarations(GoFile psiFile) {
-            List<GoLiteralIdentifier> consts = GoFileUtils.getConstIdentifiers(psiFile);
+        private List<GoIdentifier> getConstDeclarations(GoFile psiFile) {
+            List<GoIdentifier> consts = GoFileUtils.getConstIdentifiers(psiFile);
             Collections.sort(consts, NAMED_ELEMENT_COMPARATOR);
             return consts;
         }
 
-        private List<GoLiteralIdentifier> getVariableDeclarations(GoFile psiFile) {
-            List<GoLiteralIdentifier> vars = GoFileUtils.getVariableIdentifiers(psiFile);
+        private List<GoIdentifier> getVariableDeclarations(GoFile psiFile) {
+            List<GoIdentifier> vars = GoFileUtils.getVariableIdentifiers(psiFile);
             Collections.sort(vars, NAMED_ELEMENT_COMPARATOR);
             return vars;
         }
@@ -303,7 +303,7 @@ public class GoStructureViewElement implements StructureViewTreeElement, ItemPre
 
             PsiElement parent = element.getParent();
             GoPsiType type = null;
-            GoLiteralIdentifier[] identifiers = GoLiteralIdentifier.EMPTY_ARRAY;
+            GoIdentifier[] identifiers = GoIdentifier.EMPTY_ARRAY;
             GoExpr[] expressions = GoExpr.EMPTY_ARRAY;
             if (parent instanceof GoVarDeclaration) {
                 GoVarDeclaration vd = (GoVarDeclaration) parent;
@@ -506,7 +506,7 @@ public class GoStructureViewElement implements StructureViewTreeElement, ItemPre
         private List<PsiNamedElement> getNamedFields(GoPsiTypeStruct struct) {
             List<PsiNamedElement> children = new ArrayList<PsiNamedElement>();
             for (GoTypeStructField field : struct.getFields()) {
-                for (GoLiteralIdentifier identifier : field.getIdentifiers()) {
+                for (GoIdentifier identifier : field.getIdentifiers()) {
                     if (!identifier.isBlank()) {
                         children.add(identifier);
                     }

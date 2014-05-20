@@ -7,7 +7,7 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.impl.GoPsiElementBase;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.typing.GoType;
@@ -25,8 +25,8 @@ public class GoVarDeclarationImpl extends GoPsiElementBase implements GoVarDecla
     }
 
     @Override
-    public GoLiteralIdentifier[] getIdentifiers() {
-        return findChildrenByClass(GoLiteralIdentifier.class);
+    public GoIdentifier[] getIdentifiers() {
+        return findChildrenByClass(GoIdentifier.class);
     }
 
     @Override
@@ -50,17 +50,17 @@ public class GoVarDeclarationImpl extends GoPsiElementBase implements GoVarDecla
                                        @NotNull ResolveState state,
                                        PsiElement lastParent,
                                        @NotNull PsiElement place) {
-        return  processor.execute(this, state);
+        return processor.execute(this, state);
     }
 
     @Override
-    public GoType getIdentifierType(GoLiteralIdentifier identifier) {
+    public GoType getIdentifierType(GoIdentifier identifier) {
         GoPsiType identifiersType = getIdentifiersType();
         if (identifiersType != null) {
             return GoTypes.fromPsiType(identifiersType);
         }
 
-        GoLiteralIdentifier[] identifiers = getIdentifiers();
+        GoIdentifier[] identifiers = getIdentifiers();
         GoExpr[] expressions = getExpressions();
 
         List<GoType> types = new ArrayList<GoType>();
@@ -69,7 +69,7 @@ public class GoVarDeclarationImpl extends GoPsiElementBase implements GoVarDecla
         }
 
         for (int i = 0; i < identifiers.length; i++) {
-            GoLiteralIdentifier ident = identifiers[i];
+            GoIdentifier ident = identifiers[i];
             if (ident.isEquivalentTo(identifier) && types.size() > i)
                 return types.get(i);
         }

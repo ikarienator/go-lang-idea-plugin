@@ -13,7 +13,7 @@ public class ConvertToInterpretedStringIntention extends Intention {
     @Override
     protected boolean satisfiedBy(PsiElement element) {
         return element instanceof GoLiteralString &&
-               ((GoLiteralString) element).getType() == GoLiteral.Type.RawString;
+               ((GoLiteralString) element).getConstantType() == GoLiteral.Type.RawString;
     }
 
     @Override

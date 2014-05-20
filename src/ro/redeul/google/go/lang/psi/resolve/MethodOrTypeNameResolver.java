@@ -1,7 +1,7 @@
 package ro.redeul.google.go.lang.psi.resolve;
 
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.processors.GoResolveStates;
 import ro.redeul.google.go.lang.psi.resolve.references.AbstractCallOrConversionReference;
 import ro.redeul.google.go.lang.psi.statements.GoShortVarDeclaration;
@@ -47,7 +47,7 @@ public class MethodOrTypeNameResolver
 
     @Override
     public void visitShortVarDeclaration(GoShortVarDeclaration declaration) {
-        GoLiteralIdentifier ids[] = declaration.getDeclarations();
+        GoIdentifier ids[] = declaration.getDeclarations();
         checkIdentifiers(ids);
     }
 
@@ -62,7 +62,7 @@ public class MethodOrTypeNameResolver
             return;
         }
 
-        for (GoLiteralIdentifier identifier : parameter.getIdentifiers()) {
+        for (GoIdentifier identifier : parameter.getIdentifiers()) {
             if (!checkReference(identifier)) {
                 continue;
             }

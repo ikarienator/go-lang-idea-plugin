@@ -3,8 +3,8 @@ package ro.redeul.google.go.inspection;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.GoBundle;
 import ro.redeul.google.go.lang.psi.GoFile;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFunction;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
 import ro.redeul.google.go.lang.psi.toplevel.GoMethodDeclaration;
@@ -46,7 +46,7 @@ public class FunctionRedeclareParameterInResultInspection extends AbstractWholeG
         Set<String> parameters = new HashSet<String>(getParameterNames(function.getParameters()));
 
         for (GoFunctionParameter fp : function.getResults()) {
-            for (GoLiteralIdentifier id : fp.getIdentifiers()) {
+            for (GoIdentifier id : fp.getIdentifiers()) {
                 String text = id.getText();
                 if (!id.isBlank() && parameters.contains(text)) {
                     result.addProblem(id, GoBundle.message("error.redeclared.in.block", text));
@@ -58,7 +58,7 @@ public class FunctionRedeclareParameterInResultInspection extends AbstractWholeG
     private static List<String> getParameterNames(GoFunctionParameter[] parameters) {
         List<String> parameterNames = new ArrayList<String>();
         for (GoFunctionParameter fp : parameters) {
-            for (GoLiteralIdentifier id : fp.getIdentifiers()) {
+            for (GoIdentifier id : fp.getIdentifiers()) {
                 if (!id.isBlank()) {
                     parameterNames.add(id.getText());
                 }

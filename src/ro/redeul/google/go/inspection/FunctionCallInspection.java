@@ -12,18 +12,16 @@ import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.GoPrimaryExpression;
 import ro.redeul.google.go.lang.psi.expressions.GoUnaryExpression;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteral;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFloat;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralInteger;
-import ro.redeul.google.go.lang.psi.expressions.primary.GoBuiltinCallExpression;
-import ro.redeul.google.go.lang.psi.expressions.primary.GoCallOrConvExpression;
-import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
-import ro.redeul.google.go.lang.psi.expressions.primary.GoParenthesisedExpression;
+import ro.redeul.google.go.lang.psi.expressions.primary.*;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeChannel;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeMap;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeSlice;
+import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeChannel;
+import ro.redeul.google.go.lang.psi.typing.GoTypeMap;
+import ro.redeul.google.go.lang.psi.typing.GoTypeSlice;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoRecursiveElementVisitor;
 import ro.redeul.google.go.util.GoTypeInspectUtil;
@@ -89,12 +87,12 @@ public class FunctionCallInspection extends AbstractWholeGoFileInspection {
             return;
         }
 
-        GoPsiType finalType = resolveToFinalType(type);
-        if (finalType instanceof GoPsiTypeSlice) {
+        GoType finalType = resolveToFinalType(type.getType());
+        if (finalType instanceof GoTypeSlice) {
             checkMakeSliceCall(expression, arguments, result);
-        } else if (finalType instanceof GoPsiTypeChannel) {
+        } else if (finalType instanceof GoTypeChannel) {
             checkMakeChannelCall(arguments, result);
-        } else if (finalType instanceof GoPsiTypeMap) {
+        } else if (finalType instanceof GoTypeMap) {
             checkMakeMapCall(arguments, result);
         } else {
             result.addProblem(expression, GoBundle.message("error.cannot.make.type", type.getText()));
@@ -129,22 +127,6 @@ public class FunctionCallInspection extends AbstractWholeGoFileInspection {
     public static Number getNumberValueFromLiteralExpr(GoExpr expr) {
         if (expr instanceof GoLiteralExpression) {
             GoLiteral literal = ((GoLiteralExpression) expr).getLiteral();
-            if (literal instanceof GoLiteralIdentifier) {
-                if (((GoLiteralIdentifier) literal).isIota()) {
-                    Integer iotaValue = ((GoLiteralIdentifier) literal).getIotaValue();
-                    if (iotaValue != null)
-                        return iotaValue;
-
-                } else {
-                    PsiElement goConstIdentifier = GoUtil.ResolveReferece(literal);
-                    PsiElement goConstSpec = goConstIdentifier.getParent();
-                    if (goConstSpec instanceof GoConstDeclaration) {
-                        GoExpr goConstExpr = ((GoConstDeclaration) goConstSpec).getExpression((GoLiteralIdentifier) goConstIdentifier);
-                        if (goConstExpr != null)
-                            return getNumberValueFromLiteralExpr(goConstExpr);
-                    }
-                }
-            }
             if (literal instanceof GoLiteralInteger) {
                 return ((GoLiteralInteger) literal).getValue();
             }
@@ -153,11 +135,23 @@ public class FunctionCallInspection extends AbstractWholeGoFileInspection {
             }
             if (literal.getNode().getElementType() == GoElementTypes.LITERAL_CHAR) {
                 return GoPsiUtils.getRuneValue(literal.getText());
-
             }
+        } else if (expr instanceof GoIdentifierExpression) {
+            if (((GoIdentifierExpression) expr).isIota()) {
+                Integer iotaValue = ((GoIdentifierExpression) expr).getIotaValue();
+                if (iotaValue != null)
+                    return iotaValue;
 
-        }
-        if (expr instanceof GoBinaryExpression) {
+            } else {
+                PsiElement goConstIdentifier = GoUtil.ResolveReferece(expr);
+                PsiElement goConstSpec = goConstIdentifier.getParent();
+                if (goConstSpec instanceof GoConstDeclaration) {
+                    GoExpr goConstExpr = ((GoConstDeclaration) goConstSpec).getExpression((GoIdentifier) goConstIdentifier);
+                    if (goConstExpr != null)
+                        return getNumberValueFromLiteralExpr(goConstExpr);
+                }
+            }
+        } else if (expr instanceof GoBinaryExpression) {
             GoExpr leftOp = ((GoBinaryExpression) expr).getLeftOperand();
             GoExpr rightOp = ((GoBinaryExpression) expr).getRightOperand();
             IElementType op = ((GoBinaryExpression) expr).getOperator();
@@ -201,8 +195,7 @@ public class FunctionCallInspection extends AbstractWholeGoFileInspection {
                     }
                 }
             }
-        }
-        if (expr instanceof GoUnaryExpression) {
+        } else if (expr instanceof GoUnaryExpression) {
             GoUnaryExpression.Op unaryOp = ((GoUnaryExpression) expr).getUnaryOp();
             GoExpr unaryExpr = ((GoUnaryExpression) expr).getExpression();
             if (unaryOp == GoUnaryExpression.Op.None || unaryOp == GoUnaryExpression.Op.Plus
@@ -224,8 +217,7 @@ public class FunctionCallInspection extends AbstractWholeGoFileInspection {
                 }
                 return unaryVal;
             }
-        }
-        if (expr instanceof GoParenthesisedExpression)
+        } else if (expr instanceof GoParenthesisedExpression)
             return getNumberValueFromLiteralExpr(((GoParenthesisedExpression) expr).getInnerExpression());
         return null;
     }
@@ -261,7 +253,7 @@ public class FunctionCallInspection extends AbstractWholeGoFileInspection {
             name = id.getText();
         }
 
-        if (expectedCount == VARIADIC_COUNT) {
+        if (expectedCount == VARIADIC_COUNT && !call.isVariadic()) {
             GoTypeInspectUtil.checkFunctionTypeArguments(call, result);
         } else {
             if (argumentCount < expectedCount) {

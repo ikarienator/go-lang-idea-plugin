@@ -15,7 +15,7 @@ import ro.redeul.google.go.config.sdk.GoTargetOs;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.stubs.index.GoPackageImportPath;
 import ro.redeul.google.go.lang.psi.stubs.index.GoPackageName;
-import ro.redeul.google.go.lang.psi.stubs.index.GoTypeName;
+import ro.redeul.google.go.lang.psi.stubs.index.GoTypeNameIndex;
 import ro.redeul.google.go.lang.psi.toplevel.GoTypeNameDeclaration;
 import ro.redeul.google.go.sdk.GoSdkUtil;
 
@@ -197,7 +197,7 @@ public class GoNamesCache {
         StubIndex index = StubIndex.getInstance();
         GlobalSearchScope scope = getSearchScope(includeNonProjectItems);
         Collection<NavigationItem> items = new ArrayList<NavigationItem>();
-        for (GoTypeNameDeclaration type : index.safeGet(GoTypeName.KEY, name,
+        for (GoTypeNameDeclaration type : index.safeGet(GoTypeNameIndex.KEY, name,
                                                     project, scope, GoTypeNameDeclaration.class)) {
             if (type instanceof NavigationItem) {
                 items.add((NavigationItem) type);
@@ -220,7 +220,7 @@ public class GoNamesCache {
         }
 
         StubIndex index = StubIndex.getInstance();
-        dest.addAll(index.getAllKeys(GoTypeName.KEY, project));
+        dest.addAll(index.getAllKeys(GoTypeNameIndex.KEY, project));
     }
 
     @NotNull

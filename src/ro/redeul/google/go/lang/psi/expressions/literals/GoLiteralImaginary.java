@@ -1,4 +1,4 @@
 package ro.redeul.google.go.lang.psi.expressions.literals;
 
-public interface GoLiteralImaginary extends GoLiteral<Number> {
+public interface GoLiteralImaginary extends GoLiteral<GoComplexLiteralValue> {
 }

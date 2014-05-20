@@ -3,14 +3,14 @@ package ro.redeul.google.go.lang.psi.utils;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.Nullable;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 
 public class GoIdentifierUtils {
     private static final ElementPattern FUNCTION_DECLARATION_PATTERN =
-            psiElement(GoLiteralIdentifier.class)
+            psiElement(GoIdentifier.class)
                     .withParent(
                             psiElement(GoFunctionDeclaration.class));
 
@@ -20,7 +20,7 @@ public class GoIdentifierUtils {
 
     @Nullable
     public static GoFunctionDeclaration getFunctionDeclaration(@Nullable PsiElement identifier) {
-        if (!(identifier instanceof GoLiteralIdentifier)) {
+        if (!(identifier instanceof GoIdentifier)) {
             return null;
         }
 

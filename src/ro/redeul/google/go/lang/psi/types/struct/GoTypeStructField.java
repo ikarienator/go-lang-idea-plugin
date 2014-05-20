@@ -1,7 +1,7 @@
 package ro.redeul.google.go.lang.psi.types.struct;
 
 import ro.redeul.google.go.lang.psi.GoPsiElement;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.impl.GoPsiElementBase;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 
@@ -15,7 +15,7 @@ public interface GoTypeStructField extends GoPsiElement {
 
     boolean isBlank();
 
-    GoLiteralIdentifier[] getIdentifiers();
+    GoIdentifier[] getIdentifiers();
 
     GoPsiElementBase getTag();
 

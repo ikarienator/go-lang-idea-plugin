@@ -8,8 +8,7 @@ import ro.redeul.google.go.lang.psi.typing.GoTypeChannel;
  * Time: 1:20:40 PM
  */
 public interface GoPsiTypeChannel extends GoPsiType {
-
-    GoTypeChannel.ChannelType getChannelType();
+    GoTypeChannel.Direction getDirection();
 
     GoPsiType getElementType();
 }

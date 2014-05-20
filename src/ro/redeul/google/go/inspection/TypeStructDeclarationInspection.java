@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.GoBundle;
 import ro.redeul.google.go.lang.psi.GoFile;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.toplevel.GoTypeSpec;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
@@ -82,7 +82,7 @@ public class TypeStructDeclarationInspection
                     "error.invalid.recursive.type", struct.getName()));
             }
 
-            for (GoLiteralIdentifier identifier : field.getIdentifiers()) {
+            for (GoIdentifier identifier : field.getIdentifiers()) {
                 String name = identifier.getUnqualifiedName();
                 if (fields.contains(name)) {
                     result.addProblem(identifier,
@@ -105,7 +105,7 @@ public class TypeStructDeclarationInspection
                         "error.invalid.recursive.type", struct.getName()));
                 }
 
-                GoLiteralIdentifier identifier = typeName.getIdentifier();
+                GoIdentifier identifier = typeName.getIdentifier();
                 String name = identifier.getUnqualifiedName();
                 if (fields.contains(name)) {
                     result.addProblem(identifier, GoBundle.message(

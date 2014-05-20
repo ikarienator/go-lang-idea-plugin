@@ -5,7 +5,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.psi.PsiElement;
 import ro.redeul.google.go.GoLightCodeInsightFixtureTestCase;
 import ro.redeul.google.go.lang.parser.GoElementTypes;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.util.GoTestUtils;
 
 import java.io.File;
@@ -28,7 +28,7 @@ public class GoReadWriteAccessDetectorTest extends GoLightCodeInsightFixtureTest
         PsiElement child = element.getFirstChild();
         while (child != null) {
             if (isNodeOfType(child, GoElementTypes.COMMENTS) && GoTestUtils.MARKER_BEGIN.equals(child.getText())) {
-                PsiElement toDetect = findParentOfType(nextLeaf(child), GoLiteralIdentifier.class);
+                PsiElement toDetect = findParentOfType(nextLeaf(child), GoIdentifier.class);
                 assertNotNull(getElementInfo(child, "Should be followed by identifier"), toDetect);
                 PsiElement endComment = nextLeaf(toDetect);
                 assertNotNull(endComment);

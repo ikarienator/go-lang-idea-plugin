@@ -20,7 +20,7 @@ type /*begin*/IT/*end.go.type.name*/ interface {
 }
 
 func /*begin*/Foo/*end.go.method.declaration*/(/*begin*/a/*end.go.variable*/, /*begin*/b/*end.go.variable*/ /*begin*/int/*end.go.type.name*/, /*begin*/c/*end.go.variable*/ /*begin*/float64/*end.go.type.name*/) (/*begin*/m/*end.go.variable*/ /*begin*/int/*end.go.type.name*/, /*begin*/n/*end.go.variable*/ interface{}) {
-	if /*begin*/a/*end.go.variable*/ < /*begin*/int/*end.go.type.name*/(c) {
+	if /*begin*/a/*end.go.variable*/ < /*begin*/int/*end.go.type.name*/(/*begin*/c/*end.go.variable*/) {
 		/*begin*/m/*end.go.variable*/ = 1
 		/*begin*/n/*end.go.variable*/ = 2
 		return

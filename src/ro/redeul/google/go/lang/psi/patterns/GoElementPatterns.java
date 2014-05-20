@@ -7,10 +7,8 @@ import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclarations;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclarations;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
-import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.statements.GoForWithRangeAndVarsStatement;
-import ro.redeul.google.go.lang.psi.statements.GoForWithRangeStatement;
 import ro.redeul.google.go.lang.psi.statements.GoLabeledStatement;
 import ro.redeul.google.go.lang.psi.statements.GoShortVarDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
@@ -24,37 +22,37 @@ import static com.intellij.patterns.StandardPatterns.or;
 
 public class GoElementPatterns {
 
-    public static final ElementPattern<GoLiteralIdentifier> GLOBAL_CONST_DECL =
-        psiElement(GoLiteralIdentifier.class)
+    public static final ElementPattern<GoIdentifier> GLOBAL_CONST_DECL =
+        psiElement(GoIdentifier.class)
             .withParent(
                 psiElement(GoConstDeclaration.class)
                     .withParent(
                         psiElement(GoConstDeclarations.class)
                             .withParent(psiElement(GoFile.class))));
 
-    public static final ElementPattern<GoLiteralIdentifier> CONST_DECLARATION =
-        psiElement(GoLiteralIdentifier.class)
+    public static final ElementPattern<GoIdentifier> CONST_DECLARATION =
+        psiElement(GoIdentifier.class)
             .withParent(GoConstDeclaration.class);
 
-    public static final ElementPattern<GoLiteralIdentifier> GLOBAL_VAR_DECL =
-        psiElement(GoLiteralIdentifier.class)
+    public static final ElementPattern<GoIdentifier> GLOBAL_VAR_DECL =
+        psiElement(GoIdentifier.class)
             .withParent(
                 psiElement(GoVarDeclaration.class)
                     .withParent(
                         psiElement(GoVarDeclarations.class)
                             .withParent(psiElement(GoFile.class))));
 
-    public static final ElementPattern<GoLiteralIdentifier> METHOD_DECLARATION =
-        psiElement(GoLiteralIdentifier.class)
+    public static final ElementPattern<GoIdentifier> METHOD_DECLARATION =
+        psiElement(GoIdentifier.class)
             .withParent(GoMethodDeclaration.class);
 
-    public static final ElementPattern<GoLiteralIdentifier> FUNCTION_DECLARATION =
-            psiElement(GoLiteralIdentifier.class)
+    public static final ElementPattern<GoIdentifier> FUNCTION_DECLARATION =
+            psiElement(GoIdentifier.class)
                     .withParent(GoFunctionDeclaration.class);
 
     @SuppressWarnings("unchecked")
-    public static final ElementPattern<GoLiteralIdentifier> VAR_DECLARATION =
-        psiElement(GoLiteralIdentifier.class)
+    public static final ElementPattern<GoIdentifier> VAR_DECLARATION =
+        psiElement(GoIdentifier.class)
             .withParent(
                 or(
                     psiElement(GoShortVarDeclaration.class),
@@ -64,14 +62,14 @@ public class GoElementPatterns {
                 )
             );
 
-    public static final ElementPattern<GoLiteralIdentifier> VAR_IN_FOR_RANGE =
-            psiElement(GoLiteralIdentifier.class)
+    public static final ElementPattern<GoIdentifier> VAR_IN_FOR_RANGE =
+            psiElement(GoIdentifier.class)
                     .withParent(
                             psiElement(GoForWithRangeAndVarsStatement.class)
                     );
 
-    public static final ElementPattern<GoLiteralIdentifier> PARAMETER_DECLARATION =
-        psiElement(GoLiteralIdentifier.class)
+    public static final ElementPattern<GoIdentifier> PARAMETER_DECLARATION =
+        psiElement(GoIdentifier.class)
             .withParent(GoFunctionParameter.class);
 
     @SuppressWarnings("unchecked")

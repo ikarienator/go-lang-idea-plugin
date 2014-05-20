@@ -8,7 +8,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import ro.redeul.google.go.GoFileBasedPsiTestCase;
 import ro.redeul.google.go.lang.parser.GoElementTypes;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoSelectorExpression;
 
 import java.util.Collection;
@@ -108,7 +108,7 @@ public class GoUsageTest extends GoFileBasedPsiTestCase {
     private boolean isReferenceToIdentifierOfSelector(Map<Integer, PsiElement> expectedElements,
                                                       PsiElement refElement) {
         if (refElement instanceof GoSelectorExpression) {
-            GoLiteralIdentifier identifier = ((GoSelectorExpression) refElement).getIdentifier();
+            GoIdentifier identifier = ((GoSelectorExpression) refElement).getIdentifier();
             if (identifier != null) {
                 if (expectedElements.remove(identifier.getTextOffset()) != null) {
                     return true;

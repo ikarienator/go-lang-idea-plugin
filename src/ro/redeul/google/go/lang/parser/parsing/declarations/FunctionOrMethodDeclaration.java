@@ -37,7 +37,7 @@ public class FunctionOrMethodDeclaration extends ParserUtils
         }
 
         if (ParserUtils.lookAhead(builder, mIDENT)) {
-            ParserUtils.eatElement(builder, LITERAL_IDENTIFIER);
+            ParserUtils.eatElement(builder, IDENTIFIER);
             parseCompleteMethodSignature(builder, parser);
         } else {
             builder.error(GoBundle.message("error.method.name.expected"));
@@ -94,7 +94,7 @@ public class FunctionOrMethodDeclaration extends ParserUtils
 
         if (ParserUtils.lookAhead(builder, mIDENT, mIDENT) ||
             ParserUtils.lookAhead(builder, mIDENT, oMUL)) {
-            ParserUtils.eatElement(builder, LITERAL_IDENTIFIER);
+            ParserUtils.eatElement(builder, IDENTIFIER);
         }
 
         parser.parseType(builder);

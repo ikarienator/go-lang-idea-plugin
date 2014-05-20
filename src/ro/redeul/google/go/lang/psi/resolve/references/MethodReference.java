@@ -4,19 +4,20 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
-import ro.redeul.google.go.lang.psi.utils.GoPsiScopesUtil;
 import com.intellij.psi.util.PsiUtilCore;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoSelectorExpression;
 import ro.redeul.google.go.lang.psi.processors.GoResolveStates;
 import ro.redeul.google.go.lang.psi.resolve.GoResolveResult;
 import ro.redeul.google.go.lang.psi.resolve.MethodResolver;
-import ro.redeul.google.go.lang.psi.types.GoPsiType;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypePointer;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructAnonymousField;
-import ro.redeul.google.go.lang.psi.typing.*;
+import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeNamed;
+import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
+import ro.redeul.google.go.lang.psi.typing.GoTypeStruct;
+import ro.redeul.google.go.lang.psi.utils.GoPsiScopesUtil;
 import ro.redeul.google.go.util.LookupElementUtil;
 
 import java.util.*;
@@ -24,7 +25,7 @@ import java.util.*;
 public class MethodReference
     extends GoPsiReference.Single<GoSelectorExpression, MethodReference> {
 
-    private Set<GoTypeName> receiverTypes;
+    private Set<GoTypeNamed> receiverTypes;
 
     private static final ResolveCache.AbstractResolver<MethodReference, GoResolveResult> RESOLVER =
             new ResolveCache.AbstractResolver<MethodReference, GoResolveResult>() {
@@ -55,7 +56,7 @@ public class MethodReference
 
     @Override
     public TextRange getRangeInElement() {
-        GoLiteralIdentifier identifier = getElement().getIdentifier();
+        GoIdentifier identifier = getElement().getIdentifier();
         if (identifier == null)
             return TextRange.EMPTY_RANGE;
 
@@ -78,7 +79,7 @@ public class MethodReference
     @NotNull
     @Override
     public Object[] getVariants() {
-        Set<GoTypeName> resolverTypeNames = resolveBaseReceiverTypes();
+        Set<GoTypeNamed> resolverTypeNames = resolveBaseReceiverTypes();
         if (resolverTypeNames.size() == 0)
             return LookupElementBuilder.EMPTY_ARRAY;
 
@@ -110,11 +111,11 @@ public class MethodReference
     }
 
     @NotNull
-    public Set<GoTypeName> resolveBaseReceiverTypes() {
+    public Set<GoTypeNamed> resolveBaseReceiverTypes() {
         if ( receiverTypes != null )
             return receiverTypes;
 
-        receiverTypes = new HashSet<GoTypeName>();
+        receiverTypes = new HashSet<GoTypeNamed>();
 
         GoType[] types = getElement().getBaseExpression().getType();
 
@@ -125,16 +126,16 @@ public class MethodReference
         if (type instanceof GoTypePointer)
             type = ((GoTypePointer) type).getTargetType();
 
-        if (!(type instanceof GoTypeName))
+        if (!(type instanceof GoTypeNamed))
             return receiverTypes;
 
-        GoTypeName typeName = (GoTypeName) type;
+        GoTypeNamed typeName = (GoTypeNamed) type;
 
-        Queue<GoTypeName> typeNamesToExplore = new LinkedList<GoTypeName>();
+        Queue<GoTypeNamed> typeNamesToExplore = new LinkedList<GoTypeNamed>();
         typeNamesToExplore.offer(typeName);
 
         while ( ! typeNamesToExplore.isEmpty() ) {
-            GoTypeName currentTypeName = typeNamesToExplore.poll();
+            GoTypeNamed currentTypeName = typeNamesToExplore.poll();
 
             receiverTypes.add(currentTypeName);
 
@@ -143,18 +144,16 @@ public class MethodReference
 
             GoTypeStruct typeStruct = (GoTypeStruct) currentTypeName.getDefinition();
             for (GoTypeStructAnonymousField field : typeStruct.getPsiType().getAnonymousFields()) {
-                GoPsiType psiType = field.getType();
-                if ( psiType == null)
+                GoType embeddedType = field.getType().getType();
+                if ( embeddedType == null)
                     continue;
-                if ( psiType instanceof GoPsiTypePointer) {
-                    psiType = ((GoPsiTypePointer) psiType).getTargetType();
+                if ( embeddedType instanceof GoTypePointer) {
+                    embeddedType = ((GoTypePointer) embeddedType).getTargetType();
                 }
-
-                GoType embeddedType = GoTypes.fromPsiType(psiType);
-                if (embeddedType == null || !(embeddedType instanceof GoTypeName))
+                if (!(embeddedType instanceof GoTypeNamed))
                     continue;
 
-                GoTypeName embeddedTypeName = (GoTypeName) embeddedType;
+                GoTypeNamed embeddedTypeName = (GoTypeNamed) embeddedType;
                 if (! receiverTypes.contains(embeddedTypeName) )
                     typeNamesToExplore.offer(embeddedTypeName);
 

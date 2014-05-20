@@ -8,9 +8,9 @@ import com.intellij.util.Consumer;
 import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
 import ro.redeul.google.go.lang.psi.expressions.GoPrimaryExpression;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteral;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFunction;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoBuiltinCallExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.statements.GoReturnStatement;
@@ -61,7 +61,7 @@ public class HighlightExitPointsHandler extends HighlightUsagesHandlerBase<PsiEl
                 GoPrimaryExpression baseExpression = expression.getBaseExpression();
                 if (baseExpression instanceof GoLiteralExpression) {
                     GoLiteral literal = ((GoLiteralExpression) baseExpression).getLiteral();
-                    if (literal instanceof GoLiteralIdentifier && "panic".equals(literal.getText())) {
+                    if (literal instanceof GoIdentifier && "panic".equals(literal.getText())) {
                         addOccurrence(expression);
                     }
                 }
@@ -84,7 +84,7 @@ public class HighlightExitPointsHandler extends HighlightUsagesHandlerBase<PsiEl
     }
 
     private static boolean isPanicCall(PsiElement element) {
-        if (!(element instanceof GoLiteralIdentifier) || !"panic".equals(element.getText())) {
+        if (!(element instanceof GoIdentifier) || !"panic".equals(element.getText())) {
             return false;
         }
 

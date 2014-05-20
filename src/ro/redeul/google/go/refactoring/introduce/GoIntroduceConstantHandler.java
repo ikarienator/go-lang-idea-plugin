@@ -12,7 +12,7 @@ import ro.redeul.google.go.lang.psi.GoPsiElement;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclarations;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.toplevel.GoImportDeclarations;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoRecursiveElementVisitor;
@@ -143,7 +143,7 @@ public class GoIntroduceConstantHandler extends GoIntroduceVariableHandlerBase {
             }
 
             @Override
-            public void visitLiteralIdentifier(GoLiteralIdentifier identifier) {
+            public void visitIdentifier(GoIdentifier identifier) {
                 PsiElement resolve = GoPsiUtils.resolveSafely(identifier, PsiElement.class);
                 GoConstDeclarations declarations = findParentOfType(resolve, GoConstDeclarations.class);
                 if (declarations == null || !(declarations.getParent() instanceof GoFile)) {

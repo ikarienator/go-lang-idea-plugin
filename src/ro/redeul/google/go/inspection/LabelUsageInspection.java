@@ -9,8 +9,8 @@ import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFunction;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.statements.*;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoMethodDeclaration;
@@ -47,12 +47,12 @@ public class LabelUsageInspection extends AbstractWholeGoFileInspection {
     }
 
     private static void checkFunction(final InspectionResult result, GoFunctionDeclaration function) {
-        final Map<String, GoLiteralIdentifier> labelDeclarations = new HashMap<String, GoLiteralIdentifier>();
-        final List<GoLiteralIdentifier> labelUsages = new ArrayList<GoLiteralIdentifier>();
+        final Map<String, GoIdentifier> labelDeclarations = new HashMap<String, GoIdentifier>();
+        final List<GoIdentifier> labelUsages = new ArrayList<GoIdentifier>();
         new GoRecursiveElementVisitor() {
             @Override
             public void visitLabeledStatement(GoLabeledStatement statement) {
-                GoLiteralIdentifier label = statement.getLabel();
+                GoIdentifier label = statement.getLabel();
                 String name = label.getName();
                 if (labelDeclarations.containsKey(name)) {
                     result.addProblem(label, GoBundle.message("error.label.already.defined", name));
@@ -78,7 +78,7 @@ public class LabelUsageInspection extends AbstractWholeGoFileInspection {
                 checkLabelUsage(statement.getLabel());
             }
 
-            private void checkLabelUsage(GoLiteralIdentifier label) {
+            private void checkLabelUsage(GoIdentifier label) {
                 if (label == null) {
                     return;
                 }
@@ -98,21 +98,21 @@ public class LabelUsageInspection extends AbstractWholeGoFileInspection {
         }.visitElement(function);
 
         Set<String> usedLabels = new HashSet<String>();
-        for (GoLiteralIdentifier label : labelUsages) {
+        for (GoIdentifier label : labelUsages) {
             String name = label.getName();
             if (labelDeclarations.containsKey(name)) {
                 usedLabels.add(name);
             }
         }
 
-        for (Map.Entry<String, GoLiteralIdentifier> e : labelDeclarations.entrySet()) {
+        for (Map.Entry<String, GoIdentifier> e : labelDeclarations.entrySet()) {
             String name = e.getKey();
             if (!usedLabels.contains(name)) {
                 result.addProblem(e.getValue(), GoBundle.message("error.label.defined.and.not.used", name));
             }
         }
 
-        for (GoLiteralIdentifier label : labelUsages) {
+        for (GoIdentifier label : labelUsages) {
             String name = label.getName();
             if (name == null || !labelDeclarations.containsKey(name)) {
                 continue;
@@ -127,7 +127,7 @@ public class LabelUsageInspection extends AbstractWholeGoFileInspection {
             TokenSet.create(GoElementTypes.SELECT_STATEMENT)
     );
 
-    private static void checkUsage(GoLiteralIdentifier label, GoLiteralIdentifier declaration,
+    private static void checkUsage(GoIdentifier label, GoIdentifier declaration,
                                    InspectionResult result) {
         PsiElement usageParent = label.getParent();
         GoLabeledStatement labeledStatement = (GoLabeledStatement) declaration.getParent();
@@ -160,7 +160,7 @@ public class LabelUsageInspection extends AbstractWholeGoFileInspection {
             return;
         }
 
-        GoLiteralIdentifier label = gotoStatement.getLabel();
+        GoIdentifier label = gotoStatement.getLabel();
         PsiElement gotoParent = gotoStatement;
         while (gotoParent != null && !parent.equals(gotoParent.getParent())) {
             gotoParent = gotoParent.getParent();
@@ -182,9 +182,9 @@ public class LabelUsageInspection extends AbstractWholeGoFileInspection {
         }
     }
 
-    private static void addJumpOverProblem(GoLiteralIdentifier label, GoLiteralIdentifier[] identifiers,
+    private static void addJumpOverProblem(GoIdentifier label, GoIdentifier[] identifiers,
                                            InspectionResult result) {
-        GoLiteralIdentifier identifier = findFirstIdentifier(identifiers);
+        GoIdentifier identifier = findFirstIdentifier(identifiers);
         if (identifier == null) {
             return;
         }
@@ -193,8 +193,8 @@ public class LabelUsageInspection extends AbstractWholeGoFileInspection {
                 GoBundle.message("error.goto.jumps.over.declaration", label.getName(), identifier.getName()));
     }
 
-    private static GoLiteralIdentifier findFirstIdentifier(GoLiteralIdentifier[] identifiers) {
-        for (GoLiteralIdentifier identifier : identifiers) {
+    private static GoIdentifier findFirstIdentifier(GoIdentifier[] identifiers) {
+        for (GoIdentifier identifier : identifiers) {
             if (identifier.isBlank()) {
                 continue;
             }
@@ -212,7 +212,7 @@ public class LabelUsageInspection extends AbstractWholeGoFileInspection {
     private static void checkJumpInsideBlock(GoGotoStatement gotoStatement, GoLabeledStatement labeledStatement,
                                              InspectionResult result) {
         PsiElement parent = findCommonParent(gotoStatement, labeledStatement);
-        GoLiteralIdentifier label = gotoStatement.getLabel();
+        GoIdentifier label = gotoStatement.getLabel();
         String name = label.getName();
         if (!labeledStatement.getParent().equals(parent) &&
             !labeledStatement.equals(parent)) {

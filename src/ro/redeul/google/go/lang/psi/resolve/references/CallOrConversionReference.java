@@ -3,14 +3,14 @@ package ro.redeul.google.go.lang.psi.resolve.references;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
-import ro.redeul.google.go.lang.psi.utils.GoPsiScopesUtil;
 import com.intellij.psi.util.PsiUtilCore;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
-import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
+import ro.redeul.google.go.lang.psi.expressions.primary.GoIdentifierExpression;
 import ro.redeul.google.go.lang.psi.processors.GoResolveStates;
 import ro.redeul.google.go.lang.psi.resolve.GoResolveResult;
 import ro.redeul.google.go.lang.psi.resolve.MethodOrTypeNameResolver;
+import ro.redeul.google.go.lang.psi.utils.GoPsiScopesUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import static ro.redeul.google.go.util.LookupElementUtil.createLookupElement;
 
 public class CallOrConversionReference extends AbstractCallOrConversionReference<CallOrConversionReference> {
 
-    public CallOrConversionReference(GoLiteralExpression expression) {
+    public CallOrConversionReference(GoIdentifierExpression expression) {
         super(expression, RESOLVER);
     }
 
@@ -30,7 +30,7 @@ public class CallOrConversionReference extends AbstractCallOrConversionReference
                     MethodOrTypeNameResolver processor =
                             new MethodOrTypeNameResolver(psiReference);
 
-                    GoLiteralExpression expression = psiReference.getElement();
+                    GoIdentifierExpression expression = psiReference.getElement();
                     GoPsiScopesUtil.treeWalkUp(
                             processor,
                             expression, expression.getContainingFile(),
@@ -49,7 +49,7 @@ public class CallOrConversionReference extends AbstractCallOrConversionReference
     @Override
     public Object[] getVariants() {
 
-        GoLiteralExpression expression = getElement();
+        GoIdentifierExpression expression = getElement();
 
         final List<LookupElementBuilder> variants = new ArrayList<LookupElementBuilder>();
 

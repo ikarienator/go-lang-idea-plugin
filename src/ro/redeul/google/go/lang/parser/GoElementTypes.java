@@ -37,12 +37,6 @@ public interface GoElementTypes extends GoTokenTypes {
     GoElementType IDENTIFIERS = new GoElementTypeImpl("Identifiers");
 
     // literals
-    GoElementType LITERAL_IDENTIFIER =
-        new GoElementTypeImpl("LiteralIdentifier");
-
-    GoElementType LITERAL_IOTA =
-        new GoElementTypeImpl("LiteralIota");
-
     GoElementType LITERAL_BOOL =
         new GoElementTypeImpl("LiteralBool");
 
@@ -114,6 +108,10 @@ public interface GoElementTypes extends GoTokenTypes {
     GoElementType UNARY_OPERATOR =
         new GoElementTypeImpl("unary operator");
 
+    GoElementType IDENTIFIER_EXPRESSION =
+            new GoElementTypeImpl("IdentifierExpression");
+    GoElementType IOTA_EXPRESSION =
+            new GoElementTypeImpl("IotaExpression");
     GoElementType PRIMARY_EXPRESSION =
         new GoElementTypeImpl("primary expression");
     GoElementType SELECTOR_EXPRESSION =

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.inspection.fix.DeleteStmtFix;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 
 public class RemoveRedundantExpressionFix implements LocalQuickFix {
     @NotNull
@@ -38,7 +38,7 @@ public class RemoveRedundantExpressionFix implements LocalQuickFix {
         }
 
         GoConstDeclaration cd = (GoConstDeclaration) element;
-        GoLiteralIdentifier[] ids = cd.getIdentifiers();
+        GoIdentifier[] ids = cd.getIdentifiers();
         GoExpr[] expressions = cd.getExpressions();
 
         if (ids.length == 0) {

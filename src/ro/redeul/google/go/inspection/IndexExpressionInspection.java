@@ -17,12 +17,12 @@ import ro.redeul.google.go.lang.psi.types.GoPsiTypeArray;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeMap;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeSlice;
 import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypeArray;
-import ro.redeul.google.go.lang.psi.typing.GoTypePsiBacked;
+import ro.redeul.google.go.lang.psi.typing.GoTypeBuiltin;
 import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoRecursiveElementVisitor;
-import ro.redeul.google.go.util.GoTypeInspectUtil;
 import ro.redeul.google.go.util.GoUtil;
+
+import java.math.BigDecimal;
 
 import static ro.redeul.google.go.util.GoTypeInspectUtil.checkValidLiteralIntExpr;
 
@@ -45,28 +45,21 @@ public class IndexExpressionInspection extends AbstractWholeGoFileInspection {
         if (indexExpr == null)
             return;
         for (GoType goType : expression.getBaseExpression().getType()) {
-            if (goType != null && goType instanceof GoTypePsiBacked) {
+            if (goType != null) {
+                goType = GoTypeUtils.resolveToFinalType(goType);
 
-                GoPsiType psiType = GoTypeUtils.resolveToFinalType(((GoTypePsiBacked) goType).getPsiType());
-
-                if (psiType == null)
-                    psiType = ((GoTypePsiBacked) goType).getPsiType();
-
-                if (psiType instanceof GoPsiTypeArray || psiType instanceof GoPsiTypeSlice) {
+                if (goType instanceof GoPsiTypeArray || goType instanceof GoPsiTypeSlice) {
                     checkIndexSliceArray(indexExpr, result);
                 }
-                if (psiType instanceof GoPsiTypeMap) {
-                    checkIndexMap(((GoPsiTypeMap) psiType).getKeyType(), indexExpr, result);
+                if (goType instanceof GoPsiTypeMap) {
+                    checkIndexMap(((GoPsiTypeMap) goType).getKeyType(), indexExpr, result);
                 }
-            }
-            if (goType != null && goType instanceof GoTypeArray) {
-                checkIndexSliceArray(indexExpr, result);
             }
         }
     }
 
     private void checkIndexMap(GoPsiType keyType, GoExpr indexExpr, InspectionResult result) {
-        if (!GoTypeInspectUtil.checkParametersExp(keyType, indexExpr)) {
+        if (!keyType.getType().isAssignableFrom(indexExpr)) {
             result.addProblem(
                     indexExpr,
                     GoBundle.message("warning.functioncall.type.mismatch", GoUtil.getNameLocalOrGlobal(keyType, (GoFile) indexExpr.getContainingFile())),
@@ -82,7 +75,7 @@ public class IndexExpressionInspection extends AbstractWholeGoFileInspection {
             if (literal instanceof GoLiteralInteger)
                 return;
             if (literal instanceof GoLiteralFloat) {
-                Float value = ((GoLiteralFloat) literal).getValue();
+                BigDecimal value = ((GoLiteralFloat) literal).getValue();
                 if (!value.toString().matches("^[0-9]+\\.0+$")) {
                     result.addProblem(
                             index,
@@ -101,7 +94,7 @@ public class IndexExpressionInspection extends AbstractWholeGoFileInspection {
         }
         if (index.isConstantExpression()) {
             Number numValue = FunctionCallInspection.getNumberValueFromLiteralExpr(index);
-            if (numValue == null){
+            if (numValue == null) {
                 if (!checkValidLiteralIntExpr(index)) {
                     result.addProblem(
                             index,
@@ -126,13 +119,9 @@ public class IndexExpressionInspection extends AbstractWholeGoFileInspection {
         }
 
         for (GoType goType : index.getType()) {
-            if (goType != null && goType instanceof GoTypePsiBacked) {
-                GoPsiType psiType = ((GoTypePsiBacked) goType).getPsiType();
-                GoPsiType resolvedType = GoTypeUtils.resolveToFinalType(psiType);
-                if (resolvedType != null)
-                    psiType = resolvedType;
-                String name = psiType.getName();
-                if (name != null && !name.startsWith("int"))
+            if (goType != null) {
+                GoType resolvedGoType = GoTypeUtils.resolveToFinalType(goType);
+                if (resolvedGoType == null || !resolvedGoType.isIdentical(GoTypeBuiltin.Int))
                     result.addProblem(
                             index,
                             GoBundle.message("warning.functioncall.type.mismatch", "int"));

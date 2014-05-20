@@ -8,8 +8,8 @@ import org.junit.Assert;
 import ro.redeul.google.go.GoPsiTestCase;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoIndexExpression;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoSliceExpression;
 import ro.redeul.google.go.lang.psi.statements.GoSendStatement;
 import ro.redeul.google.go.lang.psi.statements.select.GoSelectStatement;
@@ -80,8 +80,8 @@ public class GoElementVisitorTest extends GoPsiTestCase {
         if (elemType.equals("GoIdentifier")) {
             return new GoRecursiveCollectorVisitor() {
                 @Override
-                public void visitLiteralIdentifier(
-                    GoLiteralIdentifier identifier) {
+                public void visitIdentifier(
+                        GoIdentifier identifier) {
                     elements.add(identifier);
                 }
             };

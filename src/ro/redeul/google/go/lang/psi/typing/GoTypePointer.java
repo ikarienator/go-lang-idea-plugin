@@ -1,36 +1,38 @@
 package ro.redeul.google.go.lang.psi.typing;
 
+import org.jetbrains.annotations.NotNull;
+import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypePointer;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypePointer;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
 
-/**
- * // TODO: mtoader ! Implement this.
- */
-public class GoTypePointer extends GoAbstractType<GoUnderlyingTypePointer> implements GoType {
+public class GoTypePointer extends GoTypeBase<GoPsiTypePointer> {
 
-    private final GoType targetType;
+    @NotNull
+    private final GoType baseType;
 
-    public GoTypePointer(GoType targetType) {
-        this.targetType = targetType;
-        setUnderlyingType(GoUnderlyingTypes.getPointer(targetType.getUnderlyingType()));
+    public GoTypePointer(GoPsiTypePointer psiType, @NotNull GoType baseType) {
+        super(psiType);
+        this.baseType = baseType;
     }
 
-    public GoTypePointer(GoPsiTypePointer type) {
-        this(GoTypes.fromPsiType(type.getTargetType()));
-    }
-
+    @NotNull
     public GoType getTargetType() {
-        return targetType;
+        return baseType;
     }
 
     @Override
-    public void accept(Visitor visitor) {
-        visitor.visitTypePointer(this);
+    public boolean isIdentical(GoType other) {
+        if (other instanceof GoTypePointer) {
+            GoTypePointer otherPointer =
+                    (GoTypePointer) other;
+
+            return baseType.isIdentical(otherPointer.baseType);
+        }
+
+        return false;
     }
 
     @Override
-    public boolean isIdentical(GoType type) {
+    public boolean isAssignableFrom(@NotNull GoExpr x) {
         return false;
     }
 }

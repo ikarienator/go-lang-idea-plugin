@@ -20,7 +20,7 @@ import ro.redeul.google.go.inspection.fix.AddImportFix;
 import ro.redeul.google.go.inspection.fix.RemoveImportFix;
 import ro.redeul.google.go.lang.lexer.GoTokenTypes;
 import ro.redeul.google.go.lang.psi.GoFile;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoSelectorExpression;
 import ro.redeul.google.go.lang.psi.toplevel.GoImportDeclaration;
@@ -97,7 +97,7 @@ public class AutoImportHighlightingPass extends TextEditorHighlightingPass {
                 continue;
             }
 
-            GoLiteralIdentifier id = findElementOfClassAtRange(file, start, end, GoLiteralIdentifier.class);
+            GoIdentifier id = findElementOfClassAtRange(file, start, end, GoIdentifier.class);
             if (!isPackageUsage(id)) {
                 continue;
             }
@@ -124,7 +124,7 @@ public class AutoImportHighlightingPass extends TextEditorHighlightingPass {
         return toImport;
     }
 
-    private static boolean isPackageUsage(GoLiteralIdentifier id) {
+    private static boolean isPackageUsage(GoIdentifier id) {
         if (id == null) {
             return false;
         }
@@ -242,7 +242,7 @@ public class AutoImportHighlightingPass extends TextEditorHighlightingPass {
                 AddImportFix fix = new AddImportFix(data.sdkPackages,
                                                     data.projectPackages, file,
                                                     editor);
-                GoLiteralIdentifier identifier = data.identifier;
+                GoIdentifier identifier = data.identifier;
                 int start = identifier.getTextOffset();
                 int end = identifier.getTextRange().getEndOffset();
                 if (identifier.isQualified()) {
@@ -305,11 +305,11 @@ public class AutoImportHighlightingPass extends TextEditorHighlightingPass {
     }
 
     private static final class Data {
-        public final GoLiteralIdentifier identifier;
+        public final GoIdentifier identifier;
         public final List<String> sdkPackages;
         public final List<String> projectPackages;
 
-        private Data(GoLiteralIdentifier identifier, List<String> sdkPackages,
+        private Data(GoIdentifier identifier, List<String> sdkPackages,
                      List<String> projectPackages) {
             this.identifier = identifier;
             this.sdkPackages = sdkPackages;

@@ -7,7 +7,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.psi.PsiElement;
 import ro.redeul.google.go.GoEditorAwareTestCase;
 import ro.redeul.google.go.lang.psi.GoFile;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 
 import java.io.File;
@@ -33,7 +33,7 @@ public class CreateFunctionFixTest extends GoEditorAwareTestCase {
         PsiElement element = file.findElementAt(editor.getSelectionModel().getSelectionStart());
         final GoLiteralExpression identifier = findParentOfType(element, GoLiteralExpression.class);
         assertNotNull(identifier);
-        assertInstanceOf(identifier.getLiteral(), GoLiteralIdentifier.class);
+        assertInstanceOf(identifier.getLiteral(), GoIdentifier.class);
 
         CommandProcessor.getInstance().executeCommand(project, new Runnable() {
             @Override

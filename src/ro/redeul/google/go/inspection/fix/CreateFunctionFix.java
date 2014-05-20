@@ -30,7 +30,6 @@ import ro.redeul.google.go.lang.psi.types.GoPsiTypePointer;
 import ro.redeul.google.go.lang.psi.typing.GoType;
 import ro.redeul.google.go.lang.psi.typing.GoTypeArray;
 import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
-import ro.redeul.google.go.lang.psi.typing.GoTypePsiBacked;
 import ro.redeul.google.go.lang.psi.utils.GoExpressionUtils;
 import ro.redeul.google.go.util.GoUtil;
 
@@ -99,17 +98,17 @@ public class CreateFunctionFix extends LocalQuickFixAndIntentionActionOnPsiEleme
                         goType = ((GoTypePointer) goType).getTargetType();
                     }
 
-                    if (goType instanceof GoTypePsiBacked) {
+                    if (goType.getPsiType() != null) {
                          /*
                           * Using the psiType,
                           */
-                        String type = GoUtil.getNameLocalOrGlobal(((GoTypePsiBacked) goType).getPsiType(), currentFile);
+                        String type = GoUtil.getNameLocalOrGlobal(goType.getPsiType(), currentFile);
                         stringBuilder.append(type);
                     } else if (goType instanceof GoTypeArray) {
                          /*
                           * Using the psiType,
                           */
-                        String type = GoUtil.getNameLocalOrGlobal(((GoTypeArray) goType).getPsiType(), currentFile);
+                        String type = GoUtil.getNameLocalOrGlobal(goType.getPsiType(), currentFile);
                         stringBuilder.append(type);
                     } else if (firstChildExp instanceof GoLiteralFunction) {
                          /*
@@ -154,7 +153,7 @@ public class CreateFunctionFix extends LocalQuickFixAndIntentionActionOnPsiEleme
                     //if (resolveTo instanceof GoPsiType) {
                     //    stringBuilder.append(getNameLocalOrGlobal((GoPsiType) resolveTo, currentFile));
                     //} else {
-                    stringBuilder.append(((GoLiteral) firstChildExp).getType().name().toLowerCase());
+                    stringBuilder.append(((GoLiteral) firstChildExp).getConstantType().name().toLowerCase());
                     //}
                 } else {
 
@@ -175,7 +174,7 @@ public class CreateFunctionFix extends LocalQuickFixAndIntentionActionOnPsiEleme
                             stringBuilder.append("interface{}");
                         }
                     } else if (firstChild instanceof GoLiteral) {
-                        GoLiteral.Type type = ((GoLiteral) firstChild).getType();
+                        GoLiteral.Type type = ((GoLiteral) firstChild).getConstantType();
                         //Fix TEST PR ##321 this only happens on test. i don't know why
                         if (type == GoLiteral.Type.Float || type == GoLiteral.Type.ImaginaryFloat) {
                             stringBuilder.append("float32");

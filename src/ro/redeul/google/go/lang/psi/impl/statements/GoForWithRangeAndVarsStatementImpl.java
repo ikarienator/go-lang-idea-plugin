@@ -6,16 +6,10 @@ import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.lexer.GoTokenTypes;
-import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.statements.GoForWithRangeAndVarsStatement;
-import ro.redeul.google.go.lang.psi.statements.GoForWithRangeStatement;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
-import ro.redeul.google.go.lang.psi.typing.*;
-import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
-import ro.redeul.google.go.lang.stubs.GoNamesCache;
 
 import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.hasPrevSiblingOfType;
 
@@ -27,13 +21,13 @@ public class GoForWithRangeAndVarsStatementImpl extends GoAbstractForWithRangeSt
     }
 
     @Override
-    public GoLiteralIdentifier getKey() {
-        return findChildByClass(GoLiteralIdentifier.class, 0);
+    public GoIdentifier getKey() {
+        return findChildByClass(GoIdentifier.class, 0);
     }
 
     @Override
-    public GoLiteralIdentifier getValue() {
-        GoLiteralIdentifier[] identifiers = findChildrenByClass(GoLiteralIdentifier.class);
+    public GoIdentifier getValue() {
+        GoIdentifier[] identifiers = findChildrenByClass(GoIdentifier.class);
 
         if (identifiers.length > 2) {
             return identifiers[1];

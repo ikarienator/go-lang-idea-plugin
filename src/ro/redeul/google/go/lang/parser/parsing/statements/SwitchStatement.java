@@ -115,7 +115,7 @@ class SwitchStatement implements GoElementTypes {
         PsiBuilder.Marker marker = builder.mark();
 
         if (ParserUtils.lookAhead(builder, mIDENT, oVAR_ASSIGN)) {
-            ParserUtils.eatElement(builder, LITERAL_IDENTIFIER);
+            ParserUtils.eatElement(builder, IDENTIFIER);
             ParserUtils.getToken(builder, oVAR_ASSIGN);
         }
 

@@ -2,7 +2,7 @@ package ro.redeul.google.go.lang.psi.resolve;
 
 import com.intellij.psi.PsiElement;
 import ro.redeul.google.go.lang.completion.GoCompletionContributor;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.resolve.references.TypeNameReference;
 import ro.redeul.google.go.lang.psi.toplevel.GoTypeNameDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoTypeSpec;
@@ -33,7 +33,7 @@ public class TypeNameResolver extends GoPsiReferenceResolver<TypeNameReference> 
         }
 
         GoTypeNameDeclaration typeNameDeclaration = (GoTypeNameDeclaration) element;
-        GoLiteralIdentifier identifier = getReference().getElement().getIdentifier();
+        GoIdentifier identifier = getReference().getElement().getIdentifier();
         String identifierName = identifier.getUnqualifiedName();
         String typeName = typeNameDeclaration.getName();
 
@@ -55,7 +55,7 @@ public class TypeNameResolver extends GoPsiReferenceResolver<TypeNameReference> 
         return false;
     }
 
-    private boolean canonicalNamesAreTheSame(GoLiteralIdentifier identifier,
+    private boolean canonicalNamesAreTheSame(GoIdentifier identifier,
                                              GoTypeNameDeclaration typeNameDeclaration) {
         String identifierName = identifier.getCanonicalName().toLowerCase();
         String typeName = typeNameDeclaration.getCanonicalName().toLowerCase();

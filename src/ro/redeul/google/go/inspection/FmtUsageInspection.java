@@ -8,10 +8,11 @@ import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.GoPrimaryExpression;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteral;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralString;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoCallOrConvExpression;
+import ro.redeul.google.go.lang.psi.expressions.primary.GoIdentifierExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoRecursiveElementVisitor;
@@ -92,6 +93,15 @@ public class FmtUsageInspection extends AbstractWholeGoFileInspection {
         }
 
         GoExpr fmtExpr = args[0];
+
+        if (fmtExpr instanceof GoIdentifierExpression) {
+            GoLiteralString literal = findConstDefinition((GoIdentifierExpression) fmtExpr);
+            if (literal == null ||
+                    literal.getConstantType() != InterpretedString &&
+                            literal.getConstantType() != RawString)
+                return;
+        }
+
         if (!(fmtExpr instanceof GoLiteralExpression)) {
             return;
         }
@@ -103,13 +113,7 @@ public class FmtUsageInspection extends AbstractWholeGoFileInspection {
 
         GoLiteral literal = literalExpression.getLiteral();
 
-        switch (literal.getType()) {
-            case Identifier:
-                literal = findConstDefinition((GoLiteralIdentifier)literal);
-                if (literal == null ||
-                    literal.getType() != InterpretedString &&
-                    literal.getType() != RawString)
-                   break;
+        switch (literal.getConstantType()) {
             case InterpretedString:
             case RawString:
                 GoLiteralString stringLiteral = (GoLiteralString) literal;
@@ -122,13 +126,13 @@ public class FmtUsageInspection extends AbstractWholeGoFileInspection {
         }
     }
 
-    private static GoLiteralString findConstDefinition(GoLiteralIdentifier idToFind) {
-        String name = idToFind.getName();
-        if (idToFind.isBlank() || idToFind.isIota() || name == null || name.isEmpty()) {
+    private static GoLiteralString findConstDefinition(GoIdentifierExpression idExp) {
+        String name = idExp.getName();
+        if (idExp.isBlank() || idExp.isIota() || name == null || name.isEmpty()) {
             return null;
         }
 
-        PsiElement resolve = GoPsiUtils.resolveSafely(idToFind, PsiElement.class);
+        PsiElement resolve = GoPsiUtils.resolveSafely(idExp, PsiElement.class);
         if (resolve == null) {
             return null;
         }
@@ -139,7 +143,7 @@ public class FmtUsageInspection extends AbstractWholeGoFileInspection {
         }
 
         GoConstDeclaration cd = ((GoConstDeclaration) parent);
-        GoLiteralIdentifier[] ids = cd.getIdentifiers();
+        GoIdentifier[] ids = cd.getIdentifiers();
         GoExpr[] exprs = cd.getExpressions();
         if (ids == null || exprs == null || ids.length != exprs.length) {
             return null;

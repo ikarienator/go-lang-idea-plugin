@@ -11,8 +11,8 @@ import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.Nullable;
 import ro.redeul.google.go.lang.lexer.GoTokenTypes;
 import ro.redeul.google.go.lang.psi.expressions.GoExpressionList;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFunction;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 
 class GoCallOrConvExpressionBlock extends GoBlock {
@@ -23,7 +23,7 @@ class GoCallOrConvExpressionBlock extends GoBlock {
 
     @Override
     protected Indent getChildIndent(@Nullable PsiElement child) {
-        if (child instanceof GoExpressionList || child instanceof GoLiteralIdentifier) {
+        if (child instanceof GoExpressionList || child instanceof GoIdentifier) {
             if (child instanceof GoExpressionList && containsLiteralFunction((GoExpressionList) child)) {
                 return CONTINUATION_WITHOUT_FIRST;
             }

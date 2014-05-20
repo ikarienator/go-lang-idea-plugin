@@ -40,7 +40,7 @@ import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.GoExpressionList;
 import ro.redeul.google.go.lang.psi.expressions.GoUnaryExpression;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoCallOrConvExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoParenthesisedExpression;
@@ -63,8 +63,8 @@ import static ro.redeul.google.go.util.EditorUtil.reformatPositions;
 public class InlineLocalVariableActionHandler extends InlineActionHandler {
 
     @SuppressWarnings("unchecked")
-    private static final ElementPattern<GoLiteralIdentifier> LOCAL_VAR_DECLARATION =
-            psiElement(GoLiteralIdentifier.class)
+    private static final ElementPattern<GoIdentifier> LOCAL_VAR_DECLARATION =
+            psiElement(GoIdentifier.class)
                     .withParent(
                             or(
                                     psiElement(GoShortVarDeclaration.class),
@@ -101,7 +101,7 @@ public class InlineLocalVariableActionHandler extends InlineActionHandler {
 
     private void doInlineElement(Project project, Editor editor, PsiElement element) {
         GoStatement statement = findParentOfType(element, GoStatement.class);
-        if (!(element instanceof GoLiteralIdentifier) || statement == null) {
+        if (!(element instanceof GoIdentifier) || statement == null) {
             return;
         }
 
@@ -118,7 +118,7 @@ public class InlineLocalVariableActionHandler extends InlineActionHandler {
             return;
         }
 
-        GoLiteralIdentifier identifier = (GoLiteralIdentifier) element;
+        GoIdentifier identifier = (GoIdentifier) element;
         GoVarDeclaration declaration = (GoVarDeclaration) statement;
         try {
             inlineElement(new InlineContext(project, editor, identifier, declaration, (GoPsiElement) scope));
@@ -196,7 +196,7 @@ public class InlineLocalVariableActionHandler extends InlineActionHandler {
                 throw new GoRefactoringException(messsage);
             }
 
-            initializer = getInitializer((GoLiteralIdentifier) usage.writeUsages[0]);
+            initializer = getInitializer((GoIdentifier) usage.writeUsages[0]);
             if (initializer == null) {
                 throw new GoRefactoringException(RefactoringBundle.message("variable.has.no.initializer", ctx.identifierToInline.getText()));
             }
@@ -264,7 +264,7 @@ public class InlineLocalVariableActionHandler extends InlineActionHandler {
             return 10;
         } else if (element instanceof GoSelectorExpression) {
             return 15;
-        } else if (element instanceof GoLiteralIdentifier ||
+        } else if (element instanceof GoIdentifier ||
                 element instanceof GoLiteralExpression) {
             return 20;
         }
@@ -340,11 +340,11 @@ public class InlineLocalVariableActionHandler extends InlineActionHandler {
         throw new GoRefactoringException(GoBundle.message("error.unknown.refactoring.case"));
     }
 
-    private PsiElement getInitializer(GoLiteralIdentifier identifier) {
+    private PsiElement getInitializer(GoIdentifier identifier) {
         PsiElement parent = identifier.getParent();
         if (parent instanceof GoVarDeclaration) {
             GoVarDeclaration declaration = (GoVarDeclaration) parent;
-            GoLiteralIdentifier[] identifiers = declaration.getIdentifiers();
+            GoIdentifier[] identifiers = declaration.getIdentifiers();
             GoExpr[] expressions = declaration.getExpressions();
             if (expressions.length != identifiers.length) {
                 return null;
@@ -375,7 +375,7 @@ public class InlineLocalVariableActionHandler extends InlineActionHandler {
         return null;
     }
 
-    private boolean identifierShouldHaveInitializer(GoLiteralIdentifier identifier) {
+    private boolean identifierShouldHaveInitializer(GoIdentifier identifier) {
         PsiElement parent = identifier.getParent();
 
         return !(parent instanceof GoVarDeclaration && ((GoVarDeclaration) parent).getExpressions().length == 0);
@@ -410,14 +410,14 @@ public class InlineLocalVariableActionHandler extends InlineActionHandler {
         return true;
     }
 
-    private static Usage findUsage(final GoLiteralIdentifier identifier, GoPsiElement scope) {
+    private static Usage findUsage(final GoIdentifier identifier, GoPsiElement scope) {
         final List<PsiElement> writeUsages = new ArrayList<PsiElement>();
         final List<PsiElement> readUsages = new ArrayList<PsiElement>();
 
         final GoReadWriteAccessDetector detector = new GoReadWriteAccessDetector();
         new GoRecursiveElementVisitor() {
             @Override
-            public void visitLiteralIdentifier(GoLiteralIdentifier id) {
+            public void visitIdentifier(GoIdentifier id) {
                 if (identifier.equals(resolveSafely(id, PsiElement.class))) {
                     if (detector.getExpressionAccess(id) == ReadWriteAccessDetector.Access.Read) {
                         readUsages.add(id);
@@ -433,11 +433,11 @@ public class InlineLocalVariableActionHandler extends InlineActionHandler {
     private static class InlineContext {
         final Project project;
         final Editor editor;
-        final GoLiteralIdentifier identifierToInline;
+        final GoIdentifier identifierToInline;
         final GoVarDeclaration statement;
         final GoPsiElement scope;
 
-        private InlineContext(Project project, Editor editor, GoLiteralIdentifier identifierToInline,
+        private InlineContext(Project project, Editor editor, GoIdentifier identifierToInline,
                               GoVarDeclaration statement, GoPsiElement scope) {
             this.project = project;
             this.editor = editor;
@@ -456,7 +456,7 @@ public class InlineLocalVariableActionHandler extends InlineActionHandler {
             this.readUsages = readUsages.toArray(new PsiElement[readUsages.size()]);
         }
 
-        private void highlight(Project project, Editor editor, GoLiteralIdentifier identifierToInline) {
+        private void highlight(Project project, Editor editor, GoIdentifier identifierToInline) {
             HighlightManager manager = HighlightManager.getInstance(project);
             EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
             TextAttributes attributes = scheme.getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);

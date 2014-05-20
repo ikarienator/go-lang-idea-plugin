@@ -11,14 +11,14 @@ import ro.redeul.google.go.lang.psi.declarations.GoConstDeclarations;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.GoUnaryExpression;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteral;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.primary.GoIdentifierExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoParenthesisedExpression;
 import ro.redeul.google.go.lang.psi.impl.GoPsiElementBase;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypePsiBacked;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 
 public class GoConstDeclarationImpl extends GoPsiElementBase
@@ -34,14 +34,14 @@ public class GoConstDeclarationImpl extends GoPsiElementBase
     }
 
     @Override
-    public GoLiteralIdentifier[] getIdentifiers() {
-        return findChildrenByClass(GoLiteralIdentifier.class);
+    public GoIdentifier[] getIdentifiers() {
+        return findChildrenByClass(GoIdentifier.class);
     }
 
-    private Integer getIdentifierIndex(GoLiteralIdentifier identifier){
-        GoLiteralIdentifier[] goIdentifiers = getIdentifiers();
+    private Integer getIdentifierIndex(GoIdentifier identifier) {
+        GoIdentifier[] goIdentifiers = getIdentifiers();
         for (int i = 0; i < goIdentifiers.length; i++) {
-            if (goIdentifiers[i] == identifier){
+            if (goIdentifiers[i] == identifier) {
                 return i;
             }
         }
@@ -82,8 +82,8 @@ public class GoConstDeclarationImpl extends GoPsiElementBase
         if (types == null) {
             for (GoExpr goExpr : getExpressions()) {
                 for (GoType goType : goExpr.getType()) {
-                    if (goType instanceof GoTypePsiBacked)
-                        return ((GoTypePsiBacked) goType).getPsiType();
+                    if (goType.getPsiType() != null)
+                        return goType.getPsiType();
                 }
             }
         }
@@ -97,33 +97,33 @@ public class GoConstDeclarationImpl extends GoPsiElementBase
     }
 
     private void setIotaValue(GoExpr expr, Integer iotaValue) {
-        if (expr instanceof GoLiteralExpression){
+        if (expr instanceof GoLiteralExpression) {
             GoLiteral literal = ((GoLiteralExpression) expr).getLiteral();
-            if (literal instanceof GoLiteralIdentifier){
-                if (((GoLiteralIdentifier) literal).isIota()){
-                   ((GoLiteralIdentifier) literal).setIotaValue(iotaValue);
-                }
+        }
+        if (expr instanceof GoIdentifierExpression) {
+            if (((GoIdentifierExpression) expr).isIota()) {
+                ((GoIdentifierExpression) expr).setIotaValue(iotaValue);
             }
         }
-        if (expr instanceof GoUnaryExpression){
+        if (expr instanceof GoUnaryExpression) {
             setIotaValue(((GoUnaryExpression) expr).getExpression(), iotaValue);
         }
-        if (expr instanceof GoBinaryExpression){
+        if (expr instanceof GoBinaryExpression) {
             setIotaValue(((GoBinaryExpression) expr).getLeftOperand(), iotaValue);
             setIotaValue(((GoBinaryExpression) expr).getRightOperand(), iotaValue);
         }
-        if (expr instanceof GoParenthesisedExpression){
+        if (expr instanceof GoParenthesisedExpression) {
             setIotaValue(((GoParenthesisedExpression) expr).getInnerExpression(), iotaValue);
         }
     }
 
     @Override
-    public GoExpr getExpression(GoLiteralIdentifier identifier) {
+    public GoExpr getExpression(GoIdentifier identifier) {
         Integer identifierIndex = getIdentifierIndex(identifier);
-        if (identifierIndex == null){
+        if (identifierIndex == null) {
             return null;
         }
-        if (hasInitializers()){
+        if (hasInitializers()) {
             GoExpr[] goExprs = getExpressions();
             if (goExprs.length <= identifierIndex)
                 return null;
@@ -132,13 +132,13 @@ public class GoConstDeclarationImpl extends GoPsiElementBase
             return expr;
         } else {
             PsiElement goConstDecls = getParent();
-            if (goConstDecls instanceof GoConstDeclarations){
+            if (goConstDecls instanceof GoConstDeclarations) {
                 PsiElement[] goConstSpecs = goConstDecls.getChildren();
                 for (int i = 1; i < goConstSpecs.length; i++) {
                     if (goConstSpecs[i] == this && goConstSpecs[i - 1] instanceof GoConstDeclaration) {
                         GoConstDeclaration prevConstSpec = (GoConstDeclaration) goConstSpecs[i - 1];
                         GoExpr prevExpr = prevConstSpec.getExpression(prevConstSpec.getIdentifiers()[identifierIndex]);
-                        if (prevExpr != null){
+                        if (prevExpr != null) {
                             // copy expression from previous constant specification and set necessary iota value
                             GoExpr expr = (GoExpr) prevExpr.copy();
                             setIotaValue(expr, getConstSpecIndex());

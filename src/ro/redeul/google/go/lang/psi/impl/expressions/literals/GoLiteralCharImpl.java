@@ -19,7 +19,7 @@ public class GoLiteralCharImpl extends GoPsiElementBase
     }
 
     @Override
-    public Type getType() {
+    public Type getConstantType() {
         return Type.Char;
     }
 }

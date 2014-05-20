@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoSelectorExpression;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoMethodDeclaration;
@@ -67,16 +67,16 @@ public class GoDocumentationProvider implements CodeDocumentationProvider,
             return "";
         }
 
-        GoLiteralIdentifier identifier = null;
-        if (element instanceof GoLiteralIdentifier) {
-            identifier = (GoLiteralIdentifier) element;
+        GoIdentifier identifier = null;
+        if (element instanceof GoIdentifier) {
+            identifier = (GoIdentifier) element;
             element = element.getParent();
         }
 
         if (element instanceof GoSelectorExpression) {
             element = resolveSafely(element, PsiElement.class);
-            if (element instanceof GoLiteralIdentifier) {
-                identifier = (GoLiteralIdentifier) element;
+            if (element instanceof GoIdentifier) {
+                identifier = (GoIdentifier) element;
                 element = element.getParent();
             }
         }

@@ -15,8 +15,9 @@ import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclarations;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralString;
+import ro.redeul.google.go.lang.psi.expressions.primary.GoIdentifierExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoSelectorExpression;
 import ro.redeul.google.go.lang.psi.resolve.references.BuiltinCallOrConversionReference;
@@ -61,9 +62,9 @@ public class UnresolvedSymbols extends AbstractWholeGoFileInspection {
             }
 
             @Override
-            public void visitLiteralIdentifier(GoLiteralIdentifier identifier) {
+            public void visitIdentifierExpression(GoIdentifierExpression identifier) {
                 if (!identifier.isIota() && !identifier.isBlank()) {
-                    tryToResolveReference(identifier, identifier.getName());
+                    tryToResolveReference(identifier, identifier.getIdentifier().getName());
                 }
             }
 
@@ -187,11 +188,11 @@ public class UnresolvedSymbols extends AbstractWholeGoFileInspection {
             element = ((GoLiteralExpression) element).getLiteral();
         }
 
-        if (!(element instanceof GoLiteralIdentifier)) {
+        if (!(element instanceof GoIdentifier)) {
             return false;
         }
 
-        GoLiteralIdentifier identifier = (GoLiteralIdentifier) element;
+        GoIdentifier identifier = (GoIdentifier) element;
         return "C".equals(identifier.getLocalPackageName()) && GoFileUtils.isPackageNameImported((GoFile) file, "C");
 
     }
@@ -202,14 +203,14 @@ public class UnresolvedSymbols extends AbstractWholeGoFileInspection {
     }
 
     private static boolean isGlobalVariableIdentifier(PsiElement element) {
-        return element instanceof GoLiteralIdentifier &&
+        return element instanceof GoIdentifier &&
                 findParentOfType(element, GoSelectorExpression.class) == null &&
                 findParentOfType(element, GoFunctionDeclaration.class) == null &&
                 findParentOfType(element, GoVarDeclarations.class) != null;
     }
 
     private static boolean isLocalVariableIdentifier(PsiElement element) {
-        return element instanceof GoLiteralIdentifier &&
+        return element instanceof GoIdentifier &&
                 findParentOfType(element, GoSelectorExpression.class) == null &&
                 findParentOfType(element, GoFunctionDeclaration.class) != null &&
                 !element.textContains('.');

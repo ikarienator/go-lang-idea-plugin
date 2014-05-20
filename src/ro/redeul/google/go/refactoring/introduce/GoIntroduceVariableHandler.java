@@ -9,7 +9,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import ro.redeul.google.go.GoBundle;
 import ro.redeul.google.go.editor.TemplateUtil;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.statements.GoBlockStatement;
 import ro.redeul.google.go.lang.psi.statements.GoStatement;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
@@ -86,13 +86,13 @@ public class GoIntroduceVariableHandler extends GoIntroduceVariableHandlerBase {
         int index = 0;
         List<String> parameterNames = new ArrayList<String>();
         for (GoFunctionParameter fp : function.getResults()) {
-            GoLiteralIdentifier[] identifiers = fp.getIdentifiers();
+            GoIdentifier[] identifiers = fp.getIdentifiers();
             // unnamed parameter
             if (identifiers.length == 0) {
                 parameterNames.add("v" + index++);
             } else {
                 // get names of named parameters
-                for (GoLiteralIdentifier identifier : identifiers) {
+                for (GoIdentifier identifier : identifiers) {
                     String name = identifier.getName();
                     if (name != null && !name.isEmpty()) {
                         parameterNames.add(name);

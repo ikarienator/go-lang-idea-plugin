@@ -33,7 +33,7 @@ public class IdentifierList implements GoElementTypes {
         }
 
         while ( ParserUtils.lookAhead(builder, mIDENT) ) {
-            ParserUtils.eatElement(builder, GoElementTypes.LITERAL_IDENTIFIER);
+            ParserUtils.eatElement(builder, GoElementTypes.IDENTIFIER);
 
             length++;
             if (!ParserUtils.lookAhead(builder, oCOMMA, mIDENT)) {

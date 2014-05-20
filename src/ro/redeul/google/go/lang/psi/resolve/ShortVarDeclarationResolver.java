@@ -3,7 +3,7 @@ package ro.redeul.google.go.lang.psi.resolve;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.psi.PsiElement;
 import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.GoIdentifier;
 import ro.redeul.google.go.lang.psi.statements.GoBlockStatement;
 import ro.redeul.google.go.lang.psi.statements.GoLabeledStatement;
 import ro.redeul.google.go.lang.psi.statements.GoShortVarDeclaration;
@@ -17,17 +17,17 @@ import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.findParentOfType;
 
 public class ShortVarDeclarationResolver {
 
-    private static final ElementPattern<GoLiteralIdentifier> SHORT_VAR_IN_FUNCTION =
-            psiElement(GoLiteralIdentifier.class).withParent(
+    private static final ElementPattern<GoIdentifier> SHORT_VAR_IN_FUNCTION =
+            psiElement(GoIdentifier.class).withParent(
                     psiElement(GoShortVarDeclaration.class).withParent(
                             psiElement(GoBlockStatement.class).withParent(GoFunctionDeclaration.class)
                     ));
 
-    private static final ElementPattern<GoLiteralIdentifier> SHORT_VAR =
-            psiElement(GoLiteralIdentifier.class).withParent(
+    private static final ElementPattern<GoIdentifier> SHORT_VAR =
+            psiElement(GoIdentifier.class).withParent(
                     psiElement(GoShortVarDeclaration.class));
 
-    public static PsiElement resolve(GoLiteralIdentifier identifier) {
+    public static PsiElement resolve(GoIdentifier identifier) {
         PsiElement result = null;
         if (SHORT_VAR_IN_FUNCTION.accepts(identifier)) {
             result = findDeclarationInFunctionParameter(identifier);
@@ -58,7 +58,7 @@ public class ShortVarDeclarationResolver {
         }
 
         if (element instanceof GoVarDeclaration) {
-            for (GoLiteralIdentifier identifier : ((GoShortVarDeclaration) element).getIdentifiers()) {
+            for (GoIdentifier identifier : ((GoShortVarDeclaration) element).getIdentifiers()) {
                 if (identifier.getUnqualifiedName().equals(identifierName)) {
                     return identifier;
                 }
@@ -67,10 +67,10 @@ public class ShortVarDeclarationResolver {
         return null;
     }
 
-    private static PsiElement findDeclarationInFunctionParameter(GoLiteralIdentifier identifier) {
+    private static PsiElement findDeclarationInFunctionParameter(GoIdentifier identifier) {
         GoFunctionDeclaration functionDeclaration = findParentOfType(identifier, GoFunctionDeclaration.class);
         for (GoFunctionParameter parameter : functionDeclaration.getParameters()) {
-            for (GoLiteralIdentifier p : parameter.getIdentifiers()) {
+            for (GoIdentifier p : parameter.getIdentifiers()) {
                 if (identifier.getUnqualifiedName().equals(p.getUnqualifiedName())) {
                     return p;
                 }
@@ -78,7 +78,7 @@ public class ShortVarDeclarationResolver {
         }
 
         for (GoFunctionParameter parameter : functionDeclaration.getResults()) {
-            for (GoLiteralIdentifier p : parameter.getIdentifiers()) {
+            for (GoIdentifier p : parameter.getIdentifiers()) {
                 if (identifier.getUnqualifiedName().equals(p.getUnqualifiedName())) {
                     return p;
                 }
@@ -87,7 +87,7 @@ public class ShortVarDeclarationResolver {
 
         if (functionDeclaration instanceof GoMethodDeclaration) {
             GoMethodReceiver methodReceiver = ((GoMethodDeclaration) functionDeclaration).getMethodReceiver();
-            GoLiteralIdentifier methodReceiverIdentifier = methodReceiver.getIdentifier();
+            GoIdentifier methodReceiverIdentifier = methodReceiver.getIdentifier();
             if (methodReceiverIdentifier != null &&
                     methodReceiverIdentifier.getUnqualifiedName().equals(identifier.getUnqualifiedName())) {
                 return methodReceiverIdentifier;
