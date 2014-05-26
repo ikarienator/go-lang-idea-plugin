@@ -105,6 +105,9 @@ public class GoTypeFunction
             if (i > 0) {
                 stringBuilder.append(", ");
             }
+            if (variadic && i == parametersLength - 1) {
+                stringBuilder.append("...");
+            }
             stringBuilder.append(types[i].getNameLocalOrGlobal(currentFile));
         }
         stringBuilder.append(')');
