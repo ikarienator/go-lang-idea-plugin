@@ -4,10 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
-import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypeInterface;
-import ro.redeul.google.go.lang.psi.typing.GoTypeName;
-import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
+import ro.redeul.google.go.lang.psi.typing.*;
 import ro.redeul.google.go.lang.psi.visitors.GoRecursiveElementVisitor;
 
 public class TypeMatchInspection extends AbstractWholeGoFileInspection {
@@ -56,9 +53,6 @@ public class TypeMatchInspection extends AbstractWholeGoFileInspection {
                         return;
                     }
                     if (shift){
-                        if (rightUnder == null) {
-                            return;
-                        }
                         String rightUnderStr = rightUnder.toString();
                         if (rightUnderStr.startsWith("uint")||rightUnderStr.equals("byte")){
                             return;
@@ -78,22 +72,20 @@ public class TypeMatchInspection extends AbstractWholeGoFileInspection {
                         rightType = rptr.getTargetType();
                     }
                 }
-                if (leftType instanceof GoTypeName && rightType instanceof GoTypeName) {
-                    String leftName = ((GoTypeName)leftType).getName();
-                    if (leftName.equals("byte")) {
-                        leftName = "uint8";
-                    }else if (leftName.equals("rune")) {
-                        leftName = "int32";
-                    }
-                    String rightName = ((GoTypeName)rightType).getName();
-                    if (rightName.equals("byte")) {
-                        rightName = "uint8";
-                    }else if (rightName.equals("rune")) {
-                        rightName = "int32";
-                    }
-                    if (leftName.equals(rightName)) {
-                        return;
-                    }
+                if (leftType == GoTypeBuiltin.Byte) {
+                    leftType = GoTypeBuiltin.Uint8;
+                }
+                if (leftType == GoTypeBuiltin.Rune) {
+                    leftType = GoTypeBuiltin.Int32;
+                }
+                if (rightType == GoTypeBuiltin.Byte) {
+                    rightType = GoTypeBuiltin.Uint8;
+                }
+                if (rightType == GoTypeBuiltin.Rune) {
+                    rightType = GoTypeBuiltin.Int32;
+                }
+                if (leftType.isIdentical(rightType)) {
+                    return;
                 }
             }
         }
