@@ -34,6 +34,7 @@ import ro.redeul.google.go.lang.psi.toplevel.GoMethodReceiver;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
 import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeSlice;
 import ro.redeul.google.go.lang.psi.typing.GoTypes;
 import ro.redeul.google.go.lang.psi.utils.GoPsiScopesUtil;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
@@ -146,9 +147,15 @@ public class GoLiteralExpressionImpl extends GoExpressionBase
                     if (parent instanceof GoFunctionParameter) {
                         GoFunctionParameter functionParameter = (GoFunctionParameter) parent;
                         if (functionParameter.getType() != null) {
-                            return new GoType[]{
-                                    GoTypes.fromPsiType(functionParameter.getType())
-                            };
+                            if (functionParameter.isVariadic()) {
+                                return new GoType[]{
+                                        new GoTypeSlice(GoTypes.fromPsiType(functionParameter.getType()))
+                                };
+                            } else {
+                                return new GoType[]{
+                                        GoTypes.fromPsiType(functionParameter.getType())
+                                };
+                            }
                         }
                     }
 

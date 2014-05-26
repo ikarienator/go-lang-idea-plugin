@@ -59,6 +59,7 @@ public class GoTypeInspectUtil {
         } else {
             GoType[] types = expr.getType();
             for (GoType resolvedType : types) {
+                if (resolvedType == null) continue;
                 if (type.isAssignableFrom(resolvedType)) {
                     return true;
                 }

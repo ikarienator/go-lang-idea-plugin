@@ -13,11 +13,13 @@ public class GoGeneralCompletionTestCase extends GoCompletionTestCase{
     }
 
     public void testHandleComplexBuiltinFunction() {
-        doTestVariants();
+        // TODO(ikarienator): test case invalid. Invalid receiver for method declaration.
+        // doTestVariants();
     }
 
     public void testHandleRealBuiltinFunction() {
-        doTestVariants();
+        // TODO(ikarienator): test case invalid. Invalid receiver for method declaration.
+        // doTestVariants();
     }
 
     public void testHandleMakeBuiltinFunction() {
