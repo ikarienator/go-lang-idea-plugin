@@ -4,7 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
-import ro.redeul.google.go.lang.psi.typing.*;
+import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeBuiltin;
+import ro.redeul.google.go.lang.psi.typing.GoTypeInterface;
+import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
 import ro.redeul.google.go.lang.psi.visitors.GoRecursiveElementVisitor;
 
 public class TypeMatchInspection extends AbstractWholeGoFileInspection {
@@ -53,11 +56,11 @@ public class TypeMatchInspection extends AbstractWholeGoFileInspection {
                         return;
                     }
                     if (shift){
-                        String rightUnderStr = rightUnder.toString();
-                        if (rightUnderStr.startsWith("uint")||rightUnderStr.equals("byte")){
+                        String rightUnderStr = rightUnder.getText();
+                        if (rightUnderStr.startsWith("uint") || rightUnderStr.equals("byte")) {
                             return;
-                        }else{
-                            result.addProblem(expression, "shift count type " + rightUnder+", must be unsigned integer");
+                        } else {
+                            result.addProblem(expression, "shift count type " + rightUnder.getText() + ", must be unsigned integer");
                             return;
                         }
                     }
