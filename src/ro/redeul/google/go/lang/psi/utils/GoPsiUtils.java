@@ -175,8 +175,8 @@ public class GoPsiUtils {
             return "";
         }
 
-        if (literalText.startsWith("`")) {
-            return literalText.replaceAll("(?:^`)|(?:`$)", "").replaceAll("\\\\`","`");
+        if (literalText.length() >= 2 && literalText.startsWith("`") && literalText.endsWith("`")) {
+            return literalText.substring(1, literalText.length() - 1);
         }
 
         Integer runeValue = getRuneValue(literalText);
