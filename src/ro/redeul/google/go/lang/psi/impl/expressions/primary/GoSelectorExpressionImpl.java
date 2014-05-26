@@ -161,18 +161,18 @@ public class GoSelectorExpressionImpl extends GoExpressionBase
         if (type instanceof GoTypePointer)
             type = ((GoTypePointer) type).getTargetType();
 
-        type = GoTypeUtils.resolveToFinalType(type);
+        GoType resolved = GoTypeUtils.resolveToFinalType(type);
 
-        if (type instanceof GoTypeInterface)
+        if (resolved instanceof GoTypeInterface)
             return new PsiReference[]{new InterfaceMethodReference(this)};
 
-        if (type instanceof GoTypeStruct && getIdentifier() != null)
+        if (resolved instanceof GoTypeStruct && getIdentifier() != null)
             return new PsiReference[]{
                     new SelectorOfStructFieldReference(this),
                     new MethodReference(this)
             };
 
-        if (type instanceof GoTypePointer) {
+        if (resolved instanceof GoTypePointer) {
             return new PsiReference[]{
                     new SelectorOfStructFieldReference(this),
                     new MethodReference(this)
