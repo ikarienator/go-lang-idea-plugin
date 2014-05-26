@@ -31,23 +31,17 @@ public class GoTypeStruct extends GoTypePsiBacked<GoPsiTypeStruct> implements Go
             if (structField instanceof GoTypeStructField) {
                 GoLiteralIdentifier[] identifiers = ((GoTypeStructField) structField).getIdentifiers();
                 GoType fieldType = GoTypes.fromPsiType(((GoTypeStructField) structField).getType());
-                String tag = null;
-                if (((GoTypeStructField) structField).getTag() instanceof GoLiteralString) {
-                    tag = ((GoLiteralString) ((GoTypeStructField) structField).getTag()).getValue();
-                }
+                GoLiteralString tag = ((GoTypeStructField) structField).getTag();
                 for (GoLiteralIdentifier identifier : identifiers) {
                     names.add(identifier.getUnqualifiedName());
                     types.add(fieldType);
-                    tags.add(tag);
+                    tags.add(tag == null ? null : tag.getValue());
                 }
             } else if (structField instanceof GoTypeStructAnonymousField) {
                 names.add(null);
                 types.add(GoTypes.fromPsiType(((GoTypeStructAnonymousField) structField).getType()));
-                String tag = null;
-                if (((GoTypeStructAnonymousField) structField).getTag() instanceof GoLiteralString) {
-                    tag = ((GoLiteralString) ((GoTypeStructAnonymousField) structField).getTag()).getValue();
-                }
-                tags.add(tag);
+                GoLiteralString tag = ((GoTypeStructAnonymousField) structField).getTag();
+                tags.add(tag == null ? null : tag.getValue());
             }
         }
         int n = names.size();
@@ -74,7 +68,7 @@ public class GoTypeStruct extends GoTypePsiBacked<GoPsiTypeStruct> implements Go
         StringBuilder stringBuilder = new StringBuilder("struct{");
         for (int i = 0; i < this.names.length; i++) {
             if (i != 0)
-                stringBuilder.append(";");
+                stringBuilder.append("; ");
 
             if (names[i] != null) {
                 stringBuilder.append(names[i]);
@@ -83,9 +77,8 @@ public class GoTypeStruct extends GoTypePsiBacked<GoPsiTypeStruct> implements Go
 
             stringBuilder.append(types[i].getNameLocalOrGlobal(currentFile));
             if (tags[i] != null) {
-                stringBuilder.append(" \"");
+                stringBuilder.append(' ');
                 stringBuilder.append(GoPsiUtils.escapeStringLiteral(tags[i]));
-                stringBuilder.append("\"");
             }
         }
 

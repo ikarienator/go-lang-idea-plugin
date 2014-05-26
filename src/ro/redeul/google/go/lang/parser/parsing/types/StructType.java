@@ -72,7 +72,7 @@ class StructType implements GoElementTypes {
 //        parser.parseType(builder);
 
         if ( builder.getTokenType() == litSTRING ) {
-            ParserUtils.eatElement(builder, IDENTIFIER);
+            ParserUtils.eatElement(builder, LITERAL_STRING);
         }
 
         fieldDeclaration.done(
