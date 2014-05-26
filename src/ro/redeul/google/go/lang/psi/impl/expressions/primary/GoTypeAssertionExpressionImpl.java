@@ -7,6 +7,7 @@ import ro.redeul.google.go.lang.psi.expressions.primary.GoTypeAssertionExpressio
 import ro.redeul.google.go.lang.psi.impl.expressions.GoExpressionBase;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeBuiltin;
 import ro.redeul.google.go.lang.psi.typing.GoTypes;
 import ro.redeul.google.go.lang.stubs.GoNamesCache;
 
@@ -21,7 +22,7 @@ public class GoTypeAssertionExpressionImpl extends GoExpressionBase
         GoNamesCache namesCache = GoNamesCache.getInstance(getProject());
         return new GoType[]{
             GoTypes.fromPsiType(getAssertedType()),
-            GoTypes.getBuiltin(GoTypes.Builtin.Bool, namesCache)
+            GoTypeBuiltin.Bool
         };
     }
 

@@ -7,8 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoRelationalExpression;
 import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypes;
-import ro.redeul.google.go.lang.stubs.GoNamesCache;
+import ro.redeul.google.go.lang.psi.typing.GoTypeBuiltin;
 
 public class GoRelationalExpressionImpl extends GoBinaryExpressionImpl
     implements GoRelationalExpression
@@ -20,9 +19,7 @@ public class GoRelationalExpressionImpl extends GoBinaryExpressionImpl
     @Override
     protected GoType[] resolveTypes() {
         return new GoType[]{
-                GoTypes.getBuiltin(
-                        GoTypes.Builtin.Bool,
-                        GoNamesCache.getInstance(getProject()))
+                GoTypeBuiltin.Bool
         };
     }
 

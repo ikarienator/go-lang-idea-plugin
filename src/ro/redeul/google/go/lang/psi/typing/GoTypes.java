@@ -48,39 +48,6 @@ public class GoTypes {
         return new GoTypePointer(fromPsiType(argumentType));
     }
 
-    public enum Builtin {
-        Bool, Byte, Complex64, Complex128, Error, Float32, Float64,
-        Int, Int8, Int16, Int32, Int64, Rune, String,
-        uInt, uInt8, uInt16, uInt32, uInt64, uIntPtr
-    }
-
-    public static final Map<Builtin, GoType> cachedTypes = new HashMap<Builtin, GoType>();
-
-    public static GoType getBuiltin(Builtin builtinType, GoNamesCache namesCache) {
-        GoType type = cachedTypes.get(builtinType);
-        if (type == null) {
-            Collection<GoFile> files =
-                    namesCache.getFilesByPackageName("builtin");
-
-            for (GoFile file : files) {
-                for (GoTypeDeclaration typeDeclaration : file.getTypeDeclarations()) {
-                    for (GoTypeSpec spec : typeDeclaration.getTypeSpecs()) {
-                        if (spec != null) {
-                            String name = spec.getName();
-                            if (name != null &&
-                                    name.equals(builtinType.name().toLowerCase())) {
-                                cachedTypes.put(builtinType,
-                                        fromPsiType(spec.getType()));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return cachedTypes.get(builtinType);
-    }
-
     @NotNull
     public static GoType fromPsiType(final GoPsiType psiType) {
         if (psiType == null)

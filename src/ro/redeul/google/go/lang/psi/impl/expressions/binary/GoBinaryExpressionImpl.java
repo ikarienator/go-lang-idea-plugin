@@ -10,9 +10,9 @@ import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
 import ro.redeul.google.go.lang.psi.impl.expressions.GoExpressionBase;
 import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeBuiltin;
 import ro.redeul.google.go.lang.psi.typing.GoTypeName;
 import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
-import ro.redeul.google.go.lang.psi.typing.GoTypes;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 import ro.redeul.google.go.lang.stubs.GoNamesCache;
 
@@ -80,7 +80,7 @@ public abstract class GoBinaryExpressionImpl extends GoExpressionBase
                             GoNamesCache namesCache =
                                     GoNamesCache.getInstance(this.getProject());
                             return new GoType[]{
-                                    GoTypes.getBuiltin(GoTypes.Builtin.Int, namesCache)
+                                    GoTypeBuiltin.Int
                             };
                         } else {
                             if (leftType instanceof GoTypePointer && rightType instanceof GoTypePointer){

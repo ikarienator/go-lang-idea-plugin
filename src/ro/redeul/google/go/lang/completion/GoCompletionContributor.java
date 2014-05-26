@@ -30,7 +30,7 @@ import ro.redeul.google.go.lang.psi.toplevel.GoImportDeclarations;
 import ro.redeul.google.go.lang.psi.toplevel.GoPackageDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoTypeSpec;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
-import ro.redeul.google.go.lang.psi.typing.GoTypes;
+import ro.redeul.google.go.lang.psi.typing.GoTypeBuiltin;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
 import ro.redeul.google.go.lang.stubs.GoNamesCache;
 
@@ -345,8 +345,8 @@ public class GoCompletionContributor extends CompletionContributor {
                 result.addElement(
                         keyword("struct", new CurlyBracesInsertHandler()));
 
-                for (GoTypes.Builtin builtin : GoTypes.Builtin.values()) {
-                    result.addElement(keyword(builtin.name().toLowerCase(), null));
+                for (GoTypeBuiltin builtin : GoTypeBuiltin.values()) {
+                    result.addElement(keyword(builtin.getText(), null));
                 }
             }
 

@@ -2,14 +2,9 @@ package ro.redeul.google.go.lang.psi.impl.statements;
 
 import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
-import ro.redeul.google.go.lang.lexer.GoTokenTypes;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
 import ro.redeul.google.go.lang.psi.typing.*;
 import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
-import ro.redeul.google.go.lang.stubs.GoNamesCache;
-
-import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.hasPrevSiblingOfType;
 
 public abstract class GoAbstractForWithRangeStatementImpl<Self extends GoAbstractForWithRangeStatementImpl<Self>> extends GoForStatementImpl {
 
@@ -37,9 +32,7 @@ public abstract class GoAbstractForWithRangeStatementImpl<Self extends GoAbstrac
                     @Override
                     protected void visitTypeArray(GoTypeArray array) {
                         setData(new GoType[]{
-                                GoTypes.getBuiltin(
-                                        GoTypes.Builtin.Int,
-                                        GoNamesCache.getInstance(getProject()))
+                                GoTypeBuiltin.Int
                         });
                     }
 
@@ -50,18 +43,14 @@ public abstract class GoAbstractForWithRangeStatementImpl<Self extends GoAbstrac
                                     @Override
                                     protected void visitTypeArray(GoTypeArray array) {
                                         setData(new GoType[]{
-                                                GoTypes.getBuiltin(
-                                                        GoTypes.Builtin.Int,
-                                                        GoNamesCache.getInstance(getProject()))
+                                                GoTypeBuiltin.Int,
                                         });
                                     }
 
                                     @Override
                                     public void visitTypeSlice(GoTypeSlice slice) {
                                         setData(new GoType[]{
-                                                GoTypes.getBuiltin(
-                                                        GoTypes.Builtin.Int,
-                                                        GoNamesCache.getInstance(getProject()))
+                                                GoTypeBuiltin.Int,
                                         });
                                     }
                                 }.visit(pointer.getTargetType())
@@ -71,9 +60,7 @@ public abstract class GoAbstractForWithRangeStatementImpl<Self extends GoAbstrac
                     @Override
                     public void visitTypeSlice(GoTypeSlice slice) {
                         setData(new GoType[]{
-                                GoTypes.getBuiltin(
-                                        GoTypes.Builtin.Int,
-                                        GoNamesCache.getInstance(getProject()))
+                                GoTypeBuiltin.Int,
                         });
                     }
 
@@ -81,9 +68,7 @@ public abstract class GoAbstractForWithRangeStatementImpl<Self extends GoAbstrac
                     public void visitTypeName(GoTypeName name) {
                         if (name.getName().equals("string")) {
                             setData(new GoType[]{
-                                    GoTypes.getBuiltin(
-                                            GoTypes.Builtin.Int,
-                                            GoNamesCache.getInstance(getProject()))
+                                    GoTypeBuiltin.Int,
                             });
                         }
                     }
@@ -144,9 +129,7 @@ public abstract class GoAbstractForWithRangeStatementImpl<Self extends GoAbstrac
                     public void visitTypeName(GoTypeName name) {
                         if (name.getName().equals("string")) {
                             setData(new GoType[]{
-                                    GoTypes.getBuiltin(
-                                            GoTypes.Builtin.Rune,
-                                            GoNamesCache.getInstance(getProject()))
+                                    GoTypeBuiltin.Rune,
                             });
                         }
                     }

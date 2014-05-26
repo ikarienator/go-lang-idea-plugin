@@ -34,6 +34,7 @@ import ro.redeul.google.go.lang.psi.toplevel.GoMethodReceiver;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
 import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeBuiltin;
 import ro.redeul.google.go.lang.psi.typing.GoTypeSlice;
 import ro.redeul.google.go.lang.psi.typing.GoTypes;
 import ro.redeul.google.go.lang.psi.utils.GoPsiScopesUtil;
@@ -42,8 +43,6 @@ import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 import ro.redeul.google.go.lang.stubs.GoNamesCache;
 import ro.redeul.google.go.services.GoPsiManager;
 import ro.redeul.google.go.util.GoUtil;
-
-import static ro.redeul.google.go.lang.psi.typing.GoTypes.Builtin;
 
 public class GoLiteralExpressionImpl extends GoExpressionBase
         implements GoLiteralExpression {
@@ -77,39 +76,39 @@ public class GoLiteralExpressionImpl extends GoExpressionBase
             switch (literal.getLiteralType()) {
                 case Bool:
                     return new GoType[]{
-                            GoTypes.getBuiltin(Builtin.Bool, namesCache)
+                            GoTypeBuiltin.Bool
                     };
 
                 case Int:
                     return new GoType[]{
-                            GoTypes.getBuiltin(Builtin.Int, namesCache)
+                            GoTypeBuiltin.Int
                     };
 
                 case Float:
                     return new GoType[]{
-                            GoTypes.getBuiltin(Builtin.Float64, namesCache)
+                            GoTypeBuiltin.Float64
                     };
 
                 case Char:
                     return new GoType[]{
-                            GoTypes.getBuiltin(Builtin.Rune, namesCache)
+                            GoTypeBuiltin.Rune
                     };
 
                 case ImaginaryInt:
                 case ImaginaryFloat:
                     return new GoType[]{
-                            GoTypes.getBuiltin(Builtin.Complex128, namesCache)
+                            GoTypeBuiltin.Complex128
                     };
 
                 case RawString:
                 case InterpretedString:
                     if (literal.getNode().getElementType() == GoElementTypes.LITERAL_CHAR){
                         return new GoType[]{
-                                GoTypes.getBuiltin(Builtin.Rune, namesCache)
+                                GoTypeBuiltin.Rune
                         };
                     } else {
                         return new GoType[]{
-                                GoTypes.getBuiltin(Builtin.String, namesCache)
+                                GoTypeBuiltin.String
                         };
                     }
 
