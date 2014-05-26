@@ -96,5 +96,17 @@ public interface GoType {
 
         public void visitTypeMap(GoTypeMap map) {
         }
+
+        public void visitTypeBuiltin(GoTypeBuiltin builtin) {
+        }
+
+        public void visitTypeStruct(GoTypeStruct struct) {
+        }
+
+        public void visitTypeInterface(GoTypeInterface typeInterface) {
+        }
+
+        public void visitTypeFunction(GoTypeFunction function) {
+        }
     }
 }

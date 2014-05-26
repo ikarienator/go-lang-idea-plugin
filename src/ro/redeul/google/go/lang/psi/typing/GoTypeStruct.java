@@ -60,6 +60,7 @@ public class GoTypeStruct extends GoTypePsiBacked<GoPsiTypeStruct> implements Go
 
     @Override
     public void accept(Visitor visitor) {
+        visitor.visitTypeStruct(this);
     }
 
     @NotNull

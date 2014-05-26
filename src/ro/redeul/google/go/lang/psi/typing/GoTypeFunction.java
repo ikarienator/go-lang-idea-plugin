@@ -90,6 +90,7 @@ public class GoTypeFunction
 
     @Override
     public void accept(Visitor visitor) {
+        visitor.visitTypeFunction(this);
     }
 
     @NotNull

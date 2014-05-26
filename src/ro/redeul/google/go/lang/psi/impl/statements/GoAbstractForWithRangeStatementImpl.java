@@ -65,8 +65,8 @@ public abstract class GoAbstractForWithRangeStatementImpl<Self extends GoAbstrac
                     }
 
                     @Override
-                    public void visitTypeName(GoTypeName name) {
-                        if (name.getName().equals("string")) {
+                    public void visitTypeBuiltin(GoTypeBuiltin builtin) {
+                        if (builtin == GoTypeBuiltin.String) {
                             setData(new GoType[]{
                                     GoTypeBuiltin.Int,
                             });
@@ -126,10 +126,10 @@ public abstract class GoAbstractForWithRangeStatementImpl<Self extends GoAbstrac
                     }
 
                     @Override
-                    public void visitTypeName(GoTypeName name) {
-                        if (name.getName().equals("string")) {
+                    public void visitTypeBuiltin(GoTypeBuiltin builtin) {
+                        if (builtin == GoTypeBuiltin.String) {
                             setData(new GoType[]{
-                                    GoTypeBuiltin.Rune,
+                                    GoTypeBuiltin.Int,
                             });
                         }
                     }

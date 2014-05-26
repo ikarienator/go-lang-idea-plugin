@@ -21,6 +21,7 @@ public class GoTypeInterface
 
     @Override
     public void accept(Visitor visitor) {
+        visitor.visitTypeInterface(this);
     }
 
     @Override
