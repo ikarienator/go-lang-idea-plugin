@@ -24,8 +24,6 @@ public class GoTypeName extends GoTypePsiBacked<GoPsiTypeName> implements GoType
     public GoTypeName(GoPsiTypeName type) {
         super(type);
         name = type.getName();
-
-        assert !type.isPrimitive();
     }
 
     @Override
@@ -52,7 +50,7 @@ public class GoTypeName extends GoTypePsiBacked<GoPsiTypeName> implements GoType
             return this.getName();
         PsiDirectory containingDirectory = goTypeSpec.getContainingFile().getContainingDirectory();
         boolean isInSameDir = currentFile.getContainingDirectory().equals(containingDirectory);
-        if (type.isPrimitive() || isInSameDir) {
+        if (isInSameDir) {
             stringBuilder.append(type.getName());
         } else {
             FORLOOP:
