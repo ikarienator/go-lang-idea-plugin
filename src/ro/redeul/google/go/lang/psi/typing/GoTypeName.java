@@ -1,6 +1,5 @@
 package ro.redeul.google.go.lang.psi.typing;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiDirectory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,15 +14,13 @@ import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
 import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.resolveTypeSpec;
 
 public class GoTypeName extends GoTypePsiBacked<GoPsiTypeName> implements GoType {
-
-    private static final Logger LOG = Logger.getInstance(GoTypeName.class);
-
     private final String name;
     private GoType definition;
 
     public GoTypeName(GoPsiTypeName type) {
         super(type);
         name = type.getName();
+        // Cannot resolve definition here. The definition type might depends on the existence of this object.
     }
 
     @Override
