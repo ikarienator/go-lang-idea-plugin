@@ -115,15 +115,14 @@ public abstract class GoBinaryExpressionImpl extends GoExpressionBase
                         }
                     }
                 }
-                // old behaviour
-                if (leftOperand.isConstantExpression()) {
-                    return rightTypes;
-                } else if (rightOperand.isConstantExpression()) {
-                    return leftTypes;
-                } else {
-                    return leftTypes;
-                }
             }
+        }
+
+        // old behaviour
+        if (leftOperand.isConstantExpression()) {
+            return rightTypes;
+        } else if (rightOperand.isConstantExpression()) {
+            return leftTypes;
         }
         return GoType.EMPTY_ARRAY;
     }

@@ -58,9 +58,9 @@ public class HighlightExitPointsHandler extends HighlightUsagesHandlerBase<PsiEl
 
             @Override
             public void visitBuiltinCallExpression(GoBuiltinCallExpression expression) {
-                GoPrimaryExpression baseExpression = expression.getBaseExpression();
-                if (baseExpression instanceof GoLiteralExpression) {
-                    GoLiteral literal = ((GoLiteralExpression) baseExpression).getLiteral();
+                GoPsiElement base = expression.getBase();
+                if (base instanceof GoLiteralExpression) {
+                    GoLiteral literal = ((GoLiteralExpression) base).getLiteral();
                     if (literal instanceof GoLiteralIdentifier && "panic".equals(literal.getText())) {
                         addOccurrence(expression);
                     }

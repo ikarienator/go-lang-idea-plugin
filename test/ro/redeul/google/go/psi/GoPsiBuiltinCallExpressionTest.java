@@ -28,7 +28,7 @@ public class GoPsiBuiltinCallExpressionTest extends GoPsiTestCase {
             );
 
         assertEquals("int", getAs(GoPsiTypeName.class, builtin.getTypeArgument()).getText());
-        assertEquals("new", get(builtin.getBaseExpression()).getText());
+        assertEquals("new", get(builtin.getBase()).getText());
     }
 
     public void testMake() throws Exception {

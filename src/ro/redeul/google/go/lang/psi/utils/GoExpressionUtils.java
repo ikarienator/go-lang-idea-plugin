@@ -27,15 +27,15 @@ public class GoExpressionUtils {
             return null;
         }
 
-        GoPrimaryExpression baseExpression = call.getBaseExpression();
-        if (baseExpression instanceof GoLiteralExpression) {
-            GoLiteralExpression literal = (GoLiteralExpression) baseExpression;
+        GoPsiElement base = call.getBase();
+        if (base instanceof GoLiteralExpression) {
+            GoLiteralExpression literal = (GoLiteralExpression) base;
             PsiElement child = literal.getLiteral();
             return child instanceof GoLiteralIdentifier ? (GoLiteralIdentifier) child : null;
         }
 
-        if (baseExpression instanceof GoSelectorExpression) {
-            return GoUtil.ResolveReferece(baseExpression);
+        if (base instanceof GoSelectorExpression) {
+            return GoUtil.ResolveReferece(base);
         }
         return null;
 
@@ -50,7 +50,7 @@ public class GoExpressionUtils {
     @Nullable
     public static GoFunctionDeclaration resolveToFunctionDeclaration(@Nullable PsiElement element) {
         if (element instanceof GoBuiltinCallExpression){
-            PsiElement reference = resolveSafely(((GoBuiltinCallExpression) element).getBaseExpression(),
+            PsiElement reference = resolveSafely(((GoBuiltinCallExpression) element).getBase(),
                     PsiElement.class);
             if (reference != null && reference.getParent() instanceof GoFunctionDeclaration){
                 return (GoFunctionDeclaration) reference.getParent();

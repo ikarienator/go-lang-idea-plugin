@@ -21,9 +21,6 @@ import ro.redeul.google.go.lang.psi.expressions.primary.GoCallOrConvExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoParenthesisedExpression;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeChannel;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeMap;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeSlice;
 import ro.redeul.google.go.lang.psi.typing.*;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoRecursiveElementVisitor;
@@ -49,8 +46,8 @@ public class FunctionCallInspection extends AbstractWholeGoFileInspection {
             public void visitBuiltinCallExpression(GoBuiltinCallExpression expression) {
                 super.visitBuiltinCallExpression(expression);
 
-                GoPrimaryExpression baseExpression = expression.getBaseExpression();
-                String expressionText = baseExpression.getText();
+                GoPsiElement base = expression.getBase();
+                String expressionText = base.getText();
                 if (expressionText.equals("make")) {
                     checkMakeCall(expression, result);
 

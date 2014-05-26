@@ -7,6 +7,7 @@ import ro.redeul.google.go.GoBundle;
 import ro.redeul.google.go.inspection.fix.AddReturnStmtFix;
 import ro.redeul.google.go.inspection.fix.RemoveFunctionResultFix;
 import ro.redeul.google.go.lang.psi.GoFile;
+import ro.redeul.google.go.lang.psi.GoPsiElement;
 import ro.redeul.google.go.lang.psi.expressions.GoPrimaryExpression;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFunction;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoBuiltinCallExpression;
@@ -79,8 +80,8 @@ public class FunctionWithResultButWihtoutReturnInspection extends AbstractWholeG
             return false;
         }
 
-        GoPrimaryExpression expression = ((GoBuiltinCallExpression) call).getBaseExpression();
-        return expression != null && "panic".equals(expression.getText());
+        GoPsiElement base = ((GoBuiltinCallExpression) call).getBase();
+        return base != null && "panic".equals(base.getText());
     }
 
     private static boolean isTerminating(GoStatement statement) {

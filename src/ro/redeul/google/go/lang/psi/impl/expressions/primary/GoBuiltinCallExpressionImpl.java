@@ -49,11 +49,11 @@ public class GoBuiltinCallExpressionImpl extends GoCallOrConvExpressionImpl
 
     @Override
     protected GoType[] resolveTypes() {
-        PsiElement reference = resolveSafely(getBaseExpression(),
+        PsiElement reference = resolveSafely(getBase(),
                 PsiElement.class);
 
         if (reference == null) {
-            return processBuiltinFunction(this.getBaseExpression().getText());
+            return processBuiltinFunction(this.getBase().getText());
         }
 
         if (reference.getParent() instanceof GoMethodDeclaration) {
@@ -74,11 +74,11 @@ public class GoBuiltinCallExpressionImpl extends GoCallOrConvExpressionImpl
 
     @Override
     public GoType[] getArgumentsType() {
-        PsiElement reference = resolveSafely(getBaseExpression(),
+        PsiElement reference = resolveSafely(getBase(),
                 PsiElement.class);
 
         if (reference == null) {
-            return processArgumentsType(this.getBaseExpression().getText());
+            return processArgumentsType(this.getBase().getText());
         }
 
         if (reference.getParent() instanceof GoFunctionDeclaration) {

@@ -30,7 +30,7 @@ public class GoPsiCallsTest extends GoPsiTestCase {
                   ).getExpression()
             );
 
-        assertEquals("f", get(expr.getBaseExpression()).getText());
+        assertEquals("f", get(expr.getBase()).getText());
         assertEquals(0, expr.getArguments().length);
     }
 
@@ -53,7 +53,7 @@ public class GoPsiCallsTest extends GoPsiTestCase {
                   ).getExpression()
             );
 
-        assertEquals("f", get(expr.getBaseExpression()).getText());
+        assertEquals("f", get(expr.getBase()).getText());
         assertEquals(1, expr.getArguments().length);
         assertEquals("1", childAt(0, expr.getArguments()).getText());
     }
@@ -77,7 +77,7 @@ public class GoPsiCallsTest extends GoPsiTestCase {
                   ).getExpression()
             );
 
-        assertEquals("f", get(expr.getBaseExpression()).getText());
+        assertEquals("f", get(expr.getBase()).getText());
         assertEquals(2, expr.getArguments().length);
         assertEquals("1", childAt(0, expr.getArguments()).getText());
         assertEquals("2", childAt(1, expr.getArguments()).getText());
@@ -102,7 +102,7 @@ public class GoPsiCallsTest extends GoPsiTestCase {
                   ).getExpression()
             );
 
-        assertEquals("f", get(expr.getBaseExpression()).getText());
+        assertEquals("f", get(expr.getBase()).getText());
         assertEquals(2, expr.getArguments().length);
         assertEquals("nil", childAt(0, expr.getArguments()).getText());
         assertEquals("2", childAt(1, expr.getArguments()).getText());
@@ -128,7 +128,7 @@ public class GoPsiCallsTest extends GoPsiTestCase {
                   ).getExpression()
             );
 
-        assertEquals("fmt.Fprintf", get(expr.getBaseExpression()).getText());
+        assertEquals("fmt.Fprintf", get(expr.getBase()).getText());
         assertEquals(2, expr.getArguments().length);
         assertEquals("nil", childAt(0, expr.getArguments()).getText());
         assertEquals("\"/*begin*/%f/*end.Missing parameter*/\\n\"", childAt(1, expr.getArguments()).getText());

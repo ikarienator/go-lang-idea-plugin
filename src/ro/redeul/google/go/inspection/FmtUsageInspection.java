@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoFile;
+import ro.redeul.google.go.lang.psi.GoPsiElement;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.GoPrimaryExpression;
@@ -50,12 +51,12 @@ public class FmtUsageInspection extends AbstractWholeGoFileInspection {
     }
 
     private static void checkFmtCall(InspectionResult result, GoCallOrConvExpression call) {
-        GoPrimaryExpression callNameExpression = call.getBaseExpression();
+        GoPsiElement base = call.getBase();
 
-        if (callNameExpression == null)
+        if (base == null)
             return;
 
-        String methodCall = callNameExpression.getText();
+        String methodCall = base.getText();
 
         GoExpr[]args = call.getArguments();
 
