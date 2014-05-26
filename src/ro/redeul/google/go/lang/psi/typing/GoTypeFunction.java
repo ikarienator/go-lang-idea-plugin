@@ -103,7 +103,7 @@ public class GoTypeFunction
 
         for (int i = 0; i < parametersLength; i++) {
             if (i > 0) {
-                stringBuilder.append(',');
+                stringBuilder.append(", ");
             }
             stringBuilder.append(types[i].getNameLocalOrGlobal(currentFile));
         }
@@ -114,7 +114,7 @@ public class GoTypeFunction
 
         for (int i = 0; i < types.length - parametersLength; i++) {
             if (i > 0) {
-                stringBuilder.append(',');
+                stringBuilder.append(", ");
             }
             stringBuilder.append(types[i + parametersLength].getNameLocalOrGlobal(currentFile));
         }
