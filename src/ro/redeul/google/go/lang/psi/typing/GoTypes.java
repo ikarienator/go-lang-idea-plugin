@@ -2,21 +2,14 @@ package ro.redeul.google.go.lang.psi.typing;
 
 import com.intellij.util.Function;
 import org.jetbrains.annotations.NotNull;
-import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFunction;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoMethodDeclaration;
-import ro.redeul.google.go.lang.psi.toplevel.GoTypeDeclaration;
-import ro.redeul.google.go.lang.psi.toplevel.GoTypeSpec;
 import ro.redeul.google.go.lang.psi.types.*;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitorWithData;
-import ro.redeul.google.go.lang.stubs.GoNamesCache;
 import ro.redeul.google.go.services.GoPsiManager;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class GoTypes {
@@ -140,6 +133,11 @@ public class GoTypes {
         @Override
         public void visitFunctionLiteral(GoLiteralFunction declaration) {
             visitFunctionType(declaration);
+        }
+
+        @Override
+        public void visitTypeParenthesized(GoPsiTypeParenthesized parenthesized) {
+            parenthesized.getInnerType().accept(this);
         }
     }
 
