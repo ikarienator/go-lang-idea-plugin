@@ -3,6 +3,7 @@ package ro.redeul.google.go.lang.psi.typing;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeChannel;
+
 public class GoTypeChannel extends GoTypePsiBacked<GoPsiTypeChannel> implements GoType {
 
     private final GoType elementType;
@@ -32,14 +33,8 @@ public class GoTypeChannel extends GoTypePsiBacked<GoPsiTypeChannel> implements 
 
     @NotNull
     @Override
-    public String getText() {
-        return String.format("%s %s", this.getChannelType().toString(), this.elementType.getText());
-    }
-
-    @NotNull
-    @Override
     public String getNameLocalOrGlobal(GoFile currentFile) {
-        return String.format("%s %s", this.getChannelType().toString(), this.elementType.getNameLocalOrGlobal(currentFile));
+        return String.format("%s %s", this.getChannelType().getText(), this.elementType.getNameLocalOrGlobal(currentFile));
     }
 
     public GoType getElementType() {
@@ -51,21 +46,18 @@ public class GoTypeChannel extends GoTypePsiBacked<GoPsiTypeChannel> implements 
     }
 
     public static enum ChannelType {
-        Bidirectional,
-        Sending,
-        Receiving;
+        Bidirectional("chan"),
+        Sending("chan<-"),
+        Receiving("<-chan");
 
-        public static String getText(ChannelType channelType) {
-            switch (channelType) {
-                case Bidirectional:
-                    return "chan";
-                case Sending:
-                    return "chan<-";
-                case Receiving:
-                    return "<-chan";
-            }
+        private final String text;
 
-            return "";
+        ChannelType(String text) {
+            this.text = text;
+        }
+
+        public String getText() {
+            return text;
         }
     }
 }

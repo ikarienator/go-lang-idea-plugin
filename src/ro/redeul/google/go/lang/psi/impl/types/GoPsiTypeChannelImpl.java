@@ -39,6 +39,6 @@ public class GoPsiTypeChannelImpl extends GoPsiPackagedElementBase implements
 
     @Override
     public String getPresentationTailText() {
-        return GoTypeChannel.ChannelType.getText(getChannelType()) + getElementType().getPresentationTailText();    //To change body of overridden methods use File | Settings | File Templates.
+        return getChannelType().getText() + getElementType().getPresentationTailText();    //To change body of overridden methods use File | Settings | File Templates.
     }
 }
