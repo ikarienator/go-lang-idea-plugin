@@ -163,6 +163,9 @@ public class CreateFunctionFix extends LocalQuickFixAndIntentionActionOnPsiEleme
                                 stringList.add(String.format("arg%d", arg));
 
                                 final GoPsiType type1 = parameter1.getType();
+                                if (parameter1.isVariadic()) {
+                                    stringBuilder.append("...");
+                                }
                                 stringBuilder.append(GoUtil.getNameLocalOrGlobalAsParameter(type1, currentFile));
                                 arg++;
                             }
