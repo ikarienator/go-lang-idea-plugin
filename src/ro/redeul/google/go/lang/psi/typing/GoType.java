@@ -1,5 +1,8 @@
 package ro.redeul.google.go.lang.psi.typing;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
 
 /**
@@ -12,8 +15,8 @@ public interface GoType {
     static final GoType Unknown = new GoType() {
 
         @Override
-        public boolean isIdentical(GoType type) {
-            return type != null && type == this;
+        public boolean isIdentical(@NotNull GoType type) {
+            return type == this;
         }
 
         @Override
@@ -25,13 +28,38 @@ public interface GoType {
         public void accept(Visitor visitor) {
 
         }
+
+        @Override
+        public boolean isAssignableFrom(@NotNull GoType type) {
+            return true;
+        }
+
+        @NotNull
+        @Override
+        public String getText() {
+            return "Undefined";
+        }
+
+        @NotNull
+        @Override
+        public String getNameLocalOrGlobal(GoFile currentFile) {
+            return "Undefined";
+        }
     };
 
-    boolean isIdentical(GoType type);
+    boolean isIdentical(@NotNull GoType type);
 
     GoUnderlyingType getUnderlyingType();
 
     void accept(Visitor visitor);
+
+    boolean isAssignableFrom(@NotNull GoType type);
+
+    @NotNull
+    String getText();
+
+    @NotNull
+    String getNameLocalOrGlobal(@Nullable GoFile currentFile);
 
     public class Visitor<T> {
 

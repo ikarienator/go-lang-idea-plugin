@@ -16,7 +16,7 @@ public class GoLiteralCompositeImpl extends GoPsiElementBase
     }
 
     @Override
-    public GoPsiType getLiteralType() {
+    public GoPsiType getPsiType() {
         return findChildByClass(GoPsiType.class);
     }
 
@@ -27,7 +27,7 @@ public class GoLiteralCompositeImpl extends GoPsiElementBase
     }
 
     @Override
-    public Type getType() {
+    public Type getLiteralType() {
         return Type.Composite;
     }
 

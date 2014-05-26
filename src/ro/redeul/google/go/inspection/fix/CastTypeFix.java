@@ -21,11 +21,11 @@ import static ro.redeul.google.go.util.EditorUtil.reformatLines;
 
 public class CastTypeFix extends LocalQuickFixAndIntentionActionOnPsiElement {
 
-    private final GoPsiType type;
+    private final GoType type;
     @Nullable
     private PsiElement element;
 
-    public CastTypeFix(@Nullable PsiElement element, GoPsiType type) {
+    public CastTypeFix(@Nullable PsiElement element, GoType type) {
         super(element);
         this.element = element;
         this.type = type;
@@ -65,11 +65,11 @@ public class CastTypeFix extends LocalQuickFixAndIntentionActionOnPsiElement {
         GoType[] type1 = ((GoExpr) element).getType();
         if (type1.length != 0) {
             if (type1[0] instanceof GoTypeInterface) {
-                castString = String.format("%s.(%s)", element.getText(), GoUtil.getNameLocalOrGlobal(this.type, currentFile));
+                castString = String.format("%s.(%s)", element.getText(), this.type.getNameLocalOrGlobal(currentFile));
             }
         }
         if (castString == null)
-            castString = String.format("(%s)(%s)", GoUtil.getNameLocalOrGlobal(this.type, currentFile), element.getText());
+            castString = String.format("(%s)(%s)", this.type.getNameLocalOrGlobal(currentFile), element.getText());
         doc.replaceString(textRange.getStartOffset(), textRange.getEndOffset(), castString);
         if (editor != null) {
             int line = doc.getLineNumber(textRange.getStartOffset());

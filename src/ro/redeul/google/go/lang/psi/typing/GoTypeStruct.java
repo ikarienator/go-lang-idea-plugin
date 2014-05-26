@@ -1,21 +1,66 @@
 package ro.redeul.google.go.lang.psi.typing;
 
+import com.intellij.psi.PsiElement;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import ro.redeul.google.go.lang.psi.GoFile;
+import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
+import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralString;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeStruct;
+import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructAnonymousField;
+import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructField;
 import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeStruct;
 import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
+import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
+
+import java.util.ArrayList;
 
 /**
  * // TODO: mtoader ! Finish this implementation.
  */
 public class GoTypeStruct extends GoTypePsiBacked<GoPsiTypeStruct, GoUnderlyingTypeStruct> implements GoType {
 
+    private final String names[];
+    private final GoType types[];
+    private final String tags[];
+
     public GoTypeStruct(GoPsiTypeStruct type) {
         super(type);
         setUnderlyingType(GoUnderlyingTypes.getStruct());
+        ArrayList<String> names = new ArrayList<String>();
+        ArrayList<GoType> types = new ArrayList<GoType>();
+        ArrayList<String> tags = new ArrayList<String>();
+        for (PsiElement structField : type.getAllFields()) {
+            if (structField instanceof GoTypeStructField) {
+                GoLiteralIdentifier[] identifiers = ((GoTypeStructField) structField).getIdentifiers();
+                GoType fieldType = GoTypes.fromPsiType(((GoTypeStructField) structField).getType());
+                String tag = null;
+                if (((GoTypeStructField) structField).getTag() instanceof GoLiteralString) {
+                    tag = ((GoLiteralString) ((GoTypeStructField) structField).getTag()).getValue();
+                }
+                for (GoLiteralIdentifier identifier : identifiers) {
+                    names.add(identifier.getUnqualifiedName());
+                    types.add(fieldType);
+                    tags.add(tag);
+                }
+            } else if (structField instanceof GoTypeStructAnonymousField) {
+                names.add(null);
+                types.add(GoTypes.fromPsiType(((GoTypeStructAnonymousField) structField).getType()));
+                String tag = null;
+                if (((GoTypeStructAnonymousField) structField).getTag() instanceof GoLiteralString) {
+                    tag = ((GoLiteralString) ((GoTypeStructAnonymousField) structField).getTag()).getValue();
+                }
+                tags.add(tag);
+            }
+        }
+        int n = names.size();
+        this.names = names.toArray(new String[n]);
+        this.types = types.toArray(new GoType[n]);
+        this.tags = tags.toArray(new String[n]);
     }
 
     @Override
-    public boolean isIdentical(GoType type) {
+    public boolean isIdentical(@NotNull GoType type) {
         if (!(type instanceof GoTypeStruct))
             return false;
 
@@ -24,5 +69,29 @@ public class GoTypeStruct extends GoTypePsiBacked<GoPsiTypeStruct, GoUnderlyingT
 
     @Override
     public void accept(Visitor visitor) {
+    }
+
+    @NotNull
+    @Override
+    public String getNameLocalOrGlobal(@Nullable GoFile currentFile) {
+        StringBuilder stringBuilder = new StringBuilder("struct{");
+        for (int i = 0; i < this.names.length; i++) {
+            if (i != 0)
+                stringBuilder.append(";");
+
+            if (names[i] != null) {
+                stringBuilder.append(names[i]);
+                stringBuilder.append(' ');
+            }
+
+            stringBuilder.append(types[i].getNameLocalOrGlobal(currentFile));
+            if (tags[i] != null) {
+                stringBuilder.append(" \"");
+                stringBuilder.append(GoPsiUtils.escapeStringLiteral(tags[i]));
+                stringBuilder.append("\"");
+            }
+        }
+
+        return stringBuilder.toString() + "}";
     }
 }

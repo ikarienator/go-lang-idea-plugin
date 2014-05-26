@@ -4,6 +4,10 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.resolve.ResolveCache;
+import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeInterface;
+import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
+import ro.redeul.google.go.lang.psi.typing.GoTypes;
 import ro.redeul.google.go.lang.psi.utils.GoPsiScopesUtil;
 import com.intellij.psi.util.PsiUtilCore;
 import org.jetbrains.annotations.NotNull;
@@ -133,9 +137,9 @@ public class TypeNameReference
     private static boolean isInterfaceOrPointer(PsiElement declaration) {
         if (declaration instanceof GoTypeNameDeclaration) {
             GoTypeSpec typeSpec = ((GoTypeNameDeclaration) declaration).getTypeSpec();
-            GoPsiType finalType = resolveToFinalType(typeSpec.getType());
-            if (finalType instanceof GoPsiTypeInterface ||
-                    finalType instanceof GoPsiTypePointer) {
+            GoType finalType = resolveToFinalType(GoTypes.fromPsiType(typeSpec.getType()));
+            if (finalType instanceof GoTypeInterface ||
+                    finalType instanceof GoTypePointer) {
                 return true;
             }
         }

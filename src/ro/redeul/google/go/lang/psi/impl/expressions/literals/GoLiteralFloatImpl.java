@@ -30,7 +30,7 @@ public class GoLiteralFloatImpl extends GoPsiElementBase
     }
 
     @Override
-    public Type getType() {
+    public Type getLiteralType() {
         return Type.Float;
     }
 }

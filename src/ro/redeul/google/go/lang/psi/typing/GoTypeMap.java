@@ -1,12 +1,13 @@
 package ro.redeul.google.go.lang.psi.typing;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeMap;
 import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeMap;
 import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
 
-public class GoTypeMap
-    extends GoTypePsiBacked<GoPsiTypeMap, GoUnderlyingTypeMap>
-    implements GoType {
+public class GoTypeMap extends GoTypePsiBacked<GoPsiTypeMap, GoUnderlyingTypeMap> implements GoType {
 
     private final GoType keyType;
     private final GoType elementType;
@@ -18,19 +19,26 @@ public class GoTypeMap
         elementType = GoTypes.fromPsiType(type.getElementType());
 
         setUnderlyingType(
-            GoUnderlyingTypes.getMap(
-            ));
+                GoUnderlyingTypes.getMap(
+                )
+        );
 
     }
 
     @Override
-    public boolean isIdentical(GoType type) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    public boolean isIdentical(@NotNull GoType type) {
+        return type == this || type instanceof GoTypeMap && ((GoTypeMap) type).elementType.isIdentical(this.elementType) && ((GoTypeMap) type).keyType.isIdentical(this.keyType);
     }
 
     @Override
     public void accept(Visitor visitor) {
         visitor.visitTypeMap(this);
+    }
+
+    @NotNull
+    @Override
+    public String getNameLocalOrGlobal(@Nullable GoFile currentFile) {
+        return String.format("map[%s]%s", keyType.getNameLocalOrGlobal(currentFile), elementType.getNameLocalOrGlobal(currentFile));
     }
 
     public GoType getKeyType() {

@@ -18,9 +18,7 @@ import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeArray;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeMap;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeSlice;
-import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypeArray;
-import ro.redeul.google.go.lang.psi.typing.GoTypePsiBacked;
+import ro.redeul.google.go.lang.psi.typing.*;
 import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
 import ro.redeul.google.go.util.GoUtil;
 
@@ -46,14 +44,8 @@ public class ConvertStatementToForRangeIntention extends Intention {
 
                 for (GoType goType : types) {
                     if (goType != null) {
-                        if (goType instanceof GoTypePsiBacked) {
-                            GoPsiType psiType = ((GoTypePsiBacked) goType).getPsiType();
-                            psiType = GoTypeUtils.resolveToFinalType(psiType);
-                            if (psiType instanceof GoPsiTypeMap || psiType instanceof GoPsiTypeSlice || psiType instanceof GoPsiTypeArray)
-                                return true;
-                            break;
-                        }
-                        if (goType instanceof GoTypeArray)
+                        goType = GoTypeUtils.resolveToFinalType(goType);
+                        if (goType instanceof GoTypeMap || goType instanceof GoTypeSlice || goType instanceof GoTypeArray)
                             return true;
                     }
                 }

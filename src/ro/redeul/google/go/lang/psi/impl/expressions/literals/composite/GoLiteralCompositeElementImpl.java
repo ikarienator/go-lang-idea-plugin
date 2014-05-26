@@ -92,7 +92,7 @@ public class GoLiteralCompositeElementImpl extends GoPsiElementBase
             GoLiteralComposite literalComposite =
                 (GoLiteralComposite) getParent().getParent();
 
-            parentType = GoTypes.fromPsiType(literalComposite.getLiteralType());
+            parentType = GoTypes.fromPsiType(literalComposite.getPsiType());
         }
 
         if (patternElementParent.accepts(this)) {

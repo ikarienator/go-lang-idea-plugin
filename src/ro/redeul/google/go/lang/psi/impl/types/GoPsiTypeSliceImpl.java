@@ -4,13 +4,10 @@ import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.impl.GoPsiPackagedElementBase;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeSlice;
 import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
 import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeSlice;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
-
-import static ro.redeul.google.go.lang.psi.utils.GoTypeUtils.resolveToFinalType;
 
 /**
  * Author: Toader Mihai Claudiu <mtoader@gmail.com>
@@ -36,19 +33,6 @@ public class GoPsiTypeSliceImpl extends GoPsiPackagedElementBase implements
     @Override
     public GoUnderlyingType getUnderlyingType() {
         return new GoUnderlyingTypeSlice(getElementType().getUnderlyingType());
-    }
-
-    @Override
-    public boolean isIdentical(GoPsiType goType) {
-        if (goType instanceof GoPsiTypeName) {
-            goType =  resolveToFinalType(goType);
-        }
-        if (!(goType instanceof GoPsiTypeSlice))
-            return false;
-
-        GoPsiTypeSlice otherTypeSlice = (GoPsiTypeSlice)goType;
-
-        return getElementType().isIdentical(otherTypeSlice.getElementType());
     }
 
     @NotNull

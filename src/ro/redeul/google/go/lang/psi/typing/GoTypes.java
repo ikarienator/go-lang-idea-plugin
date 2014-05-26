@@ -1,6 +1,7 @@
 package ro.redeul.google.go.lang.psi.typing;
 
 import com.intellij.util.Function;
+import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFunction;
@@ -80,6 +81,7 @@ public class GoTypes {
         return cachedTypes.get(builtinType);
     }
 
+    @NotNull
     public static GoType fromPsiType(final GoPsiType psiType) {
         if (psiType == null)
             return GoType.Unknown;
@@ -94,6 +96,7 @@ public class GoTypes {
         })[0];
     }
 
+    @NotNull
     public static GoType[] fromPsiType(GoPsiType[] psiTypes) {
         GoType types[] = new GoType[psiTypes.length];
         for (int i = 0; i < types.length; i++) {
@@ -130,7 +133,7 @@ public class GoTypes {
 
         @Override
         public void visitSliceType(GoPsiTypeSlice psiType) {
-            data = new GoTypeSlice(psiType);
+            data = new GoTypeSlice(GoTypes.fromPsiType(psiType.getElementType()));
         }
 
         @Override

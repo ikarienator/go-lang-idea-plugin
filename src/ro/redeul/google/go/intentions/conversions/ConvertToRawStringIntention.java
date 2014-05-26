@@ -20,7 +20,7 @@ public class ConvertToRawStringIntention extends Intention {
     @Override
     protected boolean satisfiedBy(PsiElement element) {
         return element instanceof GoLiteralString &&
-               ((GoLiteralString) element).getType() == GoLiteral.Type.InterpretedString;
+               ((GoLiteralString) element).getLiteralType() == GoLiteral.Type.InterpretedString;
     }
 
     @Override

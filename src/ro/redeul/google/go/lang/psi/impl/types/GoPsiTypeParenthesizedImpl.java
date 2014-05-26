@@ -25,12 +25,6 @@ public class GoPsiTypeParenthesizedImpl extends GoPsiPackagedElementBase
     }
 
     @Override
-    public boolean isIdentical(GoPsiType goType) {
-        // TODO: implement this
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public String getPresentationTailText() {
         return String.format("(%s)", getInnerType().getPresentationTailText());
     }

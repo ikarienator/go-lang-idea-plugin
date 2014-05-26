@@ -31,7 +31,7 @@ public class GoImportUsageCheckingVisitor extends GoRecursiveElementVisitor {
         if (literal == null)
             return;
 
-        switch (literal.getType()) {
+        switch (literal.getLiteralType()) {
             case Identifier:
                 checkQualifiedIdentifier((GoLiteralIdentifier)literal);
                 break;

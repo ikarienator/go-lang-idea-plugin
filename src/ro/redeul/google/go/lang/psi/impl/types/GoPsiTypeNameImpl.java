@@ -111,38 +111,6 @@ public class GoPsiTypeNameImpl extends GoPsiPackagedElementBase
         return GoUnderlyingType.Undefined;
     }
 
-    @Override
-    public boolean isIdentical(GoPsiType goType) {
-        if (goType instanceof GoPsiTypeName) {
-
-            if (!getName().equals(goType.getName()))
-                return false;
-
-            if (isPrimitive())
-                return true;
-            GoTypeSpec goTypeSpec = GoPsiUtils.resolveTypeSpec(this);
-            GoTypeSpec goTypeSpec1 = GoPsiUtils.resolveTypeSpec((GoPsiTypeName) goType);
-
-            if (goTypeSpec == null || goTypeSpec1 == null) {
-                return false;
-            }
-
-            if (!goTypeSpec.getContainingFile().getContainingDirectory().equals(goTypeSpec1.getContainingFile().getContainingDirectory()))
-                return false;
-            return true;
-        }
-        else {
-            if (goType instanceof GoPsiTypeMap || goType instanceof GoPsiTypeSlice || goType instanceof GoPsiTypeArray) {
-                GoPsiType resolved = resolveToFinalType(this);
-                if (resolved != null && resolved != this)
-                    return resolved.isIdentical(goType);
-            }
-        }
-
-
-        return false;
-    }
-
     @NotNull
     @Override
     public GoLiteralIdentifier getIdentifier() {

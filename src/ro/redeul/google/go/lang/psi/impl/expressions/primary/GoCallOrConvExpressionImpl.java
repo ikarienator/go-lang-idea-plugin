@@ -19,6 +19,7 @@ import ro.redeul.google.go.lang.psi.toplevel.GoTypeSpec;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeFunction;
 import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeFunction;
 import ro.redeul.google.go.lang.psi.typing.GoTypePsiBacked;
 import ro.redeul.google.go.lang.psi.typing.GoTypes;
 import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
@@ -80,12 +81,9 @@ public class GoCallOrConvExpressionImpl extends GoExpressionBase
             if (types.length != 0) {
                 GoType type = types[0];
                 if (type != null) {
-                    if (type instanceof GoTypePsiBacked) {
-                        GoPsiType psiType = ((GoTypePsiBacked) type).getPsiType();
-                        psiType = GoTypeUtils.resolveToFinalType(psiType);
-                        if (psiType instanceof GoPsiTypeFunction) {
-                            return GoUtil.getFuncCallTypes((GoPsiTypeFunction) psiType);
-                        }
+                    type = GoTypeUtils.resolveToFinalType(type);
+                    if (type instanceof GoTypeFunction) {
+                        return GoUtil.getFuncCallTypes(((GoTypeFunction) type).getPsiType());
                     }
                 }
             }
@@ -103,9 +101,9 @@ public class GoCallOrConvExpressionImpl extends GoExpressionBase
 
         GoType identifierType = parent.getIdentifierType(identifier);
         if (identifierType != null && identifierType instanceof GoTypePsiBacked) {
-            GoPsiType goPsiType = GoTypeUtils.resolveToFinalType(((GoTypePsiBacked) identifierType).getPsiType());
-            if (goPsiType instanceof GoPsiTypeFunction) {
-                return GoUtil.getFuncCallTypes((GoPsiTypeFunction) goPsiType);
+            identifierType = GoTypeUtils.resolveToFinalType(identifierType);
+            if (identifierType instanceof GoTypeFunction) {
+                return GoUtil.getFuncCallTypes(((GoTypeFunction) identifierType).getPsiType());
             }
         }
 
@@ -115,9 +113,9 @@ public class GoCallOrConvExpressionImpl extends GoExpressionBase
             if (i < types.length) {
                 GoType type = types[i];
                 if (type instanceof GoTypePsiBacked) {
-                    GoPsiType goPsiType = GoTypeUtils.resolveToFinalType(((GoTypePsiBacked) type).getPsiType());
-                    if (goPsiType instanceof GoPsiTypeFunction) {
-                        return GoUtil.getFuncCallTypes((GoPsiTypeFunction) goPsiType);
+                    type = GoTypeUtils.resolveToFinalType(type);
+                    if (type instanceof GoTypeFunction) {
+                        return GoUtil.getFuncCallTypes(((GoTypeFunction) type).getPsiType());
                     }
                 }
             }

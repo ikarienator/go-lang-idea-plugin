@@ -7,7 +7,6 @@ import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.psi.impl.GoPsiPackagedElementBase;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameterList;
-import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeFunction;
 import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
@@ -22,42 +21,6 @@ public class GoPsiTypeFunctionImpl extends GoPsiPackagedElementBase
     @Override
     public GoUnderlyingType getUnderlyingType() {
         return GoUnderlyingType.Undefined;
-    }
-
-    @Override
-    public boolean isIdentical(GoPsiType goType) {
-        if (!(goType instanceof GoPsiTypeFunction))
-            return false;
-
-        GoPsiTypeFunction functionDeclaration = (GoPsiTypeFunction) goType;
-
-        GoFunctionParameter[] funcTypeArguments = this.getParameters();
-        GoFunctionParameter[] funcDeclArguments = functionDeclaration.getParameters();
-
-        int idx = 0;
-
-        if (funcDeclArguments.length != funcTypeArguments.length)
-            return false;
-
-        for (GoFunctionParameter parameter : funcDeclArguments) {
-            if (!parameter.getType().isIdentical(funcTypeArguments[idx].getType()))
-                return false;
-            idx++;
-        }
-
-        funcTypeArguments = this.getResults();
-        funcDeclArguments = functionDeclaration.getResults();
-
-        if (funcDeclArguments.length != funcTypeArguments.length)
-            return false;
-
-        idx = 0;
-        for (GoFunctionParameter parameter : funcDeclArguments) {
-            if (!parameter.getType().isIdentical(funcTypeArguments[idx].getType()))
-                return false;
-            idx++;
-        }
-        return true;
     }
 
     @Override

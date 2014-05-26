@@ -20,6 +20,7 @@ import ro.redeul.google.go.lang.psi.statements.GoExpressionStatement;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
 import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeName;
 import ro.redeul.google.go.lang.psi.typing.GoTypePsiBacked;
 import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
 import ro.redeul.google.go.util.GoUtil;
@@ -51,11 +52,9 @@ public class ConvertStatementToIfIntention extends Intention {
 
                 for (GoType goType : expr.getType()) {
                     if (goType != null) {
-                        if (goType instanceof GoTypePsiBacked) {
-                            GoPsiType psiType = GoTypeUtils.resolveToFinalType(((GoTypePsiBacked) goType).getPsiType());
-                            if (psiType instanceof GoPsiTypeName)
-                                return psiType.getText().equals("bool") && ((GoPsiTypeName) psiType).isPrimitive();
-                        }
+                        goType = GoTypeUtils.resolveToFinalType(goType);
+                        if (goType instanceof GoTypeName)
+                            return ((GoTypeName) goType).getName().equals("bool") && ((GoTypeName) goType).getPsiType().isPrimitive();
                     }
                 }
                 if (expr instanceof GoLiteralExpression) {

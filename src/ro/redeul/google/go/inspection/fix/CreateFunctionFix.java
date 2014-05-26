@@ -9,13 +9,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ro.redeul.google.go.editor.TemplateUtil;
-import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.psi.GoFile;
-import ro.redeul.google.go.lang.psi.GoPsiElement;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoRelationalExpression;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteral;
@@ -26,11 +23,7 @@ import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameterList;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeFunction;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypePointer;
 import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypeArray;
-import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
-import ro.redeul.google.go.lang.psi.typing.GoTypePsiBacked;
 import ro.redeul.google.go.lang.psi.utils.GoExpressionUtils;
 import ro.redeul.google.go.util.GoUtil;
 
@@ -88,61 +81,7 @@ public class CreateFunctionFix extends LocalQuickFixAndIntentionActionOnPsiEleme
                 if (argument instanceof GoRelationalExpression) {
                     stringBuilder.append("bool");
                 } else if (goTypes.length > 0 && goTypes[0] != null) {
-                    GoType goType = goTypes[0];
-
-                    if (goType instanceof GoTypePointer) {
-                        /*
-                         * Detects when a reference is being passed
-                         */
-                        //Fix: Now go we are receiving the right typ
-                        stringBuilder.append('*');
-                        goType = ((GoTypePointer) goType).getTargetType();
-                    }
-
-                    if (goType instanceof GoTypePsiBacked) {
-                         /*
-                          * Using the psiType,
-                          */
-                        String type = GoUtil.getNameLocalOrGlobal(((GoTypePsiBacked) goType).getPsiType(), currentFile);
-                        stringBuilder.append(type);
-                    } else if (goType instanceof GoTypeArray) {
-                         /*
-                          * Using the psiType,
-                          */
-                        String type = GoUtil.getNameLocalOrGlobal(((GoTypeArray) goType).getPsiType(), currentFile);
-                        stringBuilder.append(type);
-                    } else if (firstChildExp instanceof GoLiteralFunction) {
-                         /*
-                          * Resolves the type of a function decl
-                          * ex: the type of http.HandleFunc is func(string,func(http.ResponseWriter,*http.Request))
-                          */
-                        GoFunctionDeclaration functionDeclaration = (GoFunctionDeclaration) firstChildExp;
-                        stringBuilder.append(GoUtil.getFuncDecAsParam(functionDeclaration.getParameters(), functionDeclaration.getResults(), currentFile));
-                    } else {
-
-                        /*
-                         * This block try to resolve a closure variable
-                         * ex: var myClosure=func()int{return 25*4}
-                         *      unresolvedFn(myClosure)
-                         * will generate:
-                         * func unresolvedFn(arg0 func()int){}
-                         */
-
-                        final PsiReference[] references = firstChildExp.getReferences();
-                        if (references.length > 0) {
-                            PsiElement resolve = references[0].resolve();
-                            if (resolve != null) {
-                                GoPsiElement resl_element = (GoPsiElement) resolve.getParent().getLastChild();
-                                GoLiteralFunction fn = (GoLiteralFunction) resl_element.getFirstChild();
-                                stringBuilder.append(GoUtil.getFuncDecAsParam(fn.getParameters(), fn.getResults(), currentFile));
-                            } else {
-                                stringBuilder.append("interface{}");
-                            }
-                        } else {
-                            stringBuilder.append("interface{}");
-                        }
-
-                    }
+                    stringBuilder.append(goTypes[0].getNameLocalOrGlobal(currentFile));
                 } else if (firstChildExp instanceof GoLiteral) {
                     /*
                      * Resolves the type of a literal
@@ -154,7 +93,7 @@ public class CreateFunctionFix extends LocalQuickFixAndIntentionActionOnPsiEleme
                     //if (resolveTo instanceof GoPsiType) {
                     //    stringBuilder.append(getNameLocalOrGlobal((GoPsiType) resolveTo, currentFile));
                     //} else {
-                    stringBuilder.append(((GoLiteral) firstChildExp).getType().name().toLowerCase());
+                    stringBuilder.append(((GoLiteral) firstChildExp).getLiteralType().name().toLowerCase());
                     //}
                 } else {
 
@@ -175,7 +114,7 @@ public class CreateFunctionFix extends LocalQuickFixAndIntentionActionOnPsiEleme
                             stringBuilder.append("interface{}");
                         }
                     } else if (firstChild instanceof GoLiteral) {
-                        GoLiteral.Type type = ((GoLiteral) firstChild).getType();
+                        GoLiteral.Type type = ((GoLiteral) firstChild).getLiteralType();
                         //Fix TEST PR ##321 this only happens on test. i don't know why
                         if (type == GoLiteral.Type.Float || type == GoLiteral.Type.ImaginaryFloat) {
                             stringBuilder.append("float32");
@@ -224,13 +163,7 @@ public class CreateFunctionFix extends LocalQuickFixAndIntentionActionOnPsiEleme
                                 stringList.add(String.format("arg%d", arg));
 
                                 final GoPsiType type1 = parameter1.getType();
-                                if (type1 instanceof GoPsiTypePointer) {
-                                    if (type1.getParent().getNode().getElementType().equals(GoElementTypes.FUNCTION_PARAMETER_VARIADIC))
-                                        stringBuilder.append("...");
-                                    stringBuilder.append('*').append(GoUtil.getNameLocalOrGlobal(((GoPsiTypePointer) type1).getTargetType(), currentFile));
-                                } else {
-                                    stringBuilder.append(GoUtil.getNameLocalOrGlobalAsParameter(type1, currentFile));
-                                }
+                                stringBuilder.append(GoUtil.getNameLocalOrGlobalAsParameter(type1, currentFile));
                                 arg++;
                             }
                         }

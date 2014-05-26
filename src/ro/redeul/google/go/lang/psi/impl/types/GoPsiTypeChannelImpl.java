@@ -44,21 +44,6 @@ public class GoPsiTypeChannelImpl extends GoPsiPackagedElementBase implements
     }
 
     @Override
-    public boolean isIdentical(GoPsiType goType) {
-        if (!(goType instanceof GoPsiTypeChannel))
-            return false;
-
-        GoPsiTypeChannel otherChannel = (GoPsiTypeChannel) goType;
-        GoPsiType elementType = this.getElementType();
-        if (elementType == null)
-            return false;
-        GoTypeChannel.ChannelType chanType = this.getChannelType();
-        GoTypeChannel.ChannelType otherChanType = otherChannel.getChannelType();
-        return (chanType == otherChanType || chanType == GoTypeChannel.ChannelType.Bidirectional) &&
-                elementType.isIdentical(otherChannel.getElementType());
-    }
-
-    @Override
     public String getPresentationTailText() {
         return GoTypeChannel.ChannelType.getText(getChannelType()) + getElementType().getPresentationTailText();    //To change body of overridden methods use File | Settings | File Templates.
     }

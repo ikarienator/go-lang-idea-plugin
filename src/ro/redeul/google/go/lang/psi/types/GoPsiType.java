@@ -16,5 +16,4 @@ public interface GoPsiType extends GoPsiElement, GoPackagedElement {
 
     GoUnderlyingType getUnderlyingType();
 
-    boolean isIdentical(GoPsiType goType);
 }

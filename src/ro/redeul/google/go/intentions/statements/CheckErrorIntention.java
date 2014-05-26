@@ -13,6 +13,8 @@ import ro.redeul.google.go.lang.psi.statements.GoExpressionStatement;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
 import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeBuiltin;
+import ro.redeul.google.go.lang.psi.typing.GoTypeName;
 import ro.redeul.google.go.lang.psi.typing.GoTypePsiBacked;
 import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
 import ro.redeul.google.go.util.GoUtil;
@@ -37,20 +39,13 @@ public class CheckErrorIntention extends Intention {
             expr = statement.getExpression();
             if (expr != null) {
                 for (GoType goType : expr.getType()) {
-                    if (goType != null) {
-                        if (goType instanceof GoTypePsiBacked) {
-                            GoPsiType psiType = GoTypeUtils.resolveToFinalType(((GoTypePsiBacked) goType).getPsiType());
-                            if (psiType instanceof GoPsiTypeName) {
-                                if (psiType.getText().equals("error") && ((GoPsiTypeName) psiType).isPrimitive())
-                                    return true;
-                            }
-                        }
-                    }
+                    if (goType == GoTypeBuiltin.Error) return true;
                 }
             }
         }
         return false;
     }
+
 
     @Override
     protected void processIntention(@NotNull PsiElement element, Editor editor) throws IntentionExecutionException {
@@ -77,30 +72,25 @@ public class CheckErrorIntention extends Intention {
                 }
 
                 String currentVar = String.format("$v%d$", j);
-                if (goType != null) {
-                    if (goType instanceof GoTypePsiBacked) {
-                        GoPsiType psiType = GoTypeUtils.resolveToFinalType(((GoTypePsiBacked) goType).getPsiType());
-                        if (psiType instanceof GoPsiTypeName && psiType.getText().equals("error") && ((GoPsiTypeName) psiType).isPrimitive()) {
-                            if (k.equals("err") && i != 0)
-                                k = "err0";
-                            while (GoUtil.TestDeclVar(expr, k)) {
-                                k = String.format("err%d", i);
-                                i++;
-                            }
-                            if (c != 0) {
-                                checkString.append(" || ");
-                            }
-                            stringList.add(k);
-
-                            ifString.append(currentVar);
-                            checkString.append(currentVar)
-                                    .append(" != nil");
-                            j++;
-                            i++;
-                            c++;
-                            continue;
-                        }
+                if (goType == GoTypeBuiltin.Error) {
+                    if (k.equals("err") && i != 0)
+                        k = "err0";
+                    while (GoUtil.TestDeclVar(expr, k)) {
+                        k = String.format("err%d", i);
+                        i++;
                     }
+                    if (c != 0) {
+                        checkString.append(" || ");
+                    }
+                    stringList.add(k);
+
+                    ifString.append(currentVar);
+                    checkString.append(currentVar)
+                            .append(" != nil");
+                    j++;
+                    i++;
+                    c++;
+                    continue;
                 }
                 ifString.append(currentVar);
                 stringList.add("_");

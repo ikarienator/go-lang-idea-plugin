@@ -40,7 +40,7 @@ public abstract class AbstractCallOrConversionReference<Reference extends Abstra
     public String getCanonicalText() {
         GoLiteral literal = getElement().getLiteral();
 
-        if (literal != null && literal.getType() == GoLiteral.Type.Identifier) {
+        if (literal != null && literal.getLiteralType() == GoLiteral.Type.Identifier) {
             GoLiteralIdentifier identifier = (GoLiteralIdentifier) literal;
             String identifierName = identifier.getName();
             if (identifierName != null) {

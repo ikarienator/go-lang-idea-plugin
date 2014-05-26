@@ -14,7 +14,7 @@ public class GoLiteralBoolImpl extends GoPsiElementBase
     }
 
     @Override
-    public Type getType() {
+    public Type getLiteralType() {
         return Type.Bool;
     }
 

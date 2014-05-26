@@ -230,7 +230,7 @@ public class GoVariableUsageStatVisitor extends GoRecursiveElementVisitor {
         }
 
         GoLiteral literal = ((GoLiteralExpression) expr).getLiteral();
-        if ( literal.getType() == GoLiteral.Type.Identifier )
+        if ( literal.getLiteralType() == GoLiteral.Type.Identifier )
         if (needToCollectUsage((GoLiteralIdentifier)literal)) {
             if (declaration) {
                 ctx.addDefinition(literal);

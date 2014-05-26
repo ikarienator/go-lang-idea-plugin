@@ -10,6 +10,8 @@ import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
+import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypes;
 import ro.redeul.google.go.lang.psi.utils.GoExpressionUtils;
 
 import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.findParentOfType;
@@ -53,7 +55,7 @@ public class CastToFixTest extends GoEditorAwareTestCase {
 
         GoFunctionDeclaration goFunctionDeclaration = GoExpressionUtils.resolveToFunctionDeclaration(expression);
         assertNotNull(goFunctionDeclaration);
-        final GoPsiType type = goFunctionDeclaration.getParameters()[1].getType();
+        final GoType type = GoTypes.fromPsiType(goFunctionDeclaration.getParameters()[1].getType());
 
         CommandProcessor.getInstance().executeCommand(project, new Runnable() {
             @Override

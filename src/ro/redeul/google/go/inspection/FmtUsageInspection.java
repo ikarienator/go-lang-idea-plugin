@@ -103,12 +103,12 @@ public class FmtUsageInspection extends AbstractWholeGoFileInspection {
 
         GoLiteral literal = literalExpression.getLiteral();
 
-        switch (literal.getType()) {
+        switch (literal.getLiteralType()) {
             case Identifier:
                 literal = findConstDefinition((GoLiteralIdentifier)literal);
                 if (literal == null ||
-                    literal.getType() != InterpretedString &&
-                    literal.getType() != RawString)
+                    literal.getLiteralType() != InterpretedString &&
+                    literal.getLiteralType() != RawString)
                    break;
             case InterpretedString:
             case RawString:

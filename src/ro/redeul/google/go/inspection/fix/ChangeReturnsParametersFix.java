@@ -69,7 +69,7 @@ public class ChangeReturnsParametersFix extends LocalQuickFixAndIntentionActionO
 
 
         GoExpr[] expressions = element.getExpressions();
-
+        GoFile elementFile = (GoFile) element.getContainingFile();
         for (GoExpr expr : expressions) {
 
             if (expr instanceof GoLiteralExpression) {
@@ -78,9 +78,7 @@ public class ChangeReturnsParametersFix extends LocalQuickFixAndIntentionActionO
                     if (i != 0) {
                         stringBuilder.append(",");
                     }
-                    stringBuilder.append(GoUtil.getFuncDecAsParam(((GoLiteralFunction) literal).getParameters(),
-                            ((GoLiteralFunction) literal).getResults(),
-                            (GoFile) element.getContainingFile()));
+                    stringBuilder.append(expr.getType()[0].getNameLocalOrGlobal(elementFile));
                     i++;
                     continue;
                 }
@@ -101,15 +99,7 @@ public class ChangeReturnsParametersFix extends LocalQuickFixAndIntentionActionO
                         }
                         break;
                     }
-
-
-                    if (type instanceof GoTypePsiBacked) {
-                        GoPsiType goPsiType = ((GoTypePsiBacked) type).getPsiType();
-                        stringBuilder.append(GoUtil.getNameLocalOrGlobal(goPsiType, (GoFile) element.getContainingFile()));
-                    } else if (type instanceof GoTypeArray) {
-                        GoPsiType goPsiType = ((GoTypeArray) type).getPsiType();
-                        stringBuilder.append(GoUtil.getNameLocalOrGlobal(goPsiType, (GoFile) element.getContainingFile()));
-                    }
+                    stringBuilder.append(type.getNameLocalOrGlobal(elementFile));
                 } else {
                     //As some Expression may not return a valid type, in this case will not modify anithing and exit
                     return;

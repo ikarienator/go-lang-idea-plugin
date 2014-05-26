@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.impl.GoPsiPackagedElementBase;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoMethodDeclaration;
-import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeInterface;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
 import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
@@ -28,15 +27,6 @@ public class GoPsiTypeInterfaceImpl extends GoPsiPackagedElementBase implements
     @Override
     public GoUnderlyingType getUnderlyingType() {
         return GoUnderlyingTypes.getInterface();
-    }
-
-    @Override
-    public boolean isIdentical(GoPsiType goType) {
-        //if (!(goType instanceof GoPsiTypeInterface))
-        //    return false;
-        //TODO: this may need to be changed later
-        //Right now the only interface{} expressions are getting this type
-        return goType instanceof GoPsiTypeInterface;
     }
 
     @Override

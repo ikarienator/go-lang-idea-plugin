@@ -24,6 +24,7 @@ import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeChannel;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeMap;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeSlice;
+import ro.redeul.google.go.lang.psi.typing.*;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoRecursiveElementVisitor;
 import ro.redeul.google.go.util.GoTypeInspectUtil;
@@ -89,12 +90,12 @@ public class FunctionCallInspection extends AbstractWholeGoFileInspection {
             return;
         }
 
-        GoPsiType finalType = resolveToFinalType(type);
-        if (finalType instanceof GoPsiTypeSlice) {
+        GoType finalType = resolveToFinalType(GoTypes.fromPsiType(type));
+        if (finalType instanceof GoTypeSlice) {
             checkMakeSliceCall(expression, arguments, result);
-        } else if (finalType instanceof GoPsiTypeChannel) {
+        } else if (finalType instanceof GoTypeChannel) {
             checkMakeChannelCall(arguments, result);
-        } else if (finalType instanceof GoPsiTypeMap) {
+        } else if (finalType instanceof GoTypeMap) {
             checkMakeMapCall(arguments, result);
         } else {
             result.addProblem(expression, GoBundle.message("error.cannot.make.type", type.getText()));

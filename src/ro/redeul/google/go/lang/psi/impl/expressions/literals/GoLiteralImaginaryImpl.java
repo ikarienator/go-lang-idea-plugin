@@ -20,7 +20,7 @@ public class GoLiteralImaginaryImpl extends GoPsiElementBase
     }
 
     @Override
-    public Type getType() {
+    public Type getLiteralType() {
         return findChildByType(litFLOAT_I) != null
              ? Type.ImaginaryFloat: Type.ImaginaryInt;
     }

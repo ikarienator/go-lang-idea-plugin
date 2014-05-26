@@ -25,7 +25,6 @@ import ro.redeul.google.go.lang.psi.resolve.references.BuiltinCallOrConversionRe
 import ro.redeul.google.go.lang.psi.resolve.references.CallOrConversionReference;
 import ro.redeul.google.go.lang.psi.resolve.references.VarOrConstReference;
 import ro.redeul.google.go.lang.psi.statements.GoForWithRangeAndVarsStatement;
-import ro.redeul.google.go.lang.psi.statements.GoForWithRangeStatement;
 import ro.redeul.google.go.lang.psi.statements.switches.GoSwitchTypeClause;
 import ro.redeul.google.go.lang.psi.statements.switches.GoSwitchTypeGuard;
 import ro.redeul.google.go.lang.psi.statements.switches.GoSwitchTypeStatement;
@@ -74,7 +73,7 @@ public class GoLiteralExpressionImpl extends GoExpressionBase
             GoNamesCache namesCache =
                     GoNamesCache.getInstance(expression.getProject());
 
-            switch (literal.getType()) {
+            switch (literal.getLiteralType()) {
                 case Bool:
                     return new GoType[]{
                             GoTypes.getBuiltin(Builtin.Bool, namesCache)
@@ -197,7 +196,7 @@ public class GoLiteralExpressionImpl extends GoExpressionBase
                     return GoType.EMPTY_ARRAY;
                 case Composite:
                     GoLiteralComposite composite = (GoLiteralComposite) literal;
-                    GoPsiType literalType = composite.getLiteralType();
+                    GoPsiType literalType = composite.getPsiType();
                     if (literalType == null) {
                         return GoType.EMPTY_ARRAY;
                     }
@@ -226,7 +225,7 @@ public class GoLiteralExpressionImpl extends GoExpressionBase
         if (literal == null)
             return true;
 
-        switch (literal.getType()) {
+        switch (literal.getLiteralType()) {
             case Bool:
             case Char:
             case Float:

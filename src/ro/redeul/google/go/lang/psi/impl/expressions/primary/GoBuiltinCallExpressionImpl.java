@@ -11,8 +11,6 @@ import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoMethodDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoPackageDeclaration;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeMap;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeSlice;
 import ro.redeul.google.go.lang.psi.typing.GoType;
 import ro.redeul.google.go.lang.psi.typing.GoTypeMap;
 import ro.redeul.google.go.lang.psi.typing.GoTypeSlice;
@@ -80,7 +78,7 @@ public class GoBuiltinCallExpressionImpl extends GoCallOrConvExpressionImpl
     }
 
     @Override
-    public GoPsiType[] getArgumentsType() {
+    public GoType[] getArgumentsType() {
         PsiElement reference = resolveSafely(getBaseExpression(),
                 PsiElement.class);
 
@@ -96,10 +94,10 @@ public class GoBuiltinCallExpressionImpl extends GoCallOrConvExpressionImpl
                 return processArgumentsType(declaration.getFunctionName());
         }
 
-        return GoPsiType.EMPTY_ARRAY;
+        return GoType.EMPTY_ARRAY;
     }
 
-    private GoPsiType[] processArgumentsType(String functionName) {
+    private GoType[] processArgumentsType(String functionName) {
         GoNamesCache namesCache = GoNamesCache.getInstance(getProject());
 
         GoExpr[] args = getArguments();
@@ -109,11 +107,11 @@ public class GoBuiltinCallExpressionImpl extends GoCallOrConvExpressionImpl
             if (args.length > 1) {
                 GoType[] types = args[0].getType();
                 if (types.length > 0 && types[0] instanceof GoTypeSlice) {
-                    GoPsiTypeSlice appendedSlice = ((GoTypeSlice) types[0]).getPsiType();
-                    GoPsiType[] result = new GoPsiType[args.length];
+                    GoTypeSlice appendedSlice = (GoTypeSlice) types[0];
+                    GoType[] result = new GoType[args.length];
                     result[0] = appendedSlice;
-                    GoPsiType elem = appendedSlice.getElementType();
-                    for (int i = 1; i < args.length; i++){
+                    GoType elem = appendedSlice.getElementType();
+                    for (int i = 1; i < args.length; i++) {
                         result[i] = elem;
                     }
                     return result;
@@ -123,21 +121,21 @@ public class GoBuiltinCallExpressionImpl extends GoCallOrConvExpressionImpl
             if (args.length == 2) {
                 GoType[] types = args[0].getType();
                 if (types.length > 0 && types[0] instanceof GoTypeSlice) {
-                    GoPsiTypeSlice copiedSlice = ((GoTypeSlice) types[0]).getPsiType();
-                    return new GoPsiType[]{copiedSlice, copiedSlice};
+                    GoTypeSlice copiedSlice = (GoTypeSlice) types[0];
+                    return new GoType[]{copiedSlice, copiedSlice};
                 }
             }
         } else if (functionName.equals("delete")) {
             if (args.length == 2) {
                 GoType[] types = args[0].getType();
                 if (types.length > 0 && types[0] instanceof GoTypeMap) {
-                    GoPsiTypeMap map = ((GoTypeMap) types[0]).getPsiType();
-                    return new GoPsiType[]{map, map.getKeyType()};
+                    GoTypeMap map = (GoTypeMap) types[0];
+                    return new GoType[]{map, map.getKeyType()};
                 }
             }
         }
 
-        return GoPsiType.EMPTY_ARRAY;
+        return GoType.EMPTY_ARRAY;
     }
 
     private GoType[] processBuiltinFunction(String functionName) {

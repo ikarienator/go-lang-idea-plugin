@@ -85,7 +85,7 @@ public class GoPsiCompositeLiteralsTest extends GoPsiTestCase {
 
         assertEquals("Line",
                      getAs(GoPsiTypeName.class,
-                           composite.getLiteralType()
+                           composite.getPsiType()
                      ).getName());
 
         GoLiteralCompositeValue value = get(composite.getValue());

@@ -15,8 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.lexer.GoTokenTypes;
 import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.psi.GoFile;
-import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
-import ro.redeul.google.go.lang.psi.declarations.GoConstDeclarations;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralString;
 import ro.redeul.google.go.lang.psi.expressions.literals.composite.GoLiteralComposite;
@@ -28,10 +26,10 @@ import ro.redeul.google.go.lang.psi.resolve.references.LabelReference;
 import ro.redeul.google.go.lang.psi.resolve.references.ShortVarDeclarationReference;
 import ro.redeul.google.go.lang.psi.resolve.references.VarOrConstReference;
 import ro.redeul.google.go.lang.psi.toplevel.*;
-import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
-import ro.redeul.google.go.lang.psi.types.GoPsiTypeStruct;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructField;
+import ro.redeul.google.go.lang.psi.typing.GoTypeStruct;
+import ro.redeul.google.go.lang.psi.typing.GoTypes;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 
 import java.util.List;
@@ -84,7 +82,7 @@ public class GoLiteralIdentifierImpl extends GoPsiElementBase
     }
 
     @Override
-    public Type getType() {
+    public Type getLiteralType() {
         return Type.Identifier;
     }
 
@@ -193,7 +191,7 @@ public class GoLiteralIdentifierImpl extends GoPsiElementBase
 
         if (CompositeElementOfStructFieldReference.MATCHER_KEY.accepts(this)) {
             GoLiteralComposite composite = findParentOfType(this, GoLiteralComposite.class);
-            if (resolveToFinalType(composite.getLiteralType()) instanceof GoPsiTypeStruct) {
+            if (resolveToFinalType(GoTypes.fromPsiType(composite.getPsiType())) instanceof GoTypeStruct) {
                 return refs(
                         new CompositeElementOfStructFieldReference(this, this)
                 );

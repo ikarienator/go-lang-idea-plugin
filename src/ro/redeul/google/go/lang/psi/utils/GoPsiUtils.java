@@ -129,6 +129,46 @@ public class GoPsiUtils {
         return false;
     }
 
+    public static String escapeStringLiteral(String value) {
+        if (!value.contains("`")) {
+            return "`" + value + "`";
+        }
+        StringBuilder w = new StringBuilder();
+        w.append('"');
+        for (char ch : value.toCharArray()) {
+            switch (ch) {
+                case 0x07:
+                    w.append("\\a");
+                    break;
+                case 0x08:
+                    w.append("\\b");
+                    break;
+                case 0x09:
+                    w.append("\\v");
+                    break;
+                case 0x0a:
+                    w.append("\\n");
+                    break;
+                case 0x0b:
+                    w.append("\\\\");
+                    break;
+                case 0x0c:
+                    w.append("\\f");
+                    break;
+                case 0x0d:
+                    w.append("\\");
+                    break;
+                case 0x22:
+                    w.append("\\\"");
+                    break;
+                default:
+                    w.append(ch);
+                    break;
+            }
+        }
+        w.append('"');
+        return w.toString();
+    }
 
     public static String getStringLiteralValue(String literalText) {
         if (literalText == null ){
@@ -177,7 +217,7 @@ public class GoPsiUtils {
             if (firstValue.equals("'"))
                 return 0x27;
             if (firstValue.equals("\""))
-                return 0x22;            
+                return 0x22;
             if (firstValue.equals("U") && runeText.length() == 10){
                 String uValue = runeText.substring(2, 10);
                 Integer value = Integer.parseInt(uValue, 16);

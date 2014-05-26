@@ -16,5 +16,5 @@ public interface GoLiteral<T> extends GoPsiElement {
     @NotNull
     T getValue();
 
-    Type getType();
+    Type getLiteralType();
 }

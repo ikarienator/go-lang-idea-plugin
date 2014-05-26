@@ -177,7 +177,7 @@ public class GoAnnotator extends GoRecursiveElementVisitor
     public void visitLiteralExpression(GoLiteralExpression expression) {
         super.visitLiteralExpression(expression);
 
-        if (expression.getLiteral().getType() == GoLiteral.Type.Identifier) {
+        if (expression.getLiteral().getLiteralType() == GoLiteral.Type.Identifier) {
             GoLiteralIdentifier identifier = (GoLiteralIdentifier) expression.getLiteral();
             processLiteralIdentifier(identifier);
         }

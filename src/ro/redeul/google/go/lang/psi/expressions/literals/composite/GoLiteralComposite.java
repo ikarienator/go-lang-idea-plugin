@@ -6,7 +6,7 @@ import ro.redeul.google.go.lang.psi.types.GoPsiType;
 
 public interface GoLiteralComposite extends GoLiteral<GoLiteralCompositeValue> {
 
-    GoPsiType getLiteralType();
+    GoPsiType getPsiType();
 
     @NotNull
     GoLiteralCompositeValue getValue();
