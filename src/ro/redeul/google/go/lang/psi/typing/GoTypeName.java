@@ -30,7 +30,7 @@ public class GoTypeName extends GoTypePsiBacked<GoPsiTypeName> implements GoType
 
     @Override
     public boolean isIdentical(@NotNull GoType type) {
-        return this == type;
+        return type == this || type instanceof GoTypeName && this.getPsiType().getIdentifier().getCanonicalName().equals(((GoTypeName) type).getPsiType().getIdentifier().getCanonicalName());
     }
 
     @Override
@@ -90,7 +90,7 @@ public class GoTypeName extends GoTypePsiBacked<GoPsiTypeName> implements GoType
 
     @Override
     public boolean isAssignableFrom(@NotNull GoType type) {
-        if (type == this) return true;
+        if (type.isIdentical(this)) return true;
         if (type instanceof GoTypeName) return false;
         GoType resolvedType = GoTypeUtils.resolveToFinalType(this);
         if (resolvedType == null) return false;
