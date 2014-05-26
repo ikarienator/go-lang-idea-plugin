@@ -151,7 +151,7 @@ public class MethodReference
                 }
 
                 GoType embeddedType = GoTypes.fromPsiType(psiType);
-                if (embeddedType == null || !(embeddedType instanceof GoTypeName))
+                if (!(embeddedType instanceof GoTypeName))
                     continue;
 
                 GoTypeName embeddedTypeName = (GoTypeName) embeddedType;
