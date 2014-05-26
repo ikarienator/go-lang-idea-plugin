@@ -5,8 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.impl.GoPsiPackagedElementBase;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypePointer;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypePointer;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 
 /**
@@ -30,11 +28,6 @@ public class GoPsiTypePointerImpl extends GoPsiPackagedElementBase implements
     @Override
     public GoPsiType getTargetType() {
         return findChildByClass(GoPsiType.class);
-    }
-
-    @Override
-    public GoUnderlyingType getUnderlyingType() {
-        return new GoUnderlyingTypePointer(getTargetType().getUnderlyingType());
     }
 
     @Override

@@ -4,9 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeInterface;
 import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeInterface;
 import ro.redeul.google.go.lang.psi.typing.GoTypeName;
 import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
 import ro.redeul.google.go.lang.psi.visitors.GoRecursiveElementVisitor;
@@ -44,9 +43,9 @@ public class TypeMatchInspection extends AbstractWholeGoFileInspection {
                 if (leftType == null || rightType == null) {
                     return;
                 }
-                GoUnderlyingType leftUnder = leftType.getUnderlyingType();
-                GoUnderlyingType rightUnder = rightType.getUnderlyingType();
-                boolean hasInterface = leftUnder instanceof GoUnderlyingTypeInterface || rightUnder instanceof GoUnderlyingTypeInterface;
+                GoType leftUnder = leftType.getUnderlyingType();
+                GoType rightUnder = rightType.getUnderlyingType();
+                boolean hasInterface = leftUnder instanceof GoTypeInterface || rightUnder instanceof GoTypeInterface;
                 if (!equality) {
                     if (leftType instanceof GoTypePointer || rightType instanceof GoTypePointer){
                         result.addProblem(expression, "operator "+operator+" not defined on pointer");

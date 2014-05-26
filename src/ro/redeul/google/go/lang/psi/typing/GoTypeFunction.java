@@ -6,13 +6,11 @@ import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeFunction;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeFunction;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
 
 import java.util.ArrayList;
 
 public class GoTypeFunction
-        extends GoTypePsiBacked<GoPsiTypeFunction, GoUnderlyingTypeFunction>
+        extends GoTypePsiBacked<GoPsiTypeFunction>
         implements GoType {
 
     @NotNull
@@ -67,7 +65,6 @@ public class GoTypeFunction
         }
         this.names = names.toArray(new String[names.size()]);
         this.types = types.toArray(new GoType[types.size()]);
-        setUnderlyingType(GoUnderlyingTypes.getFunction());
     }
 
     @Override

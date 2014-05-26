@@ -1,15 +1,11 @@
 package ro.redeul.google.go.lang.psi.typing;
 
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
 
 /**
  * // TODO: mtoader ! Please explain yourself.
  */
-public abstract class GoTypePsiBacked<
-    PsiType extends GoPsiType,
-    UnderlyingType extends GoUnderlyingType
-    > extends GoAbstractType<UnderlyingType> {
+public abstract class GoTypePsiBacked<PsiType extends GoPsiType> extends GoAbstractType {
 
     private final PsiType psiType;
 

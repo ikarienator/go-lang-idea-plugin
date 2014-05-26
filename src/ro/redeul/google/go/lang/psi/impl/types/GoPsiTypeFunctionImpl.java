@@ -8,7 +8,6 @@ import ro.redeul.google.go.lang.psi.impl.GoPsiPackagedElementBase;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameterList;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeFunction;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 
@@ -16,11 +15,6 @@ public class GoPsiTypeFunctionImpl extends GoPsiPackagedElementBase
         implements GoPsiTypeFunction {
     public GoPsiTypeFunctionImpl(@NotNull ASTNode node) {
         super(node);
-    }
-
-    @Override
-    public GoUnderlyingType getUnderlyingType() {
-        return GoUnderlyingType.Undefined;
     }
 
     @Override

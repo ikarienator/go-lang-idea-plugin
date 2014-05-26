@@ -10,8 +10,6 @@ import ro.redeul.google.go.lang.psi.types.GoPsiTypeStruct;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructAnonymousField;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructField;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructPromotedFields;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 
 import java.util.ArrayList;
@@ -99,11 +97,6 @@ public class GoPsiTypeStructImpl extends GoPsiPackagedElementBase implements
     @Override
     public void accept(GoElementVisitor visitor) {
         visitor.visitStructType(this);
-    }
-
-    @Override
-    public GoUnderlyingType getUnderlyingType() {
-        return GoUnderlyingTypes.getStruct();
     }
 
     public PsiElement[] getAllFields() {

@@ -3,15 +3,11 @@ package ro.redeul.google.go.lang.psi.typing;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ro.redeul.google.go.lang.psi.GoFile;
-import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeSlice;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
-import ro.redeul.google.go.util.GoTypeInspectUtil;
 
 /**
  * // TODO: mtoader ! Please explain yourself.
  */
-public class GoTypeSlice extends GoAbstractType<GoUnderlyingTypeSlice> implements GoType {
+public class GoTypeSlice extends GoAbstractType implements GoType {
 
     @NotNull
     private final GoType elementType;
@@ -19,7 +15,6 @@ public class GoTypeSlice extends GoAbstractType<GoUnderlyingTypeSlice> implement
 
     public GoTypeSlice(@NotNull GoType elementType) {
         this.elementType = elementType;
-        setUnderlyingType(GoUnderlyingTypes.getSlice(elementType.getUnderlyingType()));
     }
 
     @Override

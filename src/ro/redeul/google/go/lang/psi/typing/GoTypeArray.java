@@ -4,10 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeArray;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeArray;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
 
-public class GoTypeArray extends GoAbstractType<GoUnderlyingTypeArray> implements GoType {
+public class GoTypeArray extends GoAbstractType implements GoType {
 
     private final GoType elementType;
     private GoPsiType elementPsiType = null;
@@ -21,7 +19,6 @@ public class GoTypeArray extends GoAbstractType<GoUnderlyingTypeArray> implement
     public GoTypeArray(int length, GoType elementType) {
         this.length = length;
         this.elementType = elementType;
-        setUnderlyingType(GoUnderlyingTypes.getArray(elementType.getUnderlyingType(), 1));
     }
 
     public GoPsiType getPsiType() {

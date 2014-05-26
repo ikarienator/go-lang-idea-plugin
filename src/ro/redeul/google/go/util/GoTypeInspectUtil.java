@@ -34,7 +34,7 @@ public class GoTypeInspectUtil {
         if (psiType instanceof GoPsiTypeInterface)
             return true;
         if (psiType instanceof GoPsiTypeName)
-            return psiType.getName().equals("error") && ((GoPsiTypeName) psiType).isPrimitive();
+            return GoTypes.fromPsiType(psiType) == GoTypeBuiltin.Error;
         if (psiType instanceof GoPsiTypeSlice)
             return checkIsInterface(((GoPsiTypeSlice) psiType).getElementType());
         if (psiType instanceof GoPsiTypePointer)

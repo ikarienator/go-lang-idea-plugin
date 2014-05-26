@@ -4,10 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeMap;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeMap;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
 
-public class GoTypeMap extends GoTypePsiBacked<GoPsiTypeMap, GoUnderlyingTypeMap> implements GoType {
+public class GoTypeMap extends GoTypePsiBacked<GoPsiTypeMap> implements GoType {
 
     private final GoType keyType;
     private final GoType elementType;
@@ -17,12 +15,6 @@ public class GoTypeMap extends GoTypePsiBacked<GoPsiTypeMap, GoUnderlyingTypeMap
 
         keyType = GoTypes.fromPsiType(type.getKeyType());
         elementType = GoTypes.fromPsiType(type.getElementType());
-
-        setUnderlyingType(
-                GoUnderlyingTypes.getMap(
-                )
-        );
-
     }
 
     @Override

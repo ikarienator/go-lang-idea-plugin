@@ -6,11 +6,8 @@ import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.GoPrimaryExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoIndexExpression;
 import ro.redeul.google.go.lang.psi.impl.expressions.GoExpressionBase;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeArray;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeMap;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeSlice;
 import ro.redeul.google.go.lang.psi.typing.*;
+import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 
 public class GoIndexExpressionImpl extends GoExpressionBase
@@ -27,9 +24,9 @@ public class GoIndexExpressionImpl extends GoExpressionBase
             return GoType.EMPTY_ARRAY;
 
         GoType baseType = baseTypes[0];
-        GoUnderlyingType underlyingType = baseType.getUnderlyingType();
+        baseType = GoTypeUtils.resolveToFinalType(baseType);
 
-        if (underlyingType instanceof GoUnderlyingTypeSlice) {
+        if (baseType instanceof GoTypeSlice) {
             GoTypeSlice slice =
                 GoTypes.resolveTo(baseType, GoTypeSlice.class);
 
@@ -39,7 +36,7 @@ public class GoIndexExpressionImpl extends GoExpressionBase
             return new GoType[]{slice.getElementType()};
         }
 
-        if (underlyingType instanceof GoUnderlyingTypeArray) {
+        if (baseType instanceof GoTypeArray) {
             GoTypeArray typeArray =
                 GoTypes.resolveTo(baseType, GoTypeArray.class);
 
@@ -49,7 +46,7 @@ public class GoIndexExpressionImpl extends GoExpressionBase
             return new GoType[]{typeArray.getElementType()};
         }
 
-        if (underlyingType instanceof GoUnderlyingTypeMap) {
+        if (baseType instanceof GoTypeMap) {
             GoTypeMap map =
                 GoTypes.resolveTo(baseType, GoTypeMap.class);
 

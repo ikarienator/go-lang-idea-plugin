@@ -19,15 +19,9 @@ import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructAnonymousField;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructField;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeInterface;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypePointer;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeStruct;
-import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypeName;
-import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
-import ro.redeul.google.go.lang.psi.typing.GoTypes;
+import ro.redeul.google.go.lang.psi.typing.*;
 import ro.redeul.google.go.lang.psi.utils.GoIdentifierUtils;
+import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 import ro.redeul.google.go.services.GoPsiManager;
 
@@ -167,18 +161,18 @@ public class GoSelectorExpressionImpl extends GoExpressionBase
         if (type instanceof GoTypePointer)
             type = ((GoTypePointer) type).getTargetType();
 
-        GoUnderlyingType x = type.getUnderlyingType();
+        type = GoTypeUtils.resolveToFinalType(type);
 
-        if (x instanceof GoUnderlyingTypeInterface)
+        if (type instanceof GoTypeInterface)
             return new PsiReference[]{new InterfaceMethodReference(this)};
 
-        if (x instanceof GoUnderlyingTypeStruct && getIdentifier() != null)
+        if (type instanceof GoTypeStruct && getIdentifier() != null)
             return new PsiReference[]{
                     new SelectorOfStructFieldReference(this),
                     new MethodReference(this)
             };
 
-        if (x instanceof GoUnderlyingTypePointer) {
+        if (type instanceof GoTypePointer) {
             return new PsiReference[]{
                     new SelectorOfStructFieldReference(this),
                     new MethodReference(this)

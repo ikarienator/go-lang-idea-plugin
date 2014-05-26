@@ -123,7 +123,11 @@ public class GoTypes {
 
         @Override
         public void visitTypeName(GoPsiTypeName psiType) {
-            data = new GoTypeName(psiType);
+            if (psiType.isPrimitive()) {
+                data = GoTypeBuiltin.fromName(psiType.getIdentifier().getCanonicalName());
+            } else {
+                data = new GoTypeName(psiType);
+            }
         }
 
         @Override

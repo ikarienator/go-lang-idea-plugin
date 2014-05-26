@@ -6,8 +6,9 @@ import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.literals.*;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
 import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
+
+import java.util.HashMap;
 
 public enum GoTypeBuiltin implements GoType {
     // Boolean
@@ -43,6 +44,13 @@ public enum GoTypeBuiltin implements GoType {
     String("string");
 
     private final String text;
+    private static final HashMap<String, GoTypeBuiltin> fromNameMap = new HashMap<java.lang.String, GoTypeBuiltin>();
+
+    static {
+        for (GoTypeBuiltin type : GoTypeBuiltin.values()) {
+            fromNameMap.put(type.getText(), type);
+        }
+    }
 
     GoTypeBuiltin(String text) {
         this.text = text;
@@ -54,13 +62,13 @@ public enum GoTypeBuiltin implements GoType {
     }
 
     @Override
-    public GoUnderlyingType getUnderlyingType() {
-        return null;
-    }
-
-    @Override
     public void accept(Visitor visitor) {
 
+    }
+
+    @Nullable
+    public static GoTypeBuiltin fromName(String name) {
+        return fromNameMap.get(name);
     }
 
     @Override
@@ -122,5 +130,11 @@ public enum GoTypeBuiltin implements GoType {
     @Override
     public String getNameLocalOrGlobal(@Nullable GoFile currentFile) {
         return this.text;
+    }
+
+    @NotNull
+    @Override
+    public GoType getUnderlyingType() {
+        return this;
     }
 }

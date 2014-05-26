@@ -9,8 +9,6 @@ import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralString;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeStruct;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructAnonymousField;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructField;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeStruct;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
 
 import java.util.ArrayList;
@@ -18,7 +16,7 @@ import java.util.ArrayList;
 /**
  * // TODO: mtoader ! Finish this implementation.
  */
-public class GoTypeStruct extends GoTypePsiBacked<GoPsiTypeStruct, GoUnderlyingTypeStruct> implements GoType {
+public class GoTypeStruct extends GoTypePsiBacked<GoPsiTypeStruct> implements GoType {
 
     private final String names[];
     private final GoType types[];
@@ -26,7 +24,6 @@ public class GoTypeStruct extends GoTypePsiBacked<GoPsiTypeStruct, GoUnderlyingT
 
     public GoTypeStruct(GoPsiTypeStruct type) {
         super(type);
-        setUnderlyingType(GoUnderlyingTypes.getStruct());
         ArrayList<String> names = new ArrayList<String>();
         ArrayList<GoType> types = new ArrayList<GoType>();
         ArrayList<String> tags = new ArrayList<String>();

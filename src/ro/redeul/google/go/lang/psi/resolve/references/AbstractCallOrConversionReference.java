@@ -15,8 +15,8 @@ import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
 import ro.redeul.google.go.lang.psi.toplevel.GoTypeNameDeclaration;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeFunction;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeFunction;
 import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeFunction;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 
@@ -87,7 +87,7 @@ public abstract class AbstractCallOrConversionReference<Reference extends Abstra
                 shortVars.getIdentifierType((GoLiteralIdentifier) element);
 
             if (identifierType != null &&
-                identifierType.getUnderlyingType() instanceof GoUnderlyingTypeFunction)
+                identifierType.getUnderlyingType() instanceof GoTypeFunction)
                 return matchesVisiblePackageName(element, myName);
         }
 

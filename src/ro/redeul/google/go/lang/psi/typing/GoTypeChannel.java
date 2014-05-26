@@ -3,10 +3,7 @@ package ro.redeul.google.go.lang.psi.typing;
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeChannel;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeChannel;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
-
-public class GoTypeChannel extends GoTypePsiBacked<GoPsiTypeChannel, GoUnderlyingTypeChannel> implements GoType {
+public class GoTypeChannel extends GoTypePsiBacked<GoPsiTypeChannel> implements GoType {
 
     private final GoType elementType;
     private final ChannelType channelType;
@@ -16,10 +13,6 @@ public class GoTypeChannel extends GoTypePsiBacked<GoPsiTypeChannel, GoUnderlyin
 
         elementType = GoTypes.fromPsiType(psiType.getElementType());
         channelType = psiType.getChannelType();
-        setUnderlyingType(
-                GoUnderlyingTypes.getChannel(channelType,
-                        elementType.getUnderlyingType())
-        );
     }
 
     @Override

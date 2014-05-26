@@ -3,7 +3,6 @@ package ro.redeul.google.go.lang.psi.typing;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ro.redeul.google.go.lang.psi.GoFile;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
 
 /**
  * // TODO: mtoader ! Please explain yourself.
@@ -17,11 +16,6 @@ public interface GoType {
         @Override
         public boolean isIdentical(@NotNull GoType type) {
             return type == this;
-        }
-
-        @Override
-        public GoUnderlyingType getUnderlyingType() {
-            return GoUnderlyingType.Undefined;
         }
 
         @Override
@@ -45,11 +39,15 @@ public interface GoType {
         public String getNameLocalOrGlobal(GoFile currentFile) {
             return "Undefined";
         }
+
+        @NotNull
+        @Override
+        public GoType getUnderlyingType() {
+            return this;
+        }
     };
 
     boolean isIdentical(@NotNull GoType type);
-
-    GoUnderlyingType getUnderlyingType();
 
     void accept(Visitor visitor);
 
@@ -60,6 +58,9 @@ public interface GoType {
 
     @NotNull
     String getNameLocalOrGlobal(@Nullable GoFile currentFile);
+
+    @NotNull
+    GoType getUnderlyingType();
 
     public class Visitor<T> {
 
@@ -73,20 +74,27 @@ public interface GoType {
             node.accept(this);
             return data;
         }
+
         protected void setData(T data) {
             this.data = data;
         }
 
-        protected void visitTypeArray(GoTypeArray array) { }
+        protected void visitTypeArray(GoTypeArray array) {
+        }
 
-        public void visitTypeChannel(GoTypeChannel channel) { }
+        public void visitTypeChannel(GoTypeChannel channel) {
+        }
 
-        public void visitTypeName(GoTypeName name) { }
+        public void visitTypeName(GoTypeName name) {
+        }
 
-        public void visitTypeSlice(GoTypeSlice slice) { }
+        public void visitTypeSlice(GoTypeSlice slice) {
+        }
 
-        public void visitTypePointer(GoTypePointer pointer) { }
+        public void visitTypePointer(GoTypePointer pointer) {
+        }
 
-        public void visitTypeMap(GoTypeMap map) { }
+        public void visitTypeMap(GoTypeMap map) {
+        }
     }
 }

@@ -19,8 +19,6 @@ import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameterList;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypes;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 
@@ -37,11 +35,6 @@ import static ro.redeul.google.go.lang.psi.utils.GoPsiUtils.getGlobalElementSear
  */
 public class GoFunctionDeclarationImpl extends GoPsiElementBase
     implements GoFunctionDeclaration {
-
-    @Override
-    public GoUnderlyingType getUnderlyingType() {
-        return GoUnderlyingTypes.getFunction();
-    }
 
     @Override
     public String getPackageName() {

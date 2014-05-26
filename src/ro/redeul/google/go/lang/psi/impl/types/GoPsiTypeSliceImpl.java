@@ -5,8 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.impl.GoPsiPackagedElementBase;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeSlice;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingType;
-import ro.redeul.google.go.lang.psi.types.underlying.GoUnderlyingTypeSlice;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 
 /**
@@ -28,11 +26,6 @@ public class GoPsiTypeSliceImpl extends GoPsiPackagedElementBase implements
     @Override
     public void accept(GoElementVisitor visitor) {
         visitor.visitSliceType(this);
-    }
-
-    @Override
-    public GoUnderlyingType getUnderlyingType() {
-        return new GoUnderlyingTypeSlice(getElementType().getUnderlyingType());
     }
 
     @NotNull
