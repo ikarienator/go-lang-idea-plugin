@@ -24,6 +24,7 @@ public class GoTypeFunction
     GoTypeFunction(GoPsiTypeFunction psiType) {
         super(psiType);
         GoFunctionParameter[] parameters = psiType.getParameters();
+        GoFunctionParameter[] results = psiType.getResults();
         int i = 0;
         ArrayList<String> names = new ArrayList<String>();
         ArrayList<GoType> types = new ArrayList<GoType>();
@@ -48,7 +49,7 @@ public class GoTypeFunction
         }
         parametersLength = i;
         this.variadic = variadic;
-        for (GoFunctionParameter param : parameters) {
+        for (GoFunctionParameter param : results) {
             GoLiteralIdentifier[] identifiers = param.getIdentifiers();
             if (identifiers.length == 0) {
                 names.add(null);
