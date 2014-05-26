@@ -3,6 +3,7 @@ package ro.redeul.google.go.util;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.psi.PsiElement;
 import ro.redeul.google.go.GoBundle;
+import ro.redeul.google.go.inspection.FunctionCallInspection;
 import ro.redeul.google.go.inspection.InspectionResult;
 import ro.redeul.google.go.inspection.fix.CastTypeFix;
 import ro.redeul.google.go.inspection.fix.ChangeReturnsParametersFix;
@@ -11,10 +12,7 @@ import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.GoUnaryExpression;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteral;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFloat;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralInteger;
+import ro.redeul.google.go.lang.psi.expressions.literals.*;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoBuiltinCallExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoCallOrConvExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
@@ -55,44 +53,8 @@ public class GoTypeInspectUtil {
                     type instanceof GoTypeChannel ||
                     type instanceof GoTypeInterface;
         } else if (expr.isConstantExpression()) {
-
-        } else {
-            GoType[] types = expr.getType();
-            for (GoType resolvedType : types) {
-                if (resolvedType == null) continue;
-                if (type.isAssignableFrom(resolvedType)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-        /* GoPsiType resolved = resolveToFinalType(type);
-        if (resolved instanceof GoPsiTypeInterface)
-            return true;
-
-        PsiElement firstChildOfExp = expr.getFirstChild();
-        if (checkIsInterface(resolved)) {
-            return true;
-        }
-        if (resolved == null) {
-            return false;
-        }
-        //Fix issue #520 with nil
-        if (IsNil(expr)) {
-            if (resolved instanceof GoPsiTypeName) {
-                if (((GoPsiTypeName) resolved).isPrimitive() && resolved.getName().equals("error")) {
-                    return true;
-                }
-            }
-            return resolved instanceof GoPsiTypeInterface ||
-                    resolved instanceof GoPsiTypeFunction ||
-                    resolved instanceof GoPsiTypePointer ||
-                    resolved instanceof GoPsiTypeSlice ||
-                    resolved instanceof GoPsiTypeMap ||
-                    resolved instanceof GoPsiTypeChannel;
-        } else if (expr.isConstantExpression()) {
+            GoType resolved = type.getUnderlyingType();
             String resolvedTypeName = resolved.getText();
-
             if (resolvedTypeName.startsWith("int") || resolvedTypeName.startsWith("uint")
                     || resolvedTypeName.equals("byte") || resolvedTypeName.equals("rune")) {
                 Number numValue = FunctionCallInspection.getNumberValueFromLiteralExpr(expr);
@@ -124,43 +86,25 @@ public class GoTypeInspectUtil {
             if (resolvedTypeName.startsWith("float")) {
                 return checkValidLiteralFloatExpr(expr);
             }
+
+            // TODO(ikarienator): this can't be right.
+            PsiElement firstChildOfExp = expr.getFirstChild();
             if (firstChildOfExp instanceof GoLiteralString) {
                 return resolvedTypeName.equals("string");
             }
             if (firstChildOfExp instanceof GoLiteralBool) {
                 return resolvedTypeName.equals("bool");
             }
+        } else {
+            GoType[] types = expr.getType();
+            for (GoType resolvedType : types) {
+                if (resolvedType == null) continue;
+                if (type.isAssignableFrom(resolvedType)) {
+                    return true;
+                }
+            }
         }
-
-        GoType[] goTypes = expr.getType();
-        if (goTypes.length != 0 && goTypes[0] != null) {
-            return GoUtil.CompareTypes(type, goTypes[0], expr);
-        }
-
-        if (type instanceof GoPsiTypeFunction)
-            return GoUtil.CompareTypes(type, null, expr);
-
-        if (firstChildOfExp instanceof GoLiteralIdentifier) {
-            GoPsiElement goPsiElement = GoUtil.ResolveTypeOfVarDecl((GoPsiElement) firstChildOfExp);
-            if (goPsiElement instanceof GoPsiType)
-                return GoUtil.CompareTypes(type, goPsiElement);
-        }
-        if (expr instanceof GoCallOrConvExpression && firstChildOfExp instanceof GoPsiTypeParenthesized) {
-            return GoUtil.CompareTypes(type, ((GoPsiTypeParenthesized) firstChildOfExp).getInnerType(), expr);
-        }
-        type = resolved;
-        if (type == null) {
-            return false;
-        }
-
-        String typeText = type.getText();
-        if (expr instanceof GoLiteralExpression) {
-            GoLiteral.Type type1 = ((GoLiteralExpression) expr).getLiteral().getType();
-            return type1 == GoLiteral.Type.Identifier || type1.name().toLowerCase().equals(typeText);
-        }
-
-        return true;
-*/
+        return false;
     }
 
     public static boolean IsNil(PsiElement psiElement) {
@@ -168,7 +112,7 @@ public class GoTypeInspectUtil {
             return IsNil(((GoParenthesisedExpression) psiElement).getInnerExpression());
         if (psiElement instanceof GoLiteralExpression)
             psiElement = ((GoLiteralExpression) psiElement).getLiteral();
-        return psiElement instanceof GoLiteralIdentifier && ((GoLiteralIdentifier) psiElement).getName().equals("nil");
+        return psiElement instanceof GoLiteralIdentifier && psiElement.getText().equals("nil");
     }
 
     public static boolean checkValidLiteralFloatExpr(GoExpr expr) {
@@ -261,11 +205,11 @@ public class GoTypeInspectUtil {
             if (index >= goExprs.length)
                 return;
             GoType type = GoTypes.fromPsiType(functionParameter.getType());
-            String typeName = type != null ? type.getText() : "";
+            String typeName = type.getText();
             if (functionParameter.isVariadic()) {
                 for (; index < goExprs.length; index++) {
                     GoExpr goExpr = goExprs[index];
-                    if (!checkParametersExp(GoTypes.fromPsiType(functionParameter.getType()), goExpr)) {
+                    if (!checkParametersExp(type, goExpr)) {
                         result.addProblem(
                                 goExpr,
                                 GoBundle.message("warning.functioncall.type.mismatch", typeName),
