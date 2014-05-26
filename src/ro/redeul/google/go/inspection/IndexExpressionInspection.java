@@ -39,8 +39,7 @@ public class IndexExpressionInspection extends AbstractWholeGoFileInspection {
         if (indexExpr == null)
             return;
         for (GoType goType : expression.getBaseExpression().getType()) {
-            if (goType != null && goType instanceof GoTypePsiBacked) {
-
+            if (goType != null) {
                 goType = GoTypeUtils.resolveToFinalType(goType);
 
                 // TODO: not null.

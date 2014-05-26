@@ -87,14 +87,8 @@ public class GoTypeInspectUtil {
                 return checkValidLiteralFloatExpr(expr);
             }
 
-            // TODO(ikarienator): this can't be right.
-            PsiElement firstChildOfExp = expr.getFirstChild();
-            if (firstChildOfExp instanceof GoLiteralString) {
-                return resolvedTypeName.equals("string");
-            }
-            if (firstChildOfExp instanceof GoLiteralBool) {
-                return resolvedTypeName.equals("bool");
-            }
+            GoType[] exprTypes = expr.getType();
+            return exprTypes.length > 0 && exprTypes[0] != null && exprTypes[0].getUnderlyingType().isIdentical(resolved);
         } else {
             GoType[] types = expr.getType();
             for (GoType resolvedType : types) {
