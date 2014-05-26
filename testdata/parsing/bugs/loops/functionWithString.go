@@ -865,9 +865,10 @@ Go file
                 PsiElement(IDENTIFIER)('int')
           PsiElement(,)(',')
           PsiWhiteSpace(' ')
-          LiteralExpressionImpl
-            LiteralIdentifierImpl
-              PsiElement(IDENTIFIER)('tbitset')
+          ExpressionListImpl
+            LiteralExpressionImpl
+              LiteralIdentifierImpl
+                PsiElement(IDENTIFIER)('tbitset')
           PsiElement())(')')
       PsiWhiteSpace(' ')
       PsiElement(})('}')
