@@ -291,7 +291,7 @@ func main() {
 	var valid = func(arg int, arg2 *string) bool {return true}
 	HandleFunc("/", (func(int, *string)bool)(indexHandler))
 	HandleFunc("/", valid)
-	HandleFunc("/", /*begin*/indexHandler/*end.Expression type mismatch, the expected type is func(int, *string)bool|CastTypeFix*/)
+	HandleFunc("/", /*begin*/indexHandler/*end.Expression type mismatch, the expected type is func(int,*string)bool|CastTypeFix*/)
 	HandleFunc(/*begin*/56/*end.Expression type mismatch, the expected type is string|CastTypeFix*/, valid)
 
 	HandleMap(map[string]string{})
@@ -388,7 +388,7 @@ func main() {
 	HandleArray(/*begin*/[...]int{1, 2 ,3}/*end.Expression type mismatch, the expected type is [3]string|CastTypeFix*/)
 
 	HandleMyFunc(HandleMap)
-	HandleMyFunc(HandleMyMap)
+	HandleMyFunc(/*begin*/HandleMyMap/*end.Expression type mismatch, the expected type is MyFunc|CastTypeFix*/)
 	HandleMyFunc(func(map[string]string){})
 	HandleMyFunc((func(map[string]string){}))
 	HandleMyFunc(/*begin*/(-(func(map[int]string){}))/*end.Expression type mismatch, the expected type is MyFunc|CastTypeFix*/)
@@ -398,7 +398,7 @@ func main() {
 	HandleMyFunc(fn)
 	HandleMyFunc(/*begin*/HandleSlice/*end.Expression type mismatch, the expected type is MyFunc|CastTypeFix*/)
 
-	// HandleMyFunc(MyFunc2(func(map[string]string){})) TODO: should generate "Expression type mismatch, the expected type is MyFunc|CastTypeFix"
+	HandleMyFunc(MyFunc2(func(map[string]string){}))
 	//issue #520
 	HandleIFunc(nil)
 	HandleArray(/*begin*/nil/*end.Expression type mismatch, the expected type is [3]string|CastTypeFix*/)
