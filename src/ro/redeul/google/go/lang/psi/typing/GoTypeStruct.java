@@ -52,10 +52,43 @@ public class GoTypeStruct extends GoTypePsiBacked<GoPsiTypeStruct> implements Go
 
     @Override
     public boolean isIdentical(@NotNull GoType type) {
+        if (type == this) return true;
         if (!(type instanceof GoTypeStruct))
             return false;
 
-        return false;
+        GoTypeStruct structType = (GoTypeStruct) type;
+        if (structType.names.length != this.names.length) return false;
+        for (int i = 0; i < this.names.length; i++) {
+            if (this.names[i] == null) {
+                if (structType.names[i] != null) {
+                    return false;
+                }
+            } else {
+                if (structType.names[i] == null) {
+                    return false;
+                }
+                if (!structType.names[i].equals(this.names[i])) {
+                    return false;
+                }
+            }
+            if (!this.types[i].isIdentical(structType.types[i])) {
+                return false;
+            }
+
+            if (this.tags[i] == null) {
+                if (structType.tags[i] != null) {
+                    return false;
+                }
+            } else {
+                if (structType.tags[i] == null) {
+                    return false;
+                }
+                if (!structType.tags[i].equals(this.tags[i])) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override
