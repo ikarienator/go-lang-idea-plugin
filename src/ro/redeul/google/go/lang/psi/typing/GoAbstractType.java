@@ -21,12 +21,7 @@ public abstract class GoAbstractType implements GoType {
                 return false;
             type = resolvedType;
         }
-        if (type instanceof GoTypeArray) {
-            if (this.isIdentical(type)) {
-                return true;
-            }
-        }
-        return false;
+        return this.isIdentical(type);
     }
 
     @NotNull
