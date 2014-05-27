@@ -121,47 +121,7 @@ public class MethodReference
         if (types.length < 1)
             return receiverTypes;
 
-        GoType type = types[0];
-        if (type instanceof GoTypePointer)
-            type = ((GoTypePointer) type).getTargetType();
-
-        if (!(type instanceof GoTypeName))
-            return receiverTypes;
-
-        GoTypeName typeName = (GoTypeName) type;
-
-        Queue<GoTypeName> typeNamesToExplore = new LinkedList<GoTypeName>();
-        typeNamesToExplore.offer(typeName);
-
-        while ( ! typeNamesToExplore.isEmpty() ) {
-            GoTypeName currentTypeName = typeNamesToExplore.poll();
-
-            receiverTypes.add(currentTypeName);
-
-            if ( !(currentTypeName.getDefinition() instanceof GoTypeStruct) )
-                continue;
-
-            GoTypeStruct typeStruct = (GoTypeStruct) currentTypeName.getDefinition();
-            for (GoTypeStructAnonymousField field : typeStruct.getPsiType().getAnonymousFields()) {
-                GoPsiType psiType = field.getType();
-                if ( psiType == null)
-                    continue;
-                if ( psiType instanceof GoPsiTypePointer) {
-                    psiType = ((GoPsiTypePointer) psiType).getTargetType();
-                }
-
-                GoType embeddedType = GoTypes.fromPsiType(psiType);
-                if (!(embeddedType instanceof GoTypeName))
-                    continue;
-
-                GoTypeName embeddedTypeName = (GoTypeName) embeddedType;
-                if (! receiverTypes.contains(embeddedTypeName) )
-                    typeNamesToExplore.offer(embeddedTypeName);
-
-                receiverTypes.add(embeddedTypeName);
-            }
-        }
-
+        receiverTypes = GoTypes.resolveBaseReceiverTypes(types[0]);
         return receiverTypes;
     }
 

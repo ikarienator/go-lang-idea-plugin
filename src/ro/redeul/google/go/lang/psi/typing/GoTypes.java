@@ -7,9 +7,14 @@ import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFunction;
 import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
 import ro.redeul.google.go.lang.psi.toplevel.GoMethodDeclaration;
 import ro.redeul.google.go.lang.psi.types.*;
+import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructAnonymousField;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitorWithData;
 import ro.redeul.google.go.services.GoPsiManager;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class GoTypes {
@@ -160,5 +165,51 @@ public class GoTypes {
             return null;
 
         return (GoTypeStruct) type;
+    }
+
+    public static Set<GoTypeName> resolveBaseReceiverTypes(GoType type) {
+        HashSet<GoTypeName> receiverTypes = new HashSet<GoTypeName>();
+
+        if (type instanceof GoTypePointer)
+            type = ((GoTypePointer) type).getTargetType();
+
+        if (!(type instanceof GoTypeName))
+            return receiverTypes;
+
+        GoTypeName typeName = (GoTypeName) type;
+
+        Queue<GoTypeName> typeNamesToExplore = new LinkedList<GoTypeName>();
+        typeNamesToExplore.offer(typeName);
+
+        while ( ! typeNamesToExplore.isEmpty() ) {
+            GoTypeName currentTypeName = typeNamesToExplore.poll();
+
+            receiverTypes.add(currentTypeName);
+
+            if ( !(currentTypeName.getDefinition() instanceof GoTypeStruct) )
+                continue;
+
+            GoTypeStruct typeStruct = (GoTypeStruct) currentTypeName.getDefinition();
+            for (GoTypeStructAnonymousField field : typeStruct.getPsiType().getAnonymousFields()) {
+                GoPsiType psiType = field.getType();
+                if ( psiType == null)
+                    continue;
+                if ( psiType instanceof GoPsiTypePointer) {
+                    psiType = ((GoPsiTypePointer) psiType).getTargetType();
+                }
+
+                GoType embeddedType = GoTypes.fromPsiType(psiType);
+                if (!(embeddedType instanceof GoTypeName))
+                    continue;
+
+                GoTypeName embeddedTypeName = (GoTypeName) embeddedType;
+                if (! receiverTypes.contains(embeddedTypeName) )
+                    typeNamesToExplore.offer(embeddedTypeName);
+
+                receiverTypes.add(embeddedTypeName);
+            }
+        }
+
+        return receiverTypes;
     }
 }

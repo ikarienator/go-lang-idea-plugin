@@ -1,5 +1,6 @@
 package ro.redeul.google.go.lang.psi.resolve;
 
+import com.intellij.psi.PsiElement;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.resolve.references.MethodReference;
 import ro.redeul.google.go.lang.psi.toplevel.GoMethodDeclaration;
@@ -12,19 +13,27 @@ import java.util.Set;
 
 import static ro.redeul.google.go.lang.completion.GoCompletionContributor.DUMMY_IDENTIFIER;
 
-public class MethodResolver extends GoPsiReferenceResolver<MethodReference>
-{
+public class MethodResolver extends GoPsiResolver {
+    private final Set<GoTypeName> receiverTypes;
+    private final GoLiteralIdentifier identifier;
+
+
     public MethodResolver(MethodReference reference) {
-        super(reference);
+        this(reference.resolveBaseReceiverTypes(), reference.getElement().getIdentifier());
+    }
+
+    public MethodResolver(Set<GoTypeName> receiverTypes, GoLiteralIdentifier identifier) {
+        this.receiverTypes = receiverTypes;
+        this.identifier = identifier;
     }
 
     @Override
     public void visitMethodDeclaration(GoMethodDeclaration declaration) {
-        if (isReferenceTo(declaration))
+        if (isReferenceToMethodDeclaration(declaration))
             addDeclaration(declaration, declaration.getNameIdentifier());
     }
 
-    boolean isReferenceTo(GoMethodDeclaration declaration) {
+    boolean isReferenceToMethodDeclaration(GoMethodDeclaration declaration) {
         GoPsiType receiverType = declaration.getMethodReceiver().getType();
 
         if (receiverType == null)
@@ -39,14 +48,11 @@ public class MethodResolver extends GoPsiReferenceResolver<MethodReference>
 
         GoPsiTypeName methodTypeName = (GoPsiTypeName) receiverType;
 
-        Set<GoTypeName> receiverTypes = getReference().resolveBaseReceiverTypes();
-
-        GoLiteralIdentifier identifier = getReference().getElement().getIdentifier();
         if (identifier == null) {
             return false;
         }
         for (GoTypeName type : receiverTypes) {
-            if ( type.getName().equals(methodTypeName.getName())) {
+            if (type.getName().equals(methodTypeName.getName())) {
                 String methodName = declaration.getFunctionName();
                 String referenceName = identifier.getUnqualifiedName();
 
@@ -56,5 +62,15 @@ public class MethodResolver extends GoPsiReferenceResolver<MethodReference>
         }
 
         return false;
+    }
+
+    @Override
+    protected String getRefName() {
+        return identifier.getText();
+    }
+
+    @Override
+    protected boolean isReferenceTo(PsiElement element) {
+        return element instanceof GoMethodDeclaration && isReferenceToMethodDeclaration((GoMethodDeclaration) element);
     }
 }
