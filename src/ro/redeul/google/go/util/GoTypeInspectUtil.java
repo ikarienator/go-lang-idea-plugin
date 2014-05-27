@@ -88,7 +88,7 @@ public class GoTypeInspectUtil {
             }
 
             GoType[] exprTypes = expr.getType();
-            return exprTypes.length > 0 && exprTypes[0] != null && exprTypes[0].getUnderlyingType().isIdentical(resolved);
+            return exprTypes.length > 0 && exprTypes[0] != null && resolved.isAssignableFrom(exprTypes[0].getUnderlyingType());
         } else {
             GoType[] types = expr.getType();
             for (GoType resolvedType : types) {
