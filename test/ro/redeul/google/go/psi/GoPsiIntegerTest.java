@@ -43,7 +43,7 @@ public class GoPsiIntegerTest extends GoPsiTestCase {
                 );
 
         assertEquals(GoLiteral.Type.Int, integer.getLiteralType());
-        assertEquals((Integer) 10, integer.getValue());
+        assertEquals(10, integer.getValue().intValue());
 
         // y
         integer =
@@ -55,7 +55,7 @@ public class GoPsiIntegerTest extends GoPsiTestCase {
                         ).getLiteral()
                 );
         assertEquals(GoLiteral.Type.Int, integer.getLiteralType());
-        assertEquals((Integer) 0, integer.getValue());
+        assertEquals(0, integer.getValue().intValue());
 
         // z
         integer =
@@ -67,7 +67,7 @@ public class GoPsiIntegerTest extends GoPsiTestCase {
                         ).getLiteral()
                 );
         assertEquals(GoLiteral.Type.Int, integer.getLiteralType());
-        assertEquals((Integer) 0120, integer.getValue());
+        assertEquals(0120, integer.getValue().intValue());
 
         // h1
         integer =
@@ -79,7 +79,7 @@ public class GoPsiIntegerTest extends GoPsiTestCase {
                         ).getLiteral()
                 );
         assertEquals(GoLiteral.Type.Int, integer.getLiteralType());
-        assertEquals((Integer) 0xEF, integer.getValue());
+        assertEquals(0xEF, integer.getValue().intValue());
 
         // h1
         integer =
@@ -91,7 +91,7 @@ public class GoPsiIntegerTest extends GoPsiTestCase {
                         ).getLiteral()
                 );
         assertEquals(GoLiteral.Type.Int, integer.getLiteralType());
-        assertEquals((Integer) 0xAB, integer.getValue());
+        assertEquals(0xAB, integer.getValue().intValue());
 
     }
 }

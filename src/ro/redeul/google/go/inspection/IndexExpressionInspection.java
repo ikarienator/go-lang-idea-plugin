@@ -13,6 +13,7 @@ import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralString;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoIndexExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.typing.*;
+import ro.redeul.google.go.lang.psi.typing.untyped.Rational;
 import ro.redeul.google.go.lang.psi.utils.GoTypeUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoRecursiveElementVisitor;
 import ro.redeul.google.go.util.GoTypeInspectUtil;
@@ -70,7 +71,7 @@ public class IndexExpressionInspection extends AbstractWholeGoFileInspection {
             if (literal instanceof GoLiteralInteger)
                 return;
             if (literal instanceof GoLiteralFloat) {
-                Float value = ((GoLiteralFloat) literal).getValue();
+                Rational value = ((GoLiteralFloat) literal).getValue();
                 if (!value.toString().matches("^[0-9]+\\.0+$")) {
                     result.addProblem(
                             index,

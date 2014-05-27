@@ -47,6 +47,7 @@ public class GoBuiltinCallExpressionImpl extends GoCallOrConvExpressionImpl
         super(node, variadic);
     }
 
+    @NotNull
     @Override
     protected GoType[] resolveTypes() {
         PsiElement reference = resolveSafely(getBase(),

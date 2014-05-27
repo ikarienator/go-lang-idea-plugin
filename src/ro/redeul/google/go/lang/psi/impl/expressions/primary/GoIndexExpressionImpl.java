@@ -16,6 +16,7 @@ public class GoIndexExpressionImpl extends GoExpressionBase
         super(node);
     }
 
+    @NotNull
     @Override
     protected GoType[] resolveTypes() {
         GoType[] baseTypes = getBaseExpression().getType();

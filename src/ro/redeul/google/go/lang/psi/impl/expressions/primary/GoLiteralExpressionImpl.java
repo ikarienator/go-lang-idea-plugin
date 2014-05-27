@@ -1,48 +1,28 @@
 package ro.redeul.google.go.lang.psi.impl.expressions.primary;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import com.intellij.util.Function;
 import org.jetbrains.annotations.NotNull;
-import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
-import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.GoUnaryExpression;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteral;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFunction;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
-import ro.redeul.google.go.lang.psi.expressions.literals.composite.GoLiteralComposite;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.impl.expressions.GoExpressionBase;
-import ro.redeul.google.go.lang.psi.patterns.GoElementPatterns;
 import ro.redeul.google.go.lang.psi.resolve.references.BuiltinCallOrConversionReference;
 import ro.redeul.google.go.lang.psi.resolve.references.CallOrConversionReference;
 import ro.redeul.google.go.lang.psi.resolve.references.VarOrConstReference;
-import ro.redeul.google.go.lang.psi.statements.GoForWithRangeAndVarsStatement;
-import ro.redeul.google.go.lang.psi.statements.switches.GoSwitchTypeClause;
-import ro.redeul.google.go.lang.psi.statements.switches.GoSwitchTypeGuard;
-import ro.redeul.google.go.lang.psi.statements.switches.GoSwitchTypeStatement;
-import ro.redeul.google.go.lang.psi.toplevel.GoFunctionDeclaration;
-import ro.redeul.google.go.lang.psi.toplevel.GoFunctionParameter;
-import ro.redeul.google.go.lang.psi.toplevel.GoMethodReceiver;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
 import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypeBuiltin;
-import ro.redeul.google.go.lang.psi.typing.GoTypeSlice;
-import ro.redeul.google.go.lang.psi.typing.GoTypes;
 import ro.redeul.google.go.lang.psi.utils.GoPsiScopesUtil;
 import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
-import ro.redeul.google.go.lang.stubs.GoNamesCache;
-import ro.redeul.google.go.services.GoPsiManager;
-import ro.redeul.google.go.util.GoUtil;
 
 public class GoLiteralExpressionImpl extends GoExpressionBase
         implements GoLiteralExpression {
@@ -61,168 +41,13 @@ public class GoLiteralExpressionImpl extends GoExpressionBase
         return findChildByClass(GoLiteral.class);
     }
 
-
-    private static class LiteralTypeCalculator
-            implements Function<GoLiteralExpressionImpl, GoType[]> {
-        @Override
-        public GoType[] fun(GoLiteralExpressionImpl expression) {
-            GoLiteral literal = expression.getLiteral();
-            if (literal == null)
-                return GoType.EMPTY_ARRAY;
-
-            GoNamesCache namesCache =
-                    GoNamesCache.getInstance(expression.getProject());
-
-            switch (literal.getLiteralType()) {
-                case Bool:
-                    return new GoType[]{
-                            GoTypeBuiltin.Bool
-                    };
-
-                case Int:
-                    return new GoType[]{
-                            GoTypeBuiltin.Int
-                    };
-
-                case Float:
-                    return new GoType[]{
-                            GoTypeBuiltin.Float64
-                    };
-
-                case Char:
-                    return new GoType[]{
-                            GoTypeBuiltin.Rune
-                    };
-
-                case ImaginaryInt:
-                case ImaginaryFloat:
-                    return new GoType[]{
-                            GoTypeBuiltin.Complex128
-                    };
-
-                case RawString:
-                case InterpretedString:
-                    if (literal.getNode().getElementType() == GoElementTypes.LITERAL_CHAR){
-                        return new GoType[]{
-                                GoTypeBuiltin.Rune
-                        };
-                    } else {
-                        return new GoType[]{
-                                GoTypeBuiltin.String
-                        };
-                    }
-
-                case Function:
-                    return new GoType[]{
-                            GoTypes.fromPsiType((GoLiteralFunction) literal)
-                    };
-
-                case Identifier:
-                    GoLiteralIdentifier identifier = (GoLiteralIdentifier) literal;
-
-                    PsiElement resolved = GoUtil.ResolveReferece(identifier);
-                    if (resolved == null) {
-                        return GoType.EMPTY_ARRAY;
-                    }
-
-                    PsiElement parent = resolved.getParent();
-                    if (parent instanceof GoVarDeclaration) {
-                        GoVarDeclaration varDeclaration = (GoVarDeclaration) parent;
-                        GoType identifierType = varDeclaration.getIdentifierType((GoLiteralIdentifier) resolved);
-
-                        if (identifierType == null)
-                            return GoType.EMPTY_ARRAY;
-
-                        return new GoType[]{identifierType};
-                    }
-
-                    if (parent instanceof GoConstDeclaration) {
-                        GoPsiType identifiersType = ((GoConstDeclaration) parent).getIdentifiersType();
-                        if (identifiersType == null)
-                            return GoType.EMPTY_ARRAY;
-                        return new GoType[]{GoTypes.fromPsiType(identifiersType)};
-                    }
-
-                    if (parent instanceof GoFunctionParameter) {
-                        GoFunctionParameter functionParameter = (GoFunctionParameter) parent;
-                        if (functionParameter.getType() != null) {
-                            if (functionParameter.isVariadic()) {
-                                return new GoType[]{
-                                        new GoTypeSlice(GoTypes.fromPsiType(functionParameter.getType()))
-                                };
-                            } else {
-                                return new GoType[]{
-                                        GoTypes.fromPsiType(functionParameter.getType())
-                                };
-                            }
-                        }
-                    }
-
-                    if (parent instanceof GoMethodReceiver) {
-                        GoMethodReceiver receiver =
-                                (GoMethodReceiver) parent;
-
-                        if (receiver.getType() != null) {
-                            return new GoType[]{
-                                    GoTypes.fromPsiType(receiver.getType())
-                            };
-                        }
-                    }
-
-                    if (parent instanceof GoFunctionDeclaration) {
-                        GoFunctionDeclaration functionDeclaration =
-                                (GoFunctionDeclaration) parent;
-
-                        return new GoType[]{
-                                GoTypes.fromPsiType(functionDeclaration)
-                        };
-                    }
-
-                    if (parent instanceof GoSwitchTypeGuard) {
-                        GoSwitchTypeGuard guard = (GoSwitchTypeGuard) parent;
-                        GoSwitchTypeStatement switchStatement = (GoSwitchTypeStatement) guard.getParent();
-                        TextRange litRange = literal.getTextRange();
-                        for (GoSwitchTypeClause clause : switchStatement.getClauses()) {
-                            TextRange clauseTextRange = clause.getTextRange();
-                            if (clauseTextRange.contains(litRange)) {
-                                return GoTypes.fromPsiType(clause.getTypes());
-                            }
-                        }
-                    }
-
-                    if (GoElementPatterns.VAR_IN_FOR_RANGE.accepts(resolved)) {
-                        GoForWithRangeAndVarsStatement statement = (GoForWithRangeAndVarsStatement) parent;
-
-                        if (statement.getKey() == resolved) {
-                            return statement.getKeyType();
-                        } else if (statement.getValue() == resolved) {
-                            return statement.getValueType();
-                        }
-                    }
-                    return GoType.EMPTY_ARRAY;
-                case Composite:
-                    GoLiteralComposite composite = (GoLiteralComposite) literal;
-                    GoPsiType literalType = composite.getPsiType();
-                    if (literalType == null) {
-                        return GoType.EMPTY_ARRAY;
-                    }
-                    return new GoType[]{
-                            GoTypes.fromPsiType(literalType)
-                    };
-
-                default:
-                    return GoType.EMPTY_ARRAY;
-            }
-        }
-    }
-
-    private static final LiteralTypeCalculator TYPE_CALCULATOR = new LiteralTypeCalculator();
-
     @NotNull
     @Override
-    public GoType[] getType() {
-        return GoPsiManager.getInstance(getProject())
-                .getType(this, TYPE_CALCULATOR);
+    public GoType[] resolveTypes() {
+        GoLiteral literal = this.getLiteral();
+        if (literal == null)
+            return GoType.EMPTY_ARRAY;
+        return literal.getType();
     }
 
     @Override

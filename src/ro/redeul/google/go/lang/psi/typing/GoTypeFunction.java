@@ -14,8 +14,6 @@ public class GoTypeFunction
         implements GoType {
 
     @NotNull
-    private final String[] names;
-    @NotNull
     private final GoType[] types;
 
     private final int parametersLength;
@@ -26,7 +24,6 @@ public class GoTypeFunction
         GoFunctionParameter[] parameters = psiType.getParameters();
         GoFunctionParameter[] results = psiType.getResults();
         int i = 0;
-        ArrayList<String> names = new ArrayList<String>();
         ArrayList<GoType> types = new ArrayList<GoType>();
         boolean variadic = false;
         for (GoFunctionParameter param : parameters) {
@@ -35,13 +32,11 @@ public class GoTypeFunction
             }
             GoLiteralIdentifier[] identifiers = param.getIdentifiers();
             if (identifiers.length == 0) {
-                names.add(null);
                 types.add(GoTypes.fromPsiType(param.getType()));
                 i++;
             } else {
                 GoType type = GoTypes.fromPsiType(param.getType());
                 for (GoLiteralIdentifier ident : identifiers) {
-                    names.add(ident.getUnqualifiedName());
                     types.add(type);
                     i++;
                 }
@@ -52,19 +47,16 @@ public class GoTypeFunction
         for (GoFunctionParameter param : results) {
             GoLiteralIdentifier[] identifiers = param.getIdentifiers();
             if (identifiers.length == 0) {
-                names.add(null);
                 types.add(GoTypes.fromPsiType(param.getType()));
                 i++;
             } else {
                 GoType type = GoTypes.fromPsiType(param.getType());
                 for (GoLiteralIdentifier ident : identifiers) {
-                    names.add(ident.getUnqualifiedName());
                     types.add(type);
                     i++;
                 }
             }
         }
-        this.names = names.toArray(new String[names.size()]);
         this.types = types.toArray(new GoType[types.size()]);
     }
 

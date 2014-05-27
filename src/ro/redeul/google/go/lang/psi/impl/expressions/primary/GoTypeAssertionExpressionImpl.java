@@ -17,6 +17,7 @@ public class GoTypeAssertionExpressionImpl extends GoExpressionBase
         super(node);
     }
 
+    @NotNull
     @Override
     protected GoType[] resolveTypes() {
         GoNamesCache namesCache = GoNamesCache.getInstance(getProject());

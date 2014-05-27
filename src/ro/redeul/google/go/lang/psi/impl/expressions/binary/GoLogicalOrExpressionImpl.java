@@ -13,6 +13,7 @@ public class GoLogicalOrExpressionImpl extends GoBinaryExpressionImpl
         super(node);
     }
 
+    @NotNull
     @Override
     protected GoType[] resolveTypes() {
         return new GoType[]{

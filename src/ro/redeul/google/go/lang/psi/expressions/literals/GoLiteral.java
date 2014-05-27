@@ -2,6 +2,7 @@ package ro.redeul.google.go.lang.psi.expressions.literals;
 
 import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
+import ro.redeul.google.go.lang.psi.typing.GoType;
 
 public interface GoLiteral<T> extends GoPsiElement {
 
@@ -16,5 +17,9 @@ public interface GoLiteral<T> extends GoPsiElement {
     @NotNull
     T getValue();
 
+    @NotNull
     Type getLiteralType();
+
+    @NotNull
+    GoType[] getType();
 }

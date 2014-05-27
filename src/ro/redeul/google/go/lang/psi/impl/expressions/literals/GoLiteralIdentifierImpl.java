@@ -1,6 +1,7 @@
 package ro.redeul.google.go.lang.psi.impl.expressions.literals;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.ElementPattern;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -15,6 +16,8 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.lexer.GoTokenTypes;
 import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.psi.GoFile;
+import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
+import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralString;
 import ro.redeul.google.go.lang.psi.expressions.literals.composite.GoLiteralComposite;
@@ -25,12 +28,20 @@ import ro.redeul.google.go.lang.psi.resolve.references.CompositeElementOfStructF
 import ro.redeul.google.go.lang.psi.resolve.references.LabelReference;
 import ro.redeul.google.go.lang.psi.resolve.references.ShortVarDeclarationReference;
 import ro.redeul.google.go.lang.psi.resolve.references.VarOrConstReference;
+import ro.redeul.google.go.lang.psi.statements.GoForWithRangeAndVarsStatement;
+import ro.redeul.google.go.lang.psi.statements.switches.GoSwitchTypeClause;
+import ro.redeul.google.go.lang.psi.statements.switches.GoSwitchTypeGuard;
+import ro.redeul.google.go.lang.psi.statements.switches.GoSwitchTypeStatement;
 import ro.redeul.google.go.lang.psi.toplevel.*;
+import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.types.GoPsiTypeName;
 import ro.redeul.google.go.lang.psi.types.struct.GoTypeStructField;
+import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypeSlice;
 import ro.redeul.google.go.lang.psi.typing.GoTypeStruct;
 import ro.redeul.google.go.lang.psi.typing.GoTypes;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
+import ro.redeul.google.go.util.GoUtil;
 
 import java.util.List;
 
@@ -84,6 +95,91 @@ public class GoLiteralIdentifierImpl extends GoPsiElementBase
     @Override
     public Type getLiteralType() {
         return Type.Identifier;
+    }
+
+    @NotNull
+    @Override
+    public GoType[] getType() {
+        PsiElement resolved = GoUtil.ResolveReferece(this);
+        if (resolved == null) {
+            return GoType.EMPTY_ARRAY;
+        }
+
+        PsiElement parent = resolved.getParent();
+        if (parent instanceof GoVarDeclaration) {
+            GoVarDeclaration varDeclaration = (GoVarDeclaration) parent;
+            GoType identifierType = varDeclaration.getIdentifierType((GoLiteralIdentifier) resolved);
+
+            if (identifierType == null)
+                return GoType.EMPTY_ARRAY;
+
+            return new GoType[]{identifierType};
+        }
+
+        if (parent instanceof GoConstDeclaration) {
+            GoPsiType identifiersType = ((GoConstDeclaration) parent).getIdentifiersType();
+            if (identifiersType == null)
+                return GoType.EMPTY_ARRAY;
+            return new GoType[]{GoTypes.fromPsiType(identifiersType)};
+        }
+
+        if (parent instanceof GoFunctionParameter) {
+            GoFunctionParameter functionParameter = (GoFunctionParameter) parent;
+            if (functionParameter.getType() != null) {
+                if (functionParameter.isVariadic()) {
+                    return new GoType[]{
+                            new GoTypeSlice(GoTypes.fromPsiType(functionParameter.getType()))
+                    };
+                } else {
+                    return new GoType[]{
+                            GoTypes.fromPsiType(functionParameter.getType())
+                    };
+                }
+            }
+        }
+
+        if (parent instanceof GoMethodReceiver) {
+            GoMethodReceiver receiver =
+                    (GoMethodReceiver) parent;
+
+            if (receiver.getType() != null) {
+                return new GoType[]{
+                        GoTypes.fromPsiType(receiver.getType())
+                };
+            }
+        }
+
+        if (parent instanceof GoFunctionDeclaration) {
+            GoFunctionDeclaration functionDeclaration =
+                    (GoFunctionDeclaration) parent;
+
+            return new GoType[]{
+                    GoTypes.fromPsiType(functionDeclaration)
+            };
+        }
+
+        if (parent instanceof GoSwitchTypeGuard) {
+            GoSwitchTypeGuard guard = (GoSwitchTypeGuard) parent;
+            GoSwitchTypeStatement switchStatement = (GoSwitchTypeStatement) guard.getParent();
+            TextRange litRange = this.getTextRange();
+            for (GoSwitchTypeClause clause : switchStatement.getClauses()) {
+                TextRange clauseTextRange = clause.getTextRange();
+                if (clauseTextRange.contains(litRange)) {
+                    return GoTypes.fromPsiType(clause.getTypes());
+                }
+            }
+        }
+
+        if (GoElementPatterns.VAR_IN_FOR_RANGE.accepts(resolved)) {
+            GoForWithRangeAndVarsStatement statement = (GoForWithRangeAndVarsStatement) parent;
+
+            if (statement.getKey() == resolved) {
+                return statement.getKeyType();
+            } else if (statement.getValue() == resolved) {
+                return statement.getValueType();
+            }
+        }
+        return GoType.EMPTY_ARRAY;
     }
 
     public void accept(GoElementVisitor visitor) {

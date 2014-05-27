@@ -45,6 +45,7 @@ public class GoCallOrConvExpressionImpl extends GoExpressionBase
         this.variadic = variadic;
     }
 
+    @NotNull
     @Override
     protected GoType[] resolveTypes() {
         GoPsiElement base = this.getBase();

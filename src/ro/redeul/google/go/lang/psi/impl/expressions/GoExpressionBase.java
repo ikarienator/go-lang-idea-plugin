@@ -52,9 +52,8 @@ public abstract class GoExpressionBase extends GoPsiElementBase implements GoExp
 
     }
 
-    protected GoType[] resolveTypes() {
-        return GoType.EMPTY_ARRAY;
-    }
+    @NotNull
+    protected abstract GoType[] resolveTypes();
 
     public void accept(GoElementVisitor visitor) {
         visitor.visitElement(this);

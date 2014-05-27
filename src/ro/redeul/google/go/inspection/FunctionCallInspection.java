@@ -9,23 +9,21 @@ import ro.redeul.google.go.lang.psi.GoFile;
 import ro.redeul.google.go.lang.psi.GoPsiElement;
 import ro.redeul.google.go.lang.psi.declarations.GoConstDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
-import ro.redeul.google.go.lang.psi.expressions.GoPrimaryExpression;
 import ro.redeul.google.go.lang.psi.expressions.GoUnaryExpression;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteral;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFloat;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralIdentifier;
-import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralInteger;
+import ro.redeul.google.go.lang.psi.expressions.literals.*;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoBuiltinCallExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoCallOrConvExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoParenthesisedExpression;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
 import ro.redeul.google.go.lang.psi.typing.*;
-import ro.redeul.google.go.lang.psi.utils.GoPsiUtils;
 import ro.redeul.google.go.lang.psi.visitors.GoRecursiveElementVisitor;
 import ro.redeul.google.go.util.GoTypeInspectUtil;
 import ro.redeul.google.go.util.GoUtil;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import static ro.redeul.google.go.inspection.InspectionUtil.*;
 import static ro.redeul.google.go.lang.psi.utils.GoExpressionUtils.getCallFunctionIdentifier;
@@ -147,13 +145,11 @@ public class FunctionCallInspection extends AbstractWholeGoFileInspection {
                 return ((GoLiteralInteger) literal).getValue();
             }
             if (literal instanceof GoLiteralFloat) {
-                return ((GoLiteralFloat) literal).getValue();
+                return ((GoLiteralFloat) literal).getValue().toDecimal();
             }
-            if (literal.getNode().getElementType() == GoElementTypes.LITERAL_CHAR) {
-                return GoPsiUtils.getRuneValue(literal.getText());
-
+            if (literal instanceof GoLiteralChar) {
+                return ((GoLiteralChar) literal).getValue();
             }
-
         }
         if (expr instanceof GoBinaryExpression) {
             GoExpr leftOp = ((GoBinaryExpression) expr).getLeftOperand();
@@ -177,18 +173,31 @@ public class FunctionCallInspection extends AbstractWholeGoFileInspection {
                                 return left * right;
                             if (op == GoElementTypes.oQUOTIENT && right != 0)
                                 return left / right;
-                        } else {
-                            Float left = leftVal.floatValue();
-                            Float right = rightVal.floatValue();
-                            if (op == GoElementTypes.oPLUS)
-                                return left + right;
-                            if (op == GoElementTypes.oMINUS)
-                                return left - right;
-                            if (op == GoElementTypes.oMUL)
-                                return left * right;
-                            if (op == GoElementTypes.oQUOTIENT && right != 0)
-                                return left / right;
                         }
+                        if (leftVal instanceof BigInteger && rightVal instanceof BigInteger) {
+                            BigInteger left = (BigInteger) leftVal;
+                            BigInteger right = (BigInteger) rightVal;
+                            if (op == GoElementTypes.oPLUS)
+                                return left.add(right);
+                            if (op == GoElementTypes.oMINUS)
+                                return left.subtract(right);
+                            if (op == GoElementTypes.oMUL)
+                                return left.multiply(right);
+                            if (op == GoElementTypes.oQUOTIENT && right.compareTo(BigInteger.ZERO) != 0)
+                                return left.divide(right);
+                        }
+
+                        Double left = leftVal.doubleValue();
+                        Double right = rightVal.doubleValue();
+                        if (op == GoElementTypes.oPLUS)
+                            return left + right;
+                        if (op == GoElementTypes.oMINUS)
+                            return left - right;
+                        if (op == GoElementTypes.oMUL)
+                            return left * right;
+                        if (op == GoElementTypes.oQUOTIENT && right != 0)
+                            return left / right;
+
                         if ((leftVal instanceof Integer || (leftVal.intValue() == leftVal.floatValue()))
                                 && (rightVal instanceof Integer || (rightVal.intValue() == rightVal.floatValue()))) {
                             if (op == GoElementTypes.oSHIFT_LEFT)
@@ -212,6 +221,11 @@ public class FunctionCallInspection extends AbstractWholeGoFileInspection {
                             return -((Integer) unaryVal);
                         if (unaryVal instanceof Float)
                             return -((Float) unaryVal);
+                        if (unaryVal instanceof BigInteger)
+                            return ((BigInteger) unaryVal).negate();
+                        if (unaryVal instanceof BigDecimal)
+                            return ((BigDecimal) unaryVal).negate();
+                        // TODO(ikarienator):
                     }
                     if (unaryOp == GoUnaryExpression.Op.Xor) {
                         if (unaryVal instanceof Integer)

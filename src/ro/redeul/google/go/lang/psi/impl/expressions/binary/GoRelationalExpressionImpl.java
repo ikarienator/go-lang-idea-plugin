@@ -16,6 +16,7 @@ public class GoRelationalExpressionImpl extends GoBinaryExpressionImpl
         super(node);
     }
 
+    @NotNull
     @Override
     protected GoType[] resolveTypes() {
         return new GoType[]{

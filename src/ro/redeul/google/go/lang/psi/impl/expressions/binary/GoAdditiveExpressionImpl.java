@@ -5,10 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoAdditiveExpression;
 
 public class GoAdditiveExpressionImpl extends GoBinaryExpressionImpl implements
-                                                               GoAdditiveExpression {
+        GoAdditiveExpression {
     public GoAdditiveExpressionImpl(@NotNull ASTNode node) {
         super(node);
     }
-
 }
 

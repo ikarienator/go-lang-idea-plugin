@@ -21,6 +21,7 @@ public class GoUnaryExpressionImpl extends GoExpressionBase
         super(node);
     }
 
+    @NotNull
     @Override
     protected GoType[] resolveTypes() {
         GoExpr expression = getExpression();

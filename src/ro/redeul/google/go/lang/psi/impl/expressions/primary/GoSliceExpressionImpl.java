@@ -26,6 +26,7 @@ public class GoSliceExpressionImpl extends GoExpressionBase
         visitor.visitSliceExpression(this);
     }
 
+    @NotNull
     @Override
     protected GoType[] resolveTypes() {
         return getBaseExpression().getType();

@@ -108,5 +108,9 @@ public interface GoType {
 
         public void visitTypeFunction(GoTypeFunction function) {
         }
+
+        public void visitTypeUntyped(GoTypeUntyped untyped) {
+
+        }
     }
 }

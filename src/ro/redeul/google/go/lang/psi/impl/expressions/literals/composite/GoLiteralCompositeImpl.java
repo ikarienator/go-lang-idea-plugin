@@ -6,6 +6,8 @@ import ro.redeul.google.go.lang.psi.expressions.literals.composite.GoLiteralComp
 import ro.redeul.google.go.lang.psi.expressions.literals.composite.GoLiteralCompositeValue;
 import ro.redeul.google.go.lang.psi.impl.GoPsiElementBase;
 import ro.redeul.google.go.lang.psi.types.GoPsiType;
+import ro.redeul.google.go.lang.psi.typing.GoType;
+import ro.redeul.google.go.lang.psi.typing.GoTypes;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
 
 public class GoLiteralCompositeImpl extends GoPsiElementBase
@@ -29,6 +31,18 @@ public class GoLiteralCompositeImpl extends GoPsiElementBase
     @Override
     public Type getLiteralType() {
         return Type.Composite;
+    }
+
+    @NotNull
+    @Override
+    public GoType[] getType() {
+        GoPsiType literalType = this.getPsiType();
+        if (literalType == null) {
+            return GoType.EMPTY_ARRAY;
+        }
+        return new GoType[]{
+                GoTypes.fromPsiType(literalType)
+        };
     }
 
     @Override

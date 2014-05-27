@@ -38,6 +38,7 @@ public class GoSelectorExpressionImpl extends GoExpressionBase
         visitor.visitSelectorExpression(this);
     }
 
+    @NotNull
     @Override
     protected GoType[] resolveTypes() {
         return GoPsiManager.getInstance(getProject()).getType(

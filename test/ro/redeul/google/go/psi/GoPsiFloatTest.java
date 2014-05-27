@@ -6,9 +6,8 @@ import ro.redeul.google.go.lang.psi.declarations.GoVarDeclaration;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteral;
 import ro.redeul.google.go.lang.psi.expressions.literals.GoLiteralFloat;
 import ro.redeul.google.go.lang.psi.expressions.primary.GoLiteralExpression;
-import static ro.redeul.google.go.util.GoPsiTestUtils.childAt;
-import static ro.redeul.google.go.util.GoPsiTestUtils.get;
-import static ro.redeul.google.go.util.GoPsiTestUtils.getAs;
+
+import static ro.redeul.google.go.util.GoPsiTestUtils.*;
 
 public class GoPsiFloatTest extends GoPsiTestCase {
 
@@ -46,7 +45,7 @@ public class GoPsiFloatTest extends GoPsiTestCase {
                 );
 
         assertEquals(GoLiteral.Type.Float, fl.getLiteralType());
-        assertEquals((float) 10.0, fl.getValue());
+        assertEquals((float) 10.0, fl.getValue().toDecimal().floatValue());
 
         // x
         fl =
@@ -59,7 +58,7 @@ public class GoPsiFloatTest extends GoPsiTestCase {
                 );
 
         assertEquals(GoLiteral.Type.Float, fl.getLiteralType());
-        assertEquals((float) 0.25, fl.getValue());
+        assertEquals((float) 0.25, fl.getValue().toDecimal().floatValue());
 
         // y
         fl =
@@ -72,7 +71,7 @@ public class GoPsiFloatTest extends GoPsiTestCase {
                 );
 
         assertEquals(GoLiteral.Type.Float, fl.getLiteralType());
-        assertEquals((float) 0.0, fl.getValue());
+        assertEquals((float) 0.0, fl.getValue().toDecimal().floatValue());
 
         // z
         fl =
@@ -85,7 +84,7 @@ public class GoPsiFloatTest extends GoPsiTestCase {
                 );
 
         assertEquals(GoLiteral.Type.Float, fl.getLiteralType());
-        assertEquals((float) 72.40, fl.getValue());
+        assertEquals((float) 72.40, fl.getValue().toDecimal().floatValue());
 
         // e1
         fl =
@@ -98,7 +97,7 @@ public class GoPsiFloatTest extends GoPsiTestCase {
                 );
 
         assertEquals(GoLiteral.Type.Float, fl.getLiteralType());
-        assertEquals((float) 1.e+0, fl.getValue());
+        assertEquals((float) 1.e+0, fl.getValue().toDecimal().floatValue());
 
         // e2
         fl =
@@ -111,7 +110,7 @@ public class GoPsiFloatTest extends GoPsiTestCase {
                 );
 
         assertEquals(GoLiteral.Type.Float, fl.getLiteralType());
-        assertEquals((float) 6.67428e-11, fl.getValue());
+        assertEquals((float) 6.67428e-11, fl.getValue().toDecimal().floatValue());
 
         // e3
         fl =
@@ -124,7 +123,7 @@ public class GoPsiFloatTest extends GoPsiTestCase {
                 );
 
         assertEquals(GoLiteral.Type.Float, fl.getLiteralType());
-        assertEquals((float) 1E6, fl.getValue());
+        assertEquals((float) 1E6, fl.getValue().toDecimal().floatValue());
 
     }
 }

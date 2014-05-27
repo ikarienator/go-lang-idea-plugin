@@ -5,19 +5,18 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ro.redeul.google.go.lang.lexer.GoTokenTypes;
 import ro.redeul.google.go.lang.parser.GoElementTypes;
 import ro.redeul.google.go.lang.psi.expressions.GoExpr;
 import ro.redeul.google.go.lang.psi.expressions.binary.GoBinaryExpression;
 import ro.redeul.google.go.lang.psi.impl.expressions.GoExpressionBase;
 import ro.redeul.google.go.lang.psi.typing.GoType;
-import ro.redeul.google.go.lang.psi.typing.GoTypeBuiltin;
-import ro.redeul.google.go.lang.psi.typing.GoTypeName;
-import ro.redeul.google.go.lang.psi.typing.GoTypePointer;
+import ro.redeul.google.go.lang.psi.typing.GoTypeUntyped;
+import ro.redeul.google.go.lang.psi.typing.untyped.Calculator;
 import ro.redeul.google.go.lang.psi.visitors.GoElementVisitor;
-import ro.redeul.google.go.lang.stubs.GoNamesCache;
 
 public abstract class GoBinaryExpressionImpl extends GoExpressionBase
-        implements GoBinaryExpression {
+        implements GoBinaryExpression, GoTokenTypes {
 
     GoBinaryExpressionImpl(@NotNull ASTNode node) {
         super(node);
@@ -47,6 +46,15 @@ public abstract class GoBinaryExpressionImpl extends GoExpressionBase
     }
 
     @Override
+    public boolean isConstantExpression() {
+        GoExpr leftOperand = getLeftOperand();
+        GoExpr rightOperand = getRightOperand();
+
+        return leftOperand != null && leftOperand.isConstantExpression() && rightOperand != null && rightOperand.isConstantExpression();
+    }
+
+    @NotNull
+    @Override
     protected GoType[] resolveTypes() {
         GoExpr leftOperand = getLeftOperand();
         GoExpr rightOperand = getRightOperand();
@@ -63,77 +71,21 @@ public abstract class GoBinaryExpressionImpl extends GoExpressionBase
         GoType[] leftTypes = leftOperand.getType();
         GoType[] rightTypes = rightOperand.getType();
 
-        if (leftTypes.length == 1 && rightTypes.length == 1 && leftTypes[0] != null && rightTypes[0] != null) {
+        if (leftTypes.length == 1 && rightTypes.length == 1) {
+            if (leftTypes[0] instanceof GoTypeUntyped && rightTypes[0] instanceof GoTypeUntyped) {
+                GoTypeUntyped leftType = (GoTypeUntyped) leftTypes[0];
+                GoTypeUntyped rightType = (GoTypeUntyped) rightTypes[0];
+                // Constant expression
+                GoTypeUntyped result = Calculator.operate(getOperator(), leftType, rightType);
+                if (result == null) {
+                    return GoType.EMPTY_ARRAY;
+                }
+                return new GoType[]{result};
+            }
             if (leftTypes[0].isIdentical(rightTypes[0])) {
                 return leftTypes;
-            } else {
-                // based on http://golang.org/ref/spec#Constant_expressions
-                if (leftOperand.isConstantExpression() && rightOperand.isConstantExpression()){
-                    String operator = getOperator().toString();
-                    boolean equality = operator.equals("!=") || operator.equals("==");
-                    boolean shift = operator.equals("<<")||operator.equals(">>");
-                    GoType leftType = leftTypes[0];
-                    GoType rightType = rightTypes[0];
-                    if (!equality) {
-                        if (shift){
-                            // shift operation returns untyped int
-                            GoNamesCache namesCache =
-                                    GoNamesCache.getInstance(this.getProject());
-                            return new GoType[]{
-                                    GoTypeBuiltin.Int
-                            };
-                        } else {
-                            if (leftType instanceof GoTypePointer && rightType instanceof GoTypePointer){
-                                GoTypePointer lptr = (GoTypePointer)leftType;
-                                GoTypePointer rptr = (GoTypePointer)rightType;
-                                leftType = lptr.getTargetType();
-                                rightType = rptr.getTargetType();
-                            }
-                            if (leftType instanceof GoTypeName && rightType instanceof GoTypeName) {
-                                String leftName = ((GoTypeName)leftType).getName();
-                                String rightName = ((GoTypeName)rightType).getName();
-                                // the right order is complex, float, rune, int
-                                if (leftName.startsWith("complex")){
-                                    return leftTypes;
-                                }
-                                if (rightName.startsWith("complex")){
-                                    return rightTypes;
-                                }
-                                if (leftName.startsWith("float")){
-                                    return leftTypes;
-                                }
-                                if (rightName.startsWith("float")){
-                                    return rightTypes;
-                                }
-                                if (leftName.startsWith("rune")) {
-                                    return leftTypes;
-                                }
-                                if (rightName.startsWith("rune")) {
-                                    return rightTypes;
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
-
-        // old behaviour
-        if (leftOperand.isConstantExpression()) {
-            return rightTypes;
-        } else if (rightOperand.isConstantExpression()) {
-            return leftTypes;
-        }
         return GoType.EMPTY_ARRAY;
-    }
-
-    @Override
-    public boolean isConstantExpression() {
-        GoExpr leftOperand = getLeftOperand();
-        GoExpr rightOperand = getRightOperand();
-
-        return
-                leftOperand != null && leftOperand.isConstantExpression() &&
-                        rightOperand != null && rightOperand.isConstantExpression();
     }
 }

@@ -164,7 +164,7 @@ class GoPsiCreator implements GoElementTypes {
             return new GoLiteralStringImpl(node);
 
         if (elementType.equals(LITERAL_CHAR))
-            return new GoLiteralStringImpl(node);
+            return new GoLiteralCharImpl(node);
 
         if (elementType.equals(LITERAL_IMAGINARY))
             return new GoLiteralImaginaryImpl(node);

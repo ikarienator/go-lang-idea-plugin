@@ -112,17 +112,30 @@ public class GoTypeInterface
     public boolean isAssignableFrom(@NotNull GoType type) {
         if (this.isIdentical(type)) return true;
         type = type.getUnderlyingType();
+        HashMap<String, GoTypeFunction> myMethods = this.getAllMethods();
+        if (myMethods.size() == 0) return true;
         if (type instanceof GoTypeInterface) {
-            HashMap<String, GoTypeFunction> myMethods = this.getAllMethods();
             HashMap<String, GoTypeFunction> allMethods = ((GoTypeInterface) type).getAllMethods();
             for (String key : myMethods.keySet()) {
                 if (!allMethods.containsKey(key)) return false;
                 if (!allMethods.get(key).isIdentical(myMethods.get(key))) return false;
             }
-            return true;
+        } else {
+            if (type instanceof GoTypePointer) {
+                type = ((GoTypePointer) type).getTargetType();
+            }
+
+            if (!(type instanceof GoTypeName)) {
+                // Only named types and pointers to them can be used as a receiver of a method.
+                return false;
+            }
+
+            GoTypeName namedType = (GoTypeName) type;
+
+            // TODO(ikarienator): Match other types.
         }
-        // TODO(ikarienator): Match other types.
-        return false;
+
+        return true;
     }
 
     @NotNull
